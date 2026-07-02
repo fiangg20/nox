@@ -503,9 +503,11 @@ local function CreateNox(data)
                     end
                     local minMaxFade = tw:Create(btnMinMax, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         BackgroundTransparency = 1
+                        ImageTransparency = 1
                     })
                     local fadeClose = tw:Create(btnClose, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         BackgroundTransparency = 1
+                        ImageTransparency = 1
                     })
                     closeAnim:Play()
                     fadeLabel:Play()
