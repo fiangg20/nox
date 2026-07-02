@@ -496,7 +496,6 @@ local function CreateNox(data)
                     local fadeLabel = tw:Create(top, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         TextTransparency = 1
                     })
-                    local fadeSearch
                     if enableSearch then
                         fadeSearch = tw:Create(searchBar, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                             BackgroundTransparency = 1
@@ -510,7 +509,7 @@ local function CreateNox(data)
                     })
                     closeAnim:Play()
                     fadeLabel:Play()
-                    fadeSearch:Play()
+                    if enableSearch then fadeSearch:Play() end
                     minMaxFade:Play()
                     fadeClose:Play()
                     task.wait(0.4)
