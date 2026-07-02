@@ -1057,7 +1057,6 @@ local function CreateNox(data)
         lbl.TextYAlignment = Enum.TextYAlignment.Bottom
 
         table.insert(objs.icon, lbl) 
-        lib:RegisterElement(r, txt, "item")
 
         return {
             SetText = function(self, newTxt)
