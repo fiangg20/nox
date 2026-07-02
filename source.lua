@@ -334,7 +334,7 @@ local function CreateNox(data)
 
         local dockedBg = Instance.new("Frame", win)
         dockedBg.Size = UDim2.new(1, -48, 0, 0)
-        dockedBg.Position = UDim2.new(0, 24, 0, 115)
+        dockedBg.Position = UDim2.new(0, 24, 0, 125)
         dockedBg.BackgroundColor3 = curTheme.inact:Lerp(curTheme.bg, 0.4)
         dockedBg.BorderSizePixel = 0
         dockedBg.ZIndex = 50
