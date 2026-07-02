@@ -40,9 +40,7 @@
 ### Loading the Library
 
 ```lua
-local NoxLibrary = loadstring(game:HttpGet("YOUR_LIBRARY_URL"))()
--- or if running locally:
-local NoxLibrary = require(path.to.NoxLibrary)
+local NoxLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua"))()
 ```
 
 ### Creating Your First Window
