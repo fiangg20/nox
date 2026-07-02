@@ -501,9 +501,6 @@ local function CreateNox(data)
                             BackgroundTransparency = 1
                         })
                     end
-                    local fadeSearch = tw:Create(searchBar, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        BackgroundTransparency = 1
-                    })
                     local minMaxFade = tw:Create(btnMinMax, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         BackgroundTransparency = 1
                     })
