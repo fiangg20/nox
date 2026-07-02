@@ -269,11 +269,11 @@ local function CreateNox(data)
 
     local searchOffset = 0
     if enableSearch then
-        searchOffset = 66
+        searchOffset = 82
 
         searchBar = Instance.new("Frame", win)
         searchBar.Size = UDim2.new(1, -48, 0, 56) 
-        searchBar.Position = UDim2.new(0, 24, 0, 55)
+        searchBar.Position = UDim2.new(0, 24, 0, 65)
         searchBar.BackgroundColor3 = curTheme.inact:Lerp(curTheme.bg, 0.6)
         searchBar.BorderSizePixel = 0
         searchBar.ZIndex = 60
@@ -501,12 +501,12 @@ local function CreateNox(data)
                             BackgroundTransparency = 1
                         })
                     end
-                    local minMaxFade = tw:Create(btnMinMax.btn.icn, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        BackgroundTransparency = 1
+                    local minMaxFade = tw:Create(btnMinMax.icn, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        BackgroundTransparency = 1,
                         ImageTransparency = 1
                     })
-                    local fadeClose = tw:Create(btnClose.btn.icn, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        BackgroundTransparency = 1
+                    local fadeClose = tw:Create(btnClose.icn, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        BackgroundTransparency = 1,
                         ImageTransparency = 1
                     })
                     closeAnim:Play()
