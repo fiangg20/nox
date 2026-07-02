@@ -85,7 +85,7 @@ On first load, the library:
 ### Icon System
 
 The library loads Lucide icons from a remote Lua module. Icons can be referenced by:
-- **Lucide icon name**: `"search"`, `"x"`, `"chevron-down"`, `"minimize"`, `"maximize"`, `"circle-x"`
+- **Lucide icon name**: [Lucide Icon](https://lucide.dev/icons/)
 - **Direct asset ID**: `"rbxassetid://12345678"`
 - **Custom asset**: `"rbxasset://path/to/asset"`
 
