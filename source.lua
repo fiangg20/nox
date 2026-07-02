@@ -58,7 +58,7 @@ local function parseIcon(iconStr)
     end
 
     warn("[Nox] Icon '" .. iconStr .. "' not found in lucide icons. Please check the icon name or use a valid asset ID.")
-    return nil 
+    return "rbxassetid://0"
 end
 
 local cp = {
