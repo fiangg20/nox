@@ -121,7 +121,7 @@ local function CreateNox(data)
     local titleText = data.Title or "Nox"
     local finalSizeX = data.SizeX or 380
     local finalSizeY = data.SizeY or 520
-    local toggleKey = data.ToggleKey
+    local toggleKey = data.ToggleKey or Enum.KeyCode.K
     local initTheme = data.Theme or "Default" 
     local enableSearch = data.Search or false
     local searchPlaceholder = data.SearchPlaceholder or "Search..."
