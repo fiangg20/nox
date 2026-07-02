@@ -2183,6 +2183,35 @@ local function CreateNox(data)
         Transparency = 0
     }):Play()
 
+    function lib:AttachDebugger()
+        local scriptContext = game:GetService("ScriptContext")
+        local lastErrorTime = 0
+        local lastErrorMessage = ""
+        
+        scriptContext.Error:Connect(function(message, stackTrace, scriptInstance)
+            if message == lastErrorMessage and (tick() - lastErrorTime) < 2 then 
+                return 
+            end
+            
+            lastErrorTime = tick()
+            lastErrorMessage = message
+            
+            lib:AddDialog({
+                Title = "Debug: Error detected",
+                Description = "<b>Message:</b>\n" .. tostring(message) .. "\n\n<b>Trace:</b>\n" .. tostring(stackTrace),
+                Buttons = {
+                    {Text = "Copy Error", Type = "outlined", Callback = function()
+                        if setclipboard then 
+                            setclipboard("Error: " .. message .. "\nTrace: " .. stackTrace) 
+                            lib:Notify({Text = "Error disalin ke clipboard!", Duration = 3})
+                        end
+                    end},
+                    {Text = "Close", Type = "filled", Callback = nil}
+                }
+            })
+        end)
+    end
+
     return setmetatable(lib, {
         __index = {
             SetTitle = function(self, newTitle)
