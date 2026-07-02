@@ -308,7 +308,7 @@ local function CreateNox(data)
     if enableSearch then
         searchOffset = 66
 
-        local searchBar = Instance.new("Frame", win)
+        searchBar = Instance.new("Frame", win)
         searchBar.Size = UDim2.new(1, -48, 0, 56) 
         searchBar.Position = UDim2.new(0, 24, 0, 55)
         searchBar.BackgroundColor3 = curTheme.inact:Lerp(curTheme.bg, 0.6)
