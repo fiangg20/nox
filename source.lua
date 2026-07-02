@@ -267,43 +267,6 @@ local function CreateNox(data)
         end)
     end
 
-    local searchBar = nil
-
-    btnClose.MouseButton1Click:Connect(function()
-        lib:AddDialog({
-            Title = "Close " .. (titleText or "Nox") .. "?",
-            Description = "Are you sure you want to close " .. (titleText or "Nox") .. "? Any unsaved changes will be lost.",
-            Buttons = {
-                {Text = "Cancel", Type = "text", Callback = nil},
-                {Text = "Close", Type = "text", Callback = function()
-                    local closeAnim = tw:Create(win, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        Size = UDim2.new(0, win.Size.X.Offset, 0, 64),
-                        Transparency = 1
-                    })
-                    local fadeLabel = tw:Create(top, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        TextTransparency = 1
-                    })
-                    local fadeSearch = tw:Create(searchBar, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        BackgroundTransparency = 1
-                    })
-                    local minMaxFade = tw:Create(btnMinMax, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        BackgroundTransparency = 1
-                    })
-                    local fadeClose = tw:Create(btnClose, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        BackgroundTransparency = 1
-                    })
-                    closeAnim:Play()
-                    fadeLabel:Play()
-                    fadeSearch:Play()
-                    minMaxFade:Play()
-                    fadeClose:Play()
-                    task.wait(0.4)
-                    gui:Destroy()
-                end}
-            },
-        })
-    end)
-
     local searchOffset = 0
     if enableSearch then
         searchOffset = 66
@@ -518,6 +481,41 @@ local function CreateNox(data)
             end)
         end)
     end
+
+    btnClose.MouseButton1Click:Connect(function()
+        lib:AddDialog({
+            Title = "Close " .. (titleText or "Nox") .. "?",
+            Description = "Are you sure you want to close " .. (titleText or "Nox") .. "? Any unsaved changes will be lost.",
+            Buttons = {
+                {Text = "Cancel", Type = "text", Callback = nil},
+                {Text = "Close", Type = "text", Callback = function()
+                    local closeAnim = tw:Create(win, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        Size = UDim2.new(0, win.Size.X.Offset, 0, 64),
+                        Transparency = 1
+                    })
+                    local fadeLabel = tw:Create(top, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        TextTransparency = 1
+                    })
+                    local fadeSearch = tw:Create(searchBar, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        BackgroundTransparency = 1
+                    })
+                    local minMaxFade = tw:Create(btnMinMax, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        BackgroundTransparency = 1
+                    })
+                    local fadeClose = tw:Create(btnClose, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        BackgroundTransparency = 1
+                    })
+                    closeAnim:Play()
+                    fadeLabel:Play()
+                    fadeSearch:Play()
+                    minMaxFade:Play()
+                    fadeClose:Play()
+                    task.wait(0.4)
+                    gui:Destroy()
+                end}
+            },
+        })
+    end)
 
     local tabArea = Instance.new("Frame", win)
     tabArea.Size = UDim2.new(1, 0, 0, 40) 
