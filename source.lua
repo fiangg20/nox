@@ -489,31 +489,25 @@ local function CreateNox(data)
             Buttons = {
                 {Text = "Cancel", Type = "text", Callback = nil},
                 {Text = "Close", Type = "text", Callback = function()
-                    local closeAnim = tw:Create(win, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    local tInfo = TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+                    
+                    tw:Create(win, tInfo, {
                         Size = UDim2.new(0, win.Size.X.Offset, 0, 64),
                         Transparency = 1
-                    })
-                    local fadeLabel = tw:Create(top, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        TextTransparency = 1
-                    })
-                    if enableSearch then
-                        fadeSearch = tw:Create(searchBar, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                            BackgroundTransparency = 1
-                        })
+                    }):Play()
+                    
+                    tw:Create(top, tInfo, {TextTransparency = 1}):Play()
+                    
+                    if enableSearch and searchBar then
+                        tw:Create(searchBar, tInfo, {BackgroundTransparency = 1}):Play()
                     end
-                    local minMaxFade = tw:Create(btnMinMax.icn, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        BackgroundTransparency = 1,
-                        ImageTransparency = 1
-                    })
-                    local fadeClose = tw:Create(btnClose.icn, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        BackgroundTransparency = 1,
-                        ImageTransparency = 1
-                    })
-                    closeAnim:Play()
-                    fadeLabel:Play()
-                    if enableSearch then fadeSearch:Play() end
-                    minMaxFade:Play()
-                    fadeClose:Play()
+                    
+                    tw:Create(btnMinMax, tInfo, {BackgroundTransparency = 1}):Play()
+                    tw:Create(btnClose, tInfo, {BackgroundTransparency = 1}):Play()
+                    
+                    tw:Create(icnMinMax, tInfo, {ImageTransparency = 1}):Play()
+                    tw:Create(icnClose, tInfo, {ImageTransparency = 1}):Play()
+                    
                     task.wait(0.4)
                     gui:Destroy()
                 end}
