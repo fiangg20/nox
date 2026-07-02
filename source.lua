@@ -501,11 +501,11 @@ local function CreateNox(data)
                             BackgroundTransparency = 1
                         })
                     end
-                    local minMaxFade = tw:Create(btnMinMax.icn, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    local minMaxFade = tw:Create(btnMinMax.btn.icn, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         BackgroundTransparency = 1
                         ImageTransparency = 1
                     })
-                    local fadeClose = tw:Create(btnClose.icn, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    local fadeClose = tw:Create(btnClose.btn.icn, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         BackgroundTransparency = 1
                         ImageTransparency = 1
                     })
