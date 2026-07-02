@@ -496,6 +496,11 @@ local function CreateNox(data)
                     local fadeLabel = tw:Create(top, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         TextTransparency = 1
                     })
+                    if enableSearch then
+                        fadeSearch = tw:Create(searchBar, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                            BackgroundTransparency = 1
+                        })
+                    end
                     local fadeSearch = tw:Create(searchBar, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         BackgroundTransparency = 1
                     })
