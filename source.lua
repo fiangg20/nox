@@ -2186,7 +2186,7 @@ local function CreateNox(data)
     })
 end
 
-function NoxLibrary.Create(data)
+function NoxLibrary:Create(data)
     return CreateNox(data)
 end
 
