@@ -1298,4 +1298,4 @@ UI:AddButton({
 
 ---
 
-Debugging Suite Avaliable in **ScriptBlox**
+Debugging Suite Available in **ScriptBlox**
