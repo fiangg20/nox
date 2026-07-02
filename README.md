@@ -1063,23 +1063,12 @@ local UI = NoxLibrary:Create({
     SearchPlaceholder = "Search features..."
 })
 
--- Add tabs
+-- Main tab content
 local MainTab = UI:AddTab({
     Title = "Main",
     Icon = "home"
 })
 
-local VisualTab = UI:AddTab({
-    Title = "Visuals",
-    Icon = "eye"
-})
-
-local SettingsTab = UI:AddTab({
-    Title = "Settings",
-    Icon = "settings"
-})
-
--- Main tab content
 UI:AddSection({Text = "Player Features"})
 
 local speedSlider = UI:AddSlider({
@@ -1132,6 +1121,11 @@ local teamDropdown = UI:AddDropdown({
 })
 
 -- Visuals tab content
+local VisualTab = UI:AddTab({
+    Title = "Visuals",
+    Icon = "eye"
+})
+
 UI:AddButton({
     Text = "Apply Fullbright",
     Type = "filled",
@@ -1155,6 +1149,11 @@ UI:AddButton({
 })
 
 -- Settings tab content
+local SettingsTab = UI:AddTab({
+    Title = "Settings",
+    Icon = "settings"
+})
+
 UI:AddSection({Text = "Configuration"})
 
 local usernameBox = UI:AddTextBox({
