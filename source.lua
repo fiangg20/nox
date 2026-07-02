@@ -496,6 +496,7 @@ local function CreateNox(data)
                     local fadeLabel = tw:Create(top, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         TextTransparency = 1
                     })
+                    local fadeSearch
                     if enableSearch then
                         fadeSearch = tw:Create(searchBar, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                             BackgroundTransparency = 1
@@ -1051,7 +1052,7 @@ local function CreateNox(data)
         lbl.RichText = true
         lbl.Text = txt
         lbl.TextColor3 = curTheme.out
-        lbl.FontFace = Font.new(m3Font.Family, Enum.FontWeight.SemiBold, Enum.FontStyle.Normal)
+        lbl.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
         lbl.TextSize = 14
         lbl.TextXAlignment = Enum.TextXAlignment.Left
         lbl.TextYAlignment = Enum.TextYAlignment.Bottom
