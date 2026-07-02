@@ -46,7 +46,7 @@ local NoxLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/fi
 ### Creating Your First Window
 
 ```lua
-local NoxLibrary = loadstring(game:HttpGet("YOUR_LIBRARY_URL"))()
+local NoxLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua"))()
 
 local UI = NoxLibrary:Create({
     Title = "My Script Hub",
