@@ -13,19 +13,22 @@
 3. [Creating a Window](#creating-a-window)
 4. [Window Configuration](#window-configuration)
 5. [Theming System](#theming-system)
-   - [Built-in Themes](#built-in-themes)
-   - [Runtime Theme Switching](#runtime-theme-switching)
-   - [Custom Themes](#custom-themes)
+    - [Built-in Themes](#built-in-themes)
+    - [Runtime Theme Switching](#runtime-theme-switching)
+    - [Custom Themes](#custom-themes)
 6. [Tab System](#tab-system)
 7. [UI Elements](#ui-elements)
-   - [Label](#label)
-   - [Section](#section)
-   - [Divider](#divider)
-   - [Button](#button)
-   - [Switch (Toggle)](#switch-toggle)
-   - [Slider](#slider)
-   - [Dropdown](#dropdown)
-   - [TextBox](#textbox)
+    - [Label](#label)
+    - [Section](#section)
+    - [Divider](#divider)
+    - [Button](#button)
+    - [Switch (Toggle)](#switch-toggle)
+    - [Slider](#slider)
+    - [Dropdown](#dropdown)
+    - [TextBox](#textbox)
+    - [Radio Button](#radio-button)
+    - [Checkbox](#checkbox)
+    - [Chip](#chip)
 8. [Dialog System](#dialog-system)
 9. [Notification System](#notification-system)
 10. [Search Functionality](#search-functionality)
@@ -292,6 +295,9 @@ All tracked UI elements are tweened to their new colors over **0.5 seconds** wit
 - Dialog backgrounds → `bg` blended with `pri` at 11%
 - Dialog text → `fg`
 - TextBox elements (label, line, background) → based on focus state
+- Radio buttons → `pri` (selected) or `out` (unselected)
+- Checkboxes → `pri` (checked) or `out` (unchecked)
+- Chips → `pri` or `inact` based on selected state
 
 ### Custom Themes
 
@@ -486,7 +492,7 @@ Interactive button with multiple Material Design 3 variants.
 local button = UI:AddButton({
     Text = "Click Me",
     Type = "filled",
-    Icon = "lightbulb"
+    Icon = "lightbulb",
     Width = 200,        -- optional, for fixed width
     Callback = function()
         print("Button clicked!")
@@ -500,7 +506,7 @@ local button = UI:AddButton({
 |-----------|------|---------|-------------|
 | `Text` | `string` | `"Button"` | Button label text |
 | `Type` | `string` | `"filled"` | Button style variant |
-| `Icon` | `string` | `nil` | Button icon
+| `Icon` | `string` | `nil` | Button icon |
 | `Width` | `number` | `nil` | Fixed width (full-width if omitted) |
 | `Callback` | `function` | `nil` | Function called on click |
 
@@ -602,7 +608,7 @@ local slider = UI:AddSlider({
 | `Default` | `number` | `Min` | Starting value |
 | `ShowValue` | `boolean` | `true` | Show numeric value label |
 | `Size` | `string` | `"xs"` | Size variant |
-| `Icon` | `string` | `nil` | Lucide icon for the active track |
+| `Icon` | `string` | `nil` | Material icon for the active track |
 | `Callback` | `function` | `nil` | Called with new value on release |
 
 #### Size Variants
@@ -740,6 +746,165 @@ local textbox = UI:AddTextBox({
 
 ---
 
+### Radio Button
+
+A radio button component for single-selection from a group.
+
+```lua
+local radioGroup = UI:AddRadio({
+    Title = "Select Option",
+    Options = {"Option A", "Option B", "Option C"},
+    Default = 1,
+    Icon = "check_circle",  -- optional leading icon
+    Callback = function(selected, index)
+        print("Selected:", selected, "at index:", index)
+    end
+})
+```
+
+#### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Title` | `string` | `"Radio"` | Label for the radio group |
+| `Options` | `table` | `{}` | Array of option strings |
+| `Default` | `number` | `1` | Index of initially selected option |
+| `Icon` | `string` | `nil` | Material icon name or asset ID |
+| `Callback` | `function` | `nil` | Called with `(selected, index)` on selection change |
+
+#### Visual States
+
+**Unselected:**
+- Circle outline in `out` color
+- Empty interior
+
+**Selected:**
+- Circle outline in `pri` color
+- Filled dot in center using `pri` color
+
+#### Animation
+- Smooth transition between states over 0.3s
+- Ripple effect on click
+
+#### Return Methods
+
+| Method | Parameters | Description |
+|--------|-----------|-------------|
+| `SetValue` | `newIndex: number` | Programmatically sets selected option by index |
+
+---
+
+### Checkbox
+
+A checkbox component for toggling individual boolean values.
+
+```lua
+local checkbox = UI:AddCheckbox({
+    Title = "Enable Feature",
+    Default = false,
+    Icon = "check",        -- optional leading icon
+    Callback = function(state)
+        print("Checkbox state:", state)
+    end
+})
+```
+
+#### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Title` | `string` | `"Checkbox"` | Label text |
+| `Default` | `boolean` | `false` | Initial checked state |
+| `Icon` | `string` | `nil` | Material icon name or asset ID |
+| `Callback` | `function` | `nil` | Called with new boolean state |
+
+#### Visual States
+
+**Unchecked:**
+- Box outline in `out` color
+- Empty interior with `bg` background
+
+**Checked:**
+- Box filled with `pri` color
+- Check mark icon in `onpri` color
+- Rounded corners
+
+#### Animation
+- Smooth transition between states over 0.3s
+- Ripple effect on click
+
+#### Return Methods
+
+| Method | Parameters | Description |
+|--------|-----------|-------------|
+| `SetValue` | `newState: boolean` | Programmatically sets checkbox state |
+| `SetText` | `newText: string` | Updates the label text |
+
+---
+
+### Chip
+
+A small, interactive chip component that can be selected/deselected.
+
+```lua
+local chip = UI:AddChip({
+    Title = "Filter Tag",
+    Default = false,
+    Type = "filled",        -- "filled" or "outlined"
+    Icon = "tag",          -- optional leading icon
+    Callback = function(state)
+        print("Chip selected:", state)
+    end
+})
+```
+
+#### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `Title` | `string` | `"Chip"` | Chip label text |
+| `Default` | `boolean` | `false` | Initial selected state |
+| `Type` | `string` | `"filled"` | Visual style: `"filled"` or `"outlined"` |
+| `Icon` | `string` | `nil` | Material icon name or asset ID |
+| `Callback` | `function` | `nil` | Called with new boolean state |
+
+#### Visual States
+
+**Filled - Unselected:**
+- Background: `inact` blended with `fg` at 8%
+- Text: `fg` color
+- Icon: `fg` color
+
+**Filled - Selected:**
+- Background: `pri` color
+- Text: `onpri` color
+- Icon: `onpri` color
+
+**Outlined - Unselected:**
+- Background: Transparent
+- Border: `out` color stroke
+- Text: `fg` color
+- Icon: `fg` color
+
+**Outlined - Selected:**
+- Background: `inact` blended with `pri` at 15%
+- Border: `pri` color stroke
+- Text: `fg` color
+- Icon: `fg` color
+
+#### Animation
+- Smooth color transitions over 0.3s
+- Ripple effect on click
+
+#### Return Methods
+
+| Method | Parameters | Description |
+|--------|-----------|-------------|
+| `SetValue` | `newState: boolean` | Programmatically sets chip selected state |
+| `SetText` | `newText: string` | Updates the chip label text |
+
+---
+
 ## Dialog System
 
 Create modal confirmation dialogs with custom buttons.
@@ -863,7 +1028,7 @@ local UI = NoxLibrary:Create({
 
 ### Search Bar Features
 - **Avatar Display**: Shows player avatar (hidden when typing)
-- **Search Icon**: Lucide `search` icon (turns primary color when focused)
+- **Search Icon**: Material `search` icon (turns primary color when focused)
 - **Clear Button**: `x` icon appears when text is present
 - **Floating Results**: Dropdown panel below search bar with matching elements
 
@@ -893,26 +1058,26 @@ Provide a custom URL via the `SearchAvatar` configuration field.
 The `parseIcon` function resolves icons in this priority:
 
 1. **Roblox Asset ID**: If string contains `rbxassetid://` or `rbxasset://`, returns as-is
-2. **Lucide Icon Name**: Looks up in the loaded Lucide icons table
+2. **Material Icon Name**: Looks up in the loaded Material icons table
 3. **Fallback**: Returns `nil` and prints a warning
 
-### Common Lucide Icons
+### Common Material Icons
 
 The following icon names are commonly used within the library:
 
 | Icon Name | Used In |
 |-----------|---------|
 | `search` | Search bar |
-| `x` | Close button, clear button |
-| `minimize` | Window minimize |
-| `maximize` | Window maximize (after minimize) |
-| `chevron-down` | Dropdown arrow |
-| `circle-x` | TextBox clear button |
+| `close` | Close button, clear button |
+| `remove` | Window minimize |
+| `crop_square` | Window maximize (after minimize) |
+| `expand_more` | Dropdown arrow |
+| `cancel` | TextBox clear button |
 | `home`, `settings`, `eye`, `users`, `zap`, `info`, `user` | Common user-provided icons |
 
 ### Icon Styling
 
-- Icons are `ImageLabel` instances with `BackgroundTransparency = 1`
+- Icons are `ImageLabel` or `TextLabel` instances with `BackgroundTransparency = 1`
 - Default color: `out` (outline color from theme)
 - Size varies by component (typically 18-24 pixels)
 
@@ -974,7 +1139,9 @@ The library maintains several tables for runtime theme switching:
 | `objs.dlg_bg` | Dialog backgrounds | `BackgroundColor3` blend |
 | `objs.dlg_fg` | Dialog text | `TextColor3 → fg` |
 | `objs.sl_val` | Slider values | `TextColor3 → out` |
-| `objs.tonal_bg` | Tonal button backgrounds | `inact` + `pri` blend |
+| `objs.radio` | Radio button elements | State-based coloring |
+| `objs.checkbox` | Checkbox elements | State-based coloring |
+| `objs.chip` | Chip elements | State-based coloring |
 
 ### Library State Table
 
@@ -999,287 +1166,183 @@ local function t(object, property, value, duration)
     tw:Create(object, TweenInfo.new(duration or 0.3, 
         Enum.EasingStyle.Exponential, 
         Enum.EasingDirection.Out), 
-        {[property] = value}):Play()
+        {[property] = value}
+    ):Play()
 end
 ```
-
-Default tween configuration:
-- **Duration**: Configurable (default 0.3s)
-- **Easing Style**: Exponential
-- **Easing Direction**: Out
-
-### Ripple Effect
-
-Material Design ripple animation on interactive elements:
-
-1. Creates a `CanvasGroup` mask matching the target's corner radius
-2. Spawns a circular frame at the input position
-3. Animates the circle to 1.5x the target's max dimension
-4. Fades circle to full transparency over 0.4s with Sine easing
-5. Automatically cleans up after animation completes
 
 ---
 
 ## API Reference
 
-### Library-Level Functions
-
-| Function | Parameters | Returns | Description |
-|----------|-----------|---------|-------------|
-| `NoxLibrary.Create` | `data: table` | `lib` object | Creates a new window |
-
-### Window Methods (lib object)
+### Core Methods
 
 | Method | Parameters | Returns | Description |
 |--------|-----------|---------|-------------|
-| `AddTab` | `data: {Title, Icon}` | `Tab` object | Creates a new tab |
-| `SelectTab` | `tabText: string` | `nil` | Activates a tab by name |
-| `AddLabel` | `data: {Text, Icon}` | `Label` object | Adds a text label |
-| `AddSection` | `data: {Text}` | `Section` object | Adds a section header |
+| `Create` | `config: table` | `lib` | Creates and returns the main library object |
+| `AddTab` | `data: table` | `tab` | Adds a new tab with title and icon |
+| `SelectTab` | `title: string` | `nil` | Programmatically selects a tab by title |
+| `AddLabel` | `data: table` | `label` | Adds a text label element |
+| `AddSection` | `data: table` | `section` | Adds a section header |
 | `AddDivider` | `none` | `nil` | Adds a horizontal divider |
-| `AddButton` | `data: {Text, Type, Width, Callback}` | `Button` object | Adds a button |
-| `AddSwitch` | `data: {Title, Default, Icon, Callback}` | `Switch` object | Adds a toggle switch |
-| `AddSlider` | `data: {Title, Min, Max, Default, ShowValue, Size, Icon, Callback}` | `Slider` object | Adds a numeric slider |
-| `AddDropdown` | `data: {Title, Options, Default, Icon, Callback}` | `Dropdown` object | Adds a dropdown selector |
-| `AddTextBox` | `data: {Title, SupportText, Icon, Callback}` | `TextBox` object | Adds a text input |
-| `AddDialog` | `data: {Title, Description, Buttons}` | `nil` | Shows a modal dialog |
-| `Notify` | `data: {Text, Duration, Actions}` | `nil` | Shows a notification |
-| `ChangePalette` | `themeName: string` | `nil` | Changes the active theme |
-| `AddTheme` | `themeName: string, themeData: table` | `nil` | Registers a custom theme |
-| `RegisterElement` | `element: Instance, searchText: string, elementType: string` | `nil` | Registers element for search |
-| `SetTitle` | `newTitle: string` | `nil` | Updates window title |
-
-### Return Object Methods
-
-All element-returned tables support these methods where applicable:
-
-| Method | Element Types | Description |
-|--------|--------------|-------------|
-| `SetText` | Label, Section, Button, Switch, Slider, Dropdown, TextBox | Updates display text |
-| `SetValue` | Switch, Slider, Dropdown, TextBox | Updates the element's value |
-| `Refresh` | Dropdown | Replaces options list |
+| `AddButton` | `data: table` | `button` | Adds an interactive button |
+| `AddSwitch` | `data: table` | `switch` | Adds a toggle switch |
+| `AddSlider` | `data: table` | `slider` | Adds a numeric range slider |
+| `AddDropdown` | `data: table` | `dropdown` | Adds a selection dropdown |
+| `AddTextBox` | `data: table` | `textbox` | Adds a text input field |
+| `AddRadio` | `data: table` | `radio` | Adds a radio button group |
+| `AddCheckbox` | `data: table` | `checkbox` | Adds a checkbox |
+| `AddChip` | `data: table` | `chip` | Adds a selectable chip |
+| `AddDialog` | `data: table` | `nil` | Shows a modal confirmation dialog |
+| `Notify` | `data: table` | `nil` | Shows a snackbar notification |
+| `ChangePalette` | `name: string` | `nil` | Switches to a different theme |
+| `AddTheme` | `name: string, data: table` | `nil` | Registers a custom theme |
+| `SetTitle` | `newTitle: string` | `nil` | Updates the window title |
 
 ---
 
 ## Example Usage
 
-### Complete Example
-
 ```lua
 local NoxLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua"))()
 
--- Create the main window
+-- Create main window
 local UI = NoxLibrary:Create({
-    Title = "My Script Hub",
-    SizeX = 420,
-    SizeY = 540,
+    Title = "My Awesome Script",
+    SizeX = 450,
+    SizeY = 600,
     Theme = "Purple",
     ToggleKey = Enum.KeyCode.RightShift,
     Search = true,
     SearchPlaceholder = "Search features..."
 })
 
--- Main tab content
-local MainTab = UI:AddTab({
+-- Add tabs
+local mainTab = UI:AddTab({
     Title = "Main",
     Icon = "home"
 })
 
-UI:AddSection({Text = "Player Features"})
+local settingsTab = UI:AddTab({
+    Title = "Settings",
+    Icon = "settings"
+})
 
-local speedSlider = UI:AddSlider({
+-- Main Tab Content
+UI:AddLabel({
+    Text = "Welcome to the main section!",
+    Icon = "info"
+})
+
+UI:AddSection({
+    Text = "Player Features"
+})
+
+UI:AddSwitch({
+    Title = "Enable ESP",
+    Default = false,
+    Icon = "eye",
+    Callback = function(state)
+        print("ESP:", state)
+    end
+})
+
+UI:AddSlider({
     Title = "Walk Speed",
     Min = 16,
     Max = 200,
     Default = 16,
     Size = "m",
-    Icon = "bolt",
     Callback = function(value)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+        print("Speed set to:", value)
     end
 })
 
-local jumpSlider = UI:AddSlider({
-    Title = "Jump Power",
-    Min = 50,
-    Max = 300,
-    Default = 50,
-    Size = "m",
-    Callback = function(value)
-        game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+UI:AddRadio({
+    Title = "Select Game Mode",
+    Options = {"Normal", "Hard", "Impossible"},
+    Default = 1,
+    Callback = function(selected, index)
+        print("Mode selected:", selected)
     end
 })
 
 UI:AddDivider()
 
-UI:AddSection({Text = "Combat"})
-
-local espSwitch = UI:AddSwitch({
-    Title = "Enable ESP",
-    Default = false,
-    Icon = "visibility",
-    Callback = function(state)
-        if state then
-            print("ESP Enabled")
-        else
-            print("ESP Disabled")
-        end
-    end
-})
-
-local teamDropdown = UI:AddDropdown({
-    Title = "Target Team",
-    Options = {"All", "Red", "Blue", "Neutral"},
-    Default = 1,
-    Icon = "group",
-    Callback = function(selected)
-        print("Targeting:", selected)
-    end
-})
-
--- Visuals tab content
-local VisualTab = UI:AddTab({
-    Title = "Visuals",
-    Icon = "visibility"
-})
-
 UI:AddButton({
-    Text = "Apply Fullbright",
+    Text = "Execute",
     Type = "filled",
-    Icon = "light_mode",
+    Icon = "zap",
     Callback = function()
-        game.Lighting.Brightness = 2
-        game.Lighting.ClockTime = 14
-        UI:Notify({
-            Text = "Fullbright applied!",
-            Duration = 3
-        })
+        print("Executing main script!")
     end
 })
 
-UI:AddButton({
-    Text = "Reset Lighting",
-    Type = "tonal",
-    Icon = "refresh",
-    Callback = function()
-        game.Lighting.Brightness = 1
-        game.Lighting.ClockTime = 12
+-- Settings Tab Content
+UI:SelectTab("Settings")
+
+UI:AddSection({
+    Text = "Appearance"
+})
+
+UI:AddDropdown({
+    Title = "Theme",
+    Options = {"Purple", "Blue", "Red", "Green", "Orange", "Default"},
+    Default = 1,
+    Callback = function(theme)
+        UI:ChangePalette(theme)
     end
 })
 
--- Settings tab content
-local SettingsTab = UI:AddTab({
-    Title = "Settings",
-    Icon = "settings"
+UI:AddCheckbox({
+    Title = "Dark Mode",
+    Default = true,
+    Callback = function(state)
+        print("Dark mode:", state)
+    end
 })
 
-UI:AddSection({Text = "Configuration"})
+UI:AddSection({
+    Text = "Other"
+})
 
-local usernameBox = UI:AddTextBox({
-    Title = "Display Name",
-    SupportText = "This name will be shown to other players",
-    Icon = "person",
-    Callback = function(text, enterPressed)
-        if enterPressed and text ~= "" then
+UI:AddTextBox({
+    Title = "Username",
+    SupportText = "Enter your display name",
+    Icon = "user",
+    Callback = function(text)
+        print("Username set to:", text)
+    end
+})
+
+UI:AddChip({
+    Title = "Advanced Options",
+    Type = "outlined",
+    Callback = function(selected)
+        if selected then
             UI:Notify({
-                Text = "Display name set to: " .. text,
-                Duration = 4
+                Text = "Advanced options enabled!",
+                Duration = 3
             })
         end
     end
 })
 
--- Theme switching buttons
-UI:AddSection({Text = "Appearance"})
-
 UI:AddButton({
-    Text = "Purple Theme",
+    Text = "Reset Settings",
     Type = "outlined",
-    Width = 140,
-    Icon = "palette",
-    Callback = function()
-        UI:ChangePalette("Purple")
-    end
-})
-
-UI:AddButton({
-    Text = "Blue Theme",
-    Type = "outlined",
-    Width = 140,
-    Icon = "water_drop",
-    Callback = function()
-        UI:ChangePalette("Blue")
-    end
-})
-
-UI:AddButton({
-    Text = "Green Theme",
-    Type = "outlined",
-    Width = 140,
-    Icon = "eco",
-    Callback = function()
-        UI:ChangePalette("Green")
-    end
-})
-
--- Notification on load
-UI:Notify({
-    Text = "Script loaded successfully!",
-    Duration = 5,
-    Actions = {
-        {
-            Text = "Thanks!",
-            Callback = function()
-                print("User acknowledged")
-            end
-        }
-    }
-})
-```
-
-### Custom Theme Example
-
-```lua
-UI:AddTheme("Neon", {
-    Background = Color3.fromRGB(10, 10, 15),
-    Text = Color3.fromRGB(240, 255, 255),
-    Primary = Color3.fromRGB(0, 255, 200),
-    TextOnPrimary = Color3.fromRGB(0, 30, 20),
-    Surface = Color3.fromRGB(20, 25, 30),
-    Outline = Color3.fromRGB(0, 200, 150)
-})
-
--- Apply the custom theme
-UI:ChangePalette("Neon")
-```
-
-### Dialog Example
-
-```lua
-UI:AddButton({
-    Text = "Reset All Settings",
-    Type = "text",
     Callback = function()
         UI:AddDialog({
             Title = "Reset Settings?",
-            Description = "This will reset all your configured values to their defaults. This action cannot be undone.",
+            Description = "This will reset all settings to default values.",
             Buttons = {
-                {
-                    Text = "Cancel",
-                    Type = "text",
-                    Callback = nil
-                },
-                {
-                    Text = "Reset All",
-                    Type = "filled",
-                    Callback = function()
-                        speedSlider:SetValue(16)
-                        jumpSlider:SetValue(50)
-                        espSwitch:SetValue(false)
-                        teamDropdown:SetValue("All")
-                        UI:Notify({Text = "All settings reset!", Duration = 3})
-                    end
-                }
+                {Text = "Cancel", Type = "text"},
+                {Text = "Reset", Type = "filled", Callback = function()
+                    UI:Notify({
+                        Text = "Settings have been reset!",
+                        Duration = 4
+                    })
+                end}
             }
         })
     end
@@ -1288,35 +1351,6 @@ UI:AddButton({
 
 ---
 
-## Technical Notes
-
-### Performance Considerations
-- **Tweening**: The library heavily uses `TweenService` for smooth animations. Exponential easing provides a natural feel.
-- **Object Tracking**: Theme switching iterates through all tracked objects. For very large UIs, this may cause a brief frame drop.
-- **RenderStepped Connections**: Dragging and slider interactions use `RunService.RenderStepped` / `InputChanged` for responsiveness.
-- **Memory**: The `SearchRegistry` grows with each element. For long-running scripts with dynamically created elements, consider cleanup.
-
-### Security & Executor Compatibility
-- Uses `getcustomasset()` for font loading (requires executor support)
-- Uses `isfolder()`, `makefolder()`, `isfile()`, `writefile()`, `game:HttpGet()` (standard executor functions)
-- Loads Lucide icons from a remote URL via `loadstring(game:HttpGet())`
-
-### Known Limitations
-- Maximum 2 notification action buttons
-- Search results panel max height: 200 pixels
-- Dialog button count is not explicitly limited but designed for 1-3 buttons
-- Window minimum size: 320x400 pixels
-- Dropdown max visible options: 3 (with scrolling)
-
----
-
-## Credits
-
-- **Font**: Google Sans Flex by Google
-- **Icons**: Material Icons by Google
-- **Design System**: Material Design 3 by Google
-- **Created by**: UltraSirius (@fyandevelopers on Roblox)
-
----
-
-Debugging Suite Available in **ScriptBlox**
+**Documentation Last Updated:** July 2026  
+**Library Version:** 1.0+  
+**Author:** fiangg20
