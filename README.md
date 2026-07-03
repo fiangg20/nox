@@ -1,3 +1,5 @@
+![banner](https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/banner.png)
+
 # Nox - Roblox UI Library Documentation
 
 > A comprehensive, Material Design 3 inspired UI library for Roblox with theming, animations, and an extensive component system.
