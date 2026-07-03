@@ -1223,11 +1223,6 @@ local mainTab = UI:AddTab({
     Icon = "home"
 })
 
-local settingsTab = UI:AddTab({
-    Title = "Settings",
-    Icon = "settings"
-})
-
 -- Main Tab Content
 UI:AddLabel({
     Text = "Welcome to the main section!",
@@ -1279,7 +1274,10 @@ UI:AddButton({
 })
 
 -- Settings Tab Content
-UI:SelectTab("Settings")
+local settingsTab = UI:AddTab({
+    Title = "Settings",
+    Icon = "settings"
+})
 
 UI:AddSection({
     Text = "Appearance"
@@ -1354,3 +1352,4 @@ UI:AddButton({
 **Documentation Last Updated:** July 2026  
 **Library Version:** 1.0+  
 **Author:** fiangg20
+**Created by:** UltraSirius (@fyandevelopers on Roblox)
