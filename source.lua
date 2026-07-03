@@ -195,6 +195,58 @@ local function CreateNox(data)
     local lib = {}
     local resizeHandle
 
+    lib.Flags = {}
+    lib.Setters = {}
+    local configFolder = "NoxConfigs"
+
+    if not isfolder(configFolder) then makefolder(configFolder) end
+
+    function lib:SaveConfig(name)
+        if not name or name == "" then return end
+        local success, json = pcall(function()
+            return http:JSONEncode(lib.Flags)
+        end)
+        
+        if success then
+            writefile(configFolder .. "/" .. name .. ".json", json)
+            lib:Notify({Text = "Config '" .. name .. "' has been saved!", Duration = 3})
+        else
+            lib:Notify({Text = "Failed to save config!", Duration = 3})
+        end
+    end
+
+    function lib:LoadConfig(name)
+        local path = configFolder .. "/" .. name .. ".json"
+        if isfile(path) then
+            local success, decoded = pcall(function()
+                return http:JSONDecode(readfile(path))
+            end)
+            
+            if success then
+                for flag, val in pairs(decoded) do
+                    lib.Flags[flag] = val
+                    if lib.Setters[flag] then
+                        lib.Setters[flag](val) 
+                    end
+                end
+                lib:Notify({Text = "Config '" .. name .. "' has been loaded!", Duration = 3})
+            end
+        else
+            lib:Notify({Text = "Config '" .. name .. "' not found!", Duration = 3})
+        end
+    end
+
+    function lib:GetConfigs()
+        local list = {}
+        if isfolder(configFolder) then
+            for _, file in ipairs(listfiles(configFolder)) do
+                local fileName = file:match("([^/%\\]+)%.json$")
+                if fileName then table.insert(list, fileName) end
+            end
+        end
+        return list
+    end
+
     local old = cg:FindFirstChild(titleText or "Nox")
     if old then old:Destroy() end
 
@@ -323,9 +375,10 @@ local function CreateNox(data)
 
         searchBar = Instance.new("Frame", win)
         searchBar.Size = UDim2.new(1, -48, 0, 56) 
-        searchBar.Position = UDim2.new(0, 24, 0, 65)
+        searchBar.Position = UDim2.new(0.5, 0, 0, 65)
         searchBar.BackgroundColor3 = curTheme.inact:Lerp(curTheme.bg, 0.6)
         searchBar.BorderSizePixel = 0
+        searchBar.AnchorPoint = Vector2.new(0.5, 0)
         searchBar.ZIndex = 60
         table.insert(objs.inact, searchBar)
 
@@ -358,7 +411,7 @@ local function CreateNox(data)
         searchBox.Text = ""
         searchBox.PlaceholderText = searchPlaceholder
         searchBox.PlaceholderColor3 = curTheme.out
-        searchBox.TextColor3 = curTheme.fg
+        searchBox.TextColor3 = curTheme.inact
         searchBox.FontFace = m3Font
         searchBox.TextSize = 15
         searchBox.TextXAlignment = Enum.TextXAlignment.Left
@@ -372,8 +425,8 @@ local function CreateNox(data)
         table.insert(objs.icon, clearBtn)
 
         local dockedBg = Instance.new("Frame", win)
-        dockedBg.Size = UDim2.new(1, -48, 0, 0)
-        dockedBg.Position = UDim2.new(0, 24, 0, 125)
+        dockedBg.Size = UDim2.new(1, -36, 0, 0)
+        dockedBg.Position = UDim2.new(0, 18, 0, 125)
         dockedBg.BackgroundColor3 = curTheme.inact:Lerp(curTheme.bg, 0.4)
         dockedBg.BorderSizePixel = 0
         dockedBg.ZIndex = 50
@@ -483,11 +536,11 @@ local function CreateNox(data)
 
                 local finalHeight = math.clamp(math.max(1, resultsCount) * 48, 48, 200)
                 tw:Create(dockedBg, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(1, -48, 0, finalHeight)
+                    Size = UDim2.new(1, -36, 0, finalHeight)
                 }):Play()
             else
                 tw:Create(dockedBg, TweenInfo.new(0.2, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(1, -48, 0, 0)
+                    Size = UDim2.new(1, -36, 0, 0)
                 }):Play()
                 task.delay(0.2, function()
                     if #searchBox.Text == 0 then dockedBg.Visible = false end
@@ -504,11 +557,13 @@ local function CreateNox(data)
         
         searchBox.Focused:Connect(function()
             t(searchBar, "BackgroundColor3", curTheme.inact, 0.2)
+            t(searchBar, "Size", UDim2.new(1, -36, 0, 56), 0.5)
             setIconColor(searchIcn, curTheme.pri, 0.2)
         end)
 
         searchBox.FocusLost:Connect(function()
             t(searchBar, "BackgroundColor3", curTheme.inact:Lerp(curTheme.bg, 0.6), 0.2)
+            t(searchBar, "Size", UDim2.new(1, -48, 0, 56), 0.5)
             setIconColor(searchIcn, curTheme.out, 0.2)
             
             task.delay(0.1, function()
@@ -1308,6 +1363,7 @@ local function CreateNox(data)
         local labelTxt = data.Title or "TextBox"
         local supportTxt = data.SupportText
         local iconStr = data.Icon
+        local flag = data.Flag
         local cb = data.Callback
         lib.ElementCounter += 1
 
@@ -1377,6 +1433,8 @@ local function CreateNox(data)
         
         local tbPad = Instance.new("UIPadding", tbox)
         tbPad.PaddingBottom = UDim.new(0, 8)
+        
+        if flag then lib.Flags[flag] = tbox.Text end
 
         local clearBtn = createIconObj(frame, "circle-x", UDim2.new(0, 18, 0, 18), UDim2.new(1, -12, 0.5, 0), Vector2.new(1, 0.5), true)
         setIconColor(clearBtn, curTheme.out)
@@ -1438,6 +1496,7 @@ local function CreateNox(data)
         tbox.Focused:Connect(function() tbData.focused = true; updateState() end)
         tbox.FocusLost:Connect(function(enter)
             tbData.focused = false; updateState()
+            if flag then lib.Flags[flag] = tbox.Text end
             if cb then cb(tbox.Text, enter) end
         end)
         tbox:GetPropertyChangedSignal("Text"):Connect(updateState)
@@ -1461,12 +1520,21 @@ local function CreateNox(data)
 
         lib:RegisterElement(wrapper, labelTxt, "item")
 
-        return {
+        local returnObj = {
             SetText = function(self, newTxt) lbl.Text = newTxt end,
             SetValue = function(self, newVal)
-                tbox.Text = tostring(newVal); updateState()
+                tbox.Text = tostring(newVal)
+                updateState()
+                if flag then lib.Flags[flag] = tbox.Text end
+                if cb then cb(tbox.Text, false) end
             end
         }
+        
+        if flag then
+            lib.Setters[flag] = function(val) returnObj:SetValue(val) end
+        end
+
+        return returnObj
     end
 
     function lib:AddButton(data)
@@ -1591,7 +1659,7 @@ local function CreateNox(data)
             local hBg
             if bType == "tonal" then hBg = curTheme.inact:Lerp(curTheme.pri, 0.25)
             elseif bType == "outlined" or bType == "text" then hBg = curTheme.inact:Lerp(curTheme.fg, 0.05)
-            else hBg = curTheme.fg end
+            else hBg = curTheme.pri end
             
             t(b, "BackgroundColor3", hBg, 0.2)
             if bType == "outlined" or bType == "text" then t(b, "BackgroundTransparency", 0.9, 0.2) end
@@ -1619,8 +1687,12 @@ local function CreateNox(data)
         local def = data.Default or false
         local iconStr = data.Icon
         local cb = data.Callback
+        local flag = data.Flag
+
         lib.ElementCounter += 1
         local st = def or false
+        
+        if flag then lib.Flags[flag] = st end
         local r = Instance.new("Frame", lib.CurrentBuildContainer)
         r.LayoutOrder = lib.ElementCounter
         r.Size = UDim2.new(1, 0, 0, 48)
@@ -1678,12 +1750,13 @@ local function CreateNox(data)
                 Position = st and UDim2.new(0, 36, 0.5, 0) or UDim2.new(0, 16, 0.5, 0),
                 BackgroundColor3 = st and curTheme.onpri or curTheme.out
             }):Play()
+            if flag then lib.Flags[flag] = st end
             if cb then cb(st) end
         end)
 
         lib:RegisterElement(r, txt, "item")
 
-        return {
+        local returnObj = {
             SetText = function(self, newTxt) l.Text = newTxt end,
             SetValue = function(self, newState)
                 if st == newState then return end
@@ -1695,9 +1768,16 @@ local function CreateNox(data)
                     Position = st and UDim2.new(0, 36, 0.5, 0) or UDim2.new(0, 16, 0.5, 0),
                     BackgroundColor3 = st and curTheme.onpri or curTheme.out
                 }):Play()
+                if flag then lib.Flags[flag] = st end
                 if cb then cb(st) end
             end
         }
+        
+        if flag then
+            lib.Setters[flag] = function(val) returnObj:SetValue(val) end
+        end
+
+        return returnObj
     end
 
     function lib:AddRadioGroup(data)
@@ -1705,9 +1785,11 @@ local function CreateNox(data)
         local options = data.Options or {}
         local defaultIdx = data.Default or 1
         local cb = data.Callback
+        local flag = data.Flag
         lib.ElementCounter += 1
 
         local selectedIdx = defaultIdx
+        if flag then lib.Flags[flag] = selectedIdx end
 
         local groupContainer = Instance.new("Frame", lib.CurrentBuildContainer)
         groupContainer.LayoutOrder = lib.ElementCounter
@@ -1751,6 +1833,8 @@ local function CreateNox(data)
                     Size = isSel and UDim2.new(0, 10, 0, 10) or UDim2.new(0, 0, 0, 0)
                 }):Play()
             end
+            
+            if flag then lib.Flags[flag] = selectedIdx end
             if cb then cb(options[selectedIdx], selectedIdx) end
         end
 
@@ -1759,6 +1843,8 @@ local function CreateNox(data)
             btn.LayoutOrder = i
             btn.Size = UDim2.new(1, 0, 0, 40)
             btn.BackgroundTransparency = 1
+            btn.BorderSizePixel = 0
+            btn.BackgroundColor3 = curTheme.bg
             btn.Text = ""
             btn.AutoButtonColor = false
             Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
@@ -1779,6 +1865,7 @@ local function CreateNox(data)
             dot.AnchorPoint = Vector2.new(0.5, 0.5)
             dot.Position = UDim2.new(0.5, 0, 0.5, 0)
             dot.BackgroundColor3 = curTheme.pri
+            dot.BorderSizePixel = 0
             dot.Size = (i == selectedIdx) and UDim2.new(0, 10, 0, 10) or UDim2.new(0, 0, 0, 0)
             Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
 
@@ -1817,21 +1904,29 @@ local function CreateNox(data)
 
         lib:RegisterElement(groupContainer, titleText, "item")
 
-        return {
+        local returnObj = {
             GetValue = function(self) return options[selectedIdx], selectedIdx end,
             SetValue = function(self, idx)
                 if options[idx] then updateSelection(idx) end
             end
         }
+        
+        if flag then
+            lib.Setters[flag] = function(val) returnObj:SetValue(val) end
+        end
+        
+        return returnObj
     end
 
     function lib:AddCheckbox(data)
         local titleText = data.Title or "Checkbox"
         local def = data.Default or false
         local cb = data.Callback
+        local flag = data.Flag
         lib.ElementCounter += 1
 
         local isChecked = def
+        if flag then lib.Flags[flag] = isChecked end
 
         local container = Instance.new("Frame", lib.CurrentBuildContainer)
         container.LayoutOrder = lib.ElementCounter
@@ -1912,21 +2007,29 @@ local function CreateNox(data)
         btn.MouseButton1Click:Connect(function()
             isChecked = not isChecked
             updateState(true)
+            if flag then lib.Flags[flag] = isChecked end
             if cb then cb(isChecked) end
         end)
 
         lib:RegisterElement(container, titleText, "item")
 
-        return {
+        local returnObj = {
             GetValue = function(self) return isChecked end,
             SetValue = function(self, val)
                 if isChecked == val then return end
                 isChecked = val
                 updateState(true)
+                if flag then lib.Flags[flag] = isChecked end
                 if cb then cb(isChecked) end
             end,
             SetText = function(self, newTxt) lbl.Text = newTxt end
         }
+        
+        if flag then
+            lib.Setters[flag] = function(val) returnObj:SetValue(val) end
+        end
+        
+        return returnObj
     end
 
     function lib:AddChipGroup(data)
@@ -1935,10 +2038,17 @@ local function CreateNox(data)
         local chipType = string.lower(data.Type or "outlined")
         local multi = data.Multiselect or false
         local cb = data.Callback
+        local flag = data.Flag
         lib.ElementCounter += 1
 
         local selected = {}
         local chipBtns = {}
+        
+        if flag then
+            local tCopy = {}
+            for k,v in pairs(selected) do tCopy[k] = v end
+            lib.Flags[flag] = tCopy
+        end
 
         local container = Instance.new("Frame", lib.CurrentBuildContainer)
         container.LayoutOrder = lib.ElementCounter
@@ -1975,6 +2085,13 @@ local function CreateNox(data)
         sLayout.VerticalAlignment = Enum.VerticalAlignment.Center
         sLayout.SortOrder = Enum.SortOrder.LayoutOrder
         sLayout.Padding = UDim.new(0, 8)
+        
+        if chipType == "outlined" then
+            local paddingFrame = Instance.new("Frame", scroll)
+            paddingFrame.Size = UDim2.new(0, 0.1, 1, 0)
+            paddingFrame.BackgroundTransparency = 1
+            paddingFrame.BorderSizePixel = 0
+        end
 
         local function updateState(idx)
             local isSel = selected[idx]
@@ -1989,6 +2106,8 @@ local function CreateNox(data)
                 t(c.bg, "BackgroundColor3", isSel and curTheme.inact:Lerp(curTheme.pri, 0.15) or curTheme.bg, 0.2)
                 t(c.bg, "BackgroundTransparency", isSel and 0 or 1, 0.2)
                 t(c.stroke, "Color", isSel and curTheme.pri or curTheme.out, 0.2)
+                t(c.lbl, "TextColor3", curTheme.fg, 0.2)
+                if c.icon then setIconColor(c.icon, curTheme.fg, 0.2) end
             end
         end
 
@@ -2089,6 +2208,12 @@ local function CreateNox(data)
                     chipBtns[j].selected = selected[j]
                     updateState(j)
                 end
+                
+                if flag then
+                    local tCopy = {}
+                    for k,v in pairs(selected) do tCopy[k] = v end
+                    lib.Flags[flag] = tCopy
+                end
 
                 if cb then
                     if multi then
@@ -2104,13 +2229,46 @@ local function CreateNox(data)
 
         lib:RegisterElement(container, titleText, "item")
 
-        return {
+        local returnObj = {
             GetSelected = function(self)
                 local res = {}
                 for j, val in pairs(selected) do if val then table.insert(res, options[j]) end end
                 return multi and res or res[1]
+            end,
+            SetValue = function(self, stateTable)
+                if type(stateTable) == "table" then
+                    for k, v in pairs(stateTable) do
+                        selected[k] = v
+                        if chipBtns[k] then
+                            chipBtns[k].selected = v
+                            updateState(k)
+                        end
+                    end
+                    if flag then
+                        local tCopy = {}
+                        for k,v in pairs(selected) do tCopy[k] = v end
+                        lib.Flags[flag] = tCopy
+                    end
+                    if cb then
+                        if multi then
+                            local res = {}
+                            for j, val in pairs(selected) do if val then table.insert(res, options[j]) end end
+                            cb(res)
+                        else
+                            local resOpt
+                            for j, val in pairs(selected) do if val then resOpt = options[j]; break end end
+                            cb(resOpt)
+                        end
+                    end
+                end
             end
         }
+        
+        if flag then
+            lib.Setters[flag] = function(val) returnObj:SetValue(val) end
+        end
+        
+        return returnObj
     end
 
     function lib:AddSlider(data)
@@ -2123,9 +2281,11 @@ local function CreateNox(data)
         local sizeStr = data.Size or "xs"
         local iconStr = data.Icon
         local cb = data.Callback
+        local flag = data.Flag
         lib.ElementCounter += 1
         
         local v = math.clamp(df or m, m, mx)
+        if flag then lib.Flags[flag] = v end
         local drag = false
 
         local sType = string.lower(sizeStr or "xs")
@@ -2260,17 +2420,21 @@ local function CreateNox(data)
             if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then drag = true; upd(i, true) end 
         end)
         uis.InputChanged:Connect(function(i) 
-            if drag and (i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch")) then upd(i, false) end 
+            if drag and (i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch")) then upd(i, false) end
         end)
         uis.InputEnded:Connect(function(i) 
             if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then 
-                if drag then drag = false; if cb then cb(v) end end
-            end 
+                if drag then 
+                    drag = false
+                    if flag then lib.Flags[flag] = v end
+                    if cb then cb(v) end 
+                end
+            end
         end)
 
         lib:RegisterElement(r, txt, "item")
 
-        return {
+        local returnObj = {
             SetText = function(self, newTxt) vl.Text = newTxt end,
             SetValue = function(self, newVal)
                 v = math.clamp(newVal, m, mx)
@@ -2282,9 +2446,26 @@ local function CreateNox(data)
                 inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
                 thm.Position = UDim2.new(0, tX, 0.5, 0)
                 
+                if flag then lib.Flags[flag] = v end
                 if cb then cb(v) end
+            end,
+            SetIcon = function(self, newIcon)
+                if not newIcon or newIcon == "" then return end
+                if cfg.icn > 0 then
+                    local slIcn = createIconObj(act, newIcon, UDim2.new(0, cfg.icn, 0, cfg.icn), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
+                    if slIcn then
+                        setIconColor(slIcn, curTheme.onpri)
+                        table.insert(objs.onpri, slIcn)
+                    end
+                end
             end
         }
+        
+        if flag then
+            lib.Setters[flag] = function(val) returnObj:SetValue(val) end
+        end
+        
+        return returnObj
     end
 
     function lib:AddDropdown(data)
@@ -2293,10 +2474,13 @@ local function CreateNox(data)
         local defaultIdx = data.Default or 1
         local iconStr = data.Icon
         local cb = data.Callback
+        local flag = data.Flag
         lib.ElementCounter += 1
         local selectedIdx = defaultIdx or 1
         local currentOptions = options or {}
         local isOpen = false
+        
+        if flag then lib.Flags[flag] = currentOptions[selectedIdx] or "" end
     
         local frame = Instance.new("Frame", lib.CurrentBuildContainer)
         frame.LayoutOrder = lib.ElementCounter
@@ -2463,6 +2647,7 @@ local function CreateNox(data)
                     optBtn.TextColor3 = curTheme.fg
                     optBtn.TextXAlignment = Enum.TextXAlignment.Left
                     optBtn.LayoutOrder = i
+                    optBtn.BorderSizePixel = 0
                     optBtn.ZIndex = 501
                     optBtn.TextTransparency = 1
                     optBtn.AutoButtonColor = false
@@ -2482,6 +2667,7 @@ local function CreateNox(data)
     
                     optBtn.MouseButton1Click:Connect(function()
                         selectedIdx = i; valLbl.Text = opt
+                        if flag then lib.Flags[flag] = opt end
                         if cb then cb(opt) end
                         closeMenu()
                     end)
@@ -2510,9 +2696,19 @@ local function CreateNox(data)
 
         lib:RegisterElement(frame, labelTxt, "item")
 
-        return {
+        local returnObj = {
             SetText = function(self, newTxt) lbl.Text = newTxt end,
-            SetValue = function(self, newOpt) valLbl.Text = newOpt; if cb then cb(newOpt) end end,
+            SetValue = function(self, newOpt) 
+                local found = false
+                for i, v in ipairs(currentOptions) do
+                    if v == newOpt then selectedIdx = i; found = true; break end
+                end
+                if found then
+                    valLbl.Text = newOpt
+                    if flag then lib.Flags[flag] = newOpt end
+                    if cb then cb(newOpt) end 
+                end
+            end,
             Refresh = function(self, newOptions, newDefaultIdx)
                 currentOptions = newOptions or {}
                 selectedIdx = newDefaultIdx or 1
@@ -2520,6 +2716,12 @@ local function CreateNox(data)
                 if isOpen then closeMenu() end
             end
         }
+        
+        if flag then
+            lib.Setters[flag] = function(val) returnObj:SetValue(val) end
+        end
+        
+        return returnObj
     end
 
     resizeHandle = Instance.new("TextButton", win)
@@ -2578,7 +2780,7 @@ local function CreateNox(data)
                     
         tw:Create(btnMinMax, tInfo, {BackgroundTransparency = 1}):Play()
         tw:Create(btnClose, tInfo, {BackgroundTransparency = 1}):Play()
-                   
+                    
         setIconTrans(icnMinMax, 1, 0.4)
         setIconTrans(icnClose, 1, 0.4)
                     
