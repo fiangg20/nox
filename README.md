@@ -1066,7 +1066,7 @@ All element-returned tables support these methods where applicable:
 ### Complete Example
 
 ```lua
-local NoxLibrary = loadstring(game:HttpGet("[https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua](https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua)"))()
+local NoxLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua"))()
 
 -- Create the main window
 local UI = NoxLibrary:Create({
