@@ -9,7 +9,7 @@ local http = game:GetService("HttpService")
 local folderName = "NoxAssets"
 local jsonName = "m3font.json"
 local ttfName = "GoogleSans.ttf"
-local fontUrl = "https://github.com/fiangg20/Fian_gg-Repo/raw/refs/heads/main/GoogleSansFlex_24pt-Regular.ttf"
+local fontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/font.ttf"
 
 if not isfolder(folderName) then makefolder(folderName) end
 
@@ -37,7 +37,7 @@ local m3Font = Font.new(getcustomasset(pathJSON))
 
 local lucideIcons = {}
 local success, result = pcall(function()
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/Fian_gg-Repo/refs/heads/main/lucideicn.lua"))()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/icon.lua"))()
 end)
 
 if success and type(result) == "table" then
