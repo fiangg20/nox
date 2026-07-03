@@ -127,7 +127,7 @@ local cp = {
     ["Default"] = {bg=Color3.fromRGB(0,0,0), fg=Color3.fromRGB(230,225,229), pri=Color3.fromRGB(208,188,255), onpri=Color3.fromRGB(56,30,114), inact=Color3.fromRGB(28,28,30), out=Color3.fromRGB(147,143,153)}
 }
 
-local objs = {bg={}, fg={}, pri={}, onpri={}, inact={}, out={}, s_trk={}, s_thm={}, tab_btn={}, tbox={}, icon={}, dlg_bg={}, dlg_fg={}, sl_val={}}
+local objs = {bg={}, fg={}, pri={}, onpri={}, inact={}, out={}, s_trk={}, s_thm={}, tab_btn={}, tbox={}, icon={}, dlg_bg={}, dlg_fg={}, sl_val={}, radio={}, checkbox={}, chip={}}
 
 function t(o, p, v, d)
     tw:Create(o, TweenInfo.new(d or 0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {[p] = v}):Play()
@@ -336,7 +336,6 @@ local function CreateNox(data)
         setIconColor(searchIcn, curTheme.out)
         table.insert(objs.icon, searchIcn)
 
-        local avatarImg
         local rightMargin = -16 
 
         if searchAvatar and searchAvatar ~= "" then
@@ -541,6 +540,8 @@ local function CreateNox(data)
                     
                     if enableSearch and searchBar then
                         tw:Create(searchBar, tInfo, {BackgroundTransparency = 1}):Play()
+                        tw:Create(avatarImg, tInfo, {BackgroundTransparency = 1}):Play()
+                        tw:Create(avatarImg, tInfo, {ImageTransparency = 1}):Play()
                     end
                     
                     tw:Create(btnMinMax, tInfo, {BackgroundTransparency = 1}):Play()
@@ -738,8 +739,30 @@ local function CreateNox(data)
             t(tb.bg, "BackgroundColor3", curTheme.inact, d)
         end
         for _, v in pairs (objs.out) do  
-        t(v, "BorderColor3", curTheme.fg, d)
-        t(v, "TextColor3", curTheme.fg, d)
+            t(v, "BorderColor3", curTheme.fg, d)
+            t(v, "TextColor3", curTheme.fg, d)
+        end
+        for _,x in pairs(objs.radio) do 
+            t(x.stroke, "Color", x.selected and curTheme.pri or curTheme.out, d)
+            t(x.dot, "BackgroundColor3", curTheme.pri, d)
+        end
+        for _,x in pairs(objs.checkbox) do
+            t(x.box, "BackgroundColor3", x.state and curTheme.pri or curTheme.bg, d)
+            t(x.stroke, "Color", x.state and curTheme.pri or curTheme.out, d)
+            t(x.icon, "TextColor3", curTheme.onpri, d)
+        end
+        for _, c in pairs(objs.chip) do
+            if c.type == "filled" then
+                t(c.bg, "BackgroundColor3", c.selected and curTheme.pri or (curTheme.inact:Lerp(curTheme.fg, 0.08)), d)
+                t(c.lbl, "TextColor3", c.selected and curTheme.onpri or curTheme.fg, d)
+                if c.icon then setIconColor(c.icon, c.selected and curTheme.onpri or curTheme.fg, d) end
+            else
+                t(c.bg, "BackgroundColor3", c.selected and curTheme.inact:Lerp(curTheme.pri, 0.15) or curTheme.bg, d)
+                t(c.bg, "BackgroundTransparency", c.selected and 0 or 1, d)
+                t(c.stroke, "Color", c.selected and curTheme.pri or curTheme.out, d)
+                t(c.lbl, "TextColor3", curTheme.fg, d)
+                if c.icon then setIconColor(c.icon, curTheme.fg, d) end
+            end
         end
     end
 
@@ -842,6 +865,7 @@ local function CreateNox(data)
         btn.FontFace = m3Font
         btn.Text = txt
         btn.TextSize = 14
+        btn.RichText = true
         btn.TextTransparency = 1
         btn.TextColor3 = curTheme.out
         btn.Size = UDim2.new(0, 20, 1, 0) 
@@ -980,6 +1004,7 @@ local function CreateNox(data)
                 local actBtn = Instance.new("TextButton", snk)
                 actBtn.BackgroundTransparency = 1
                 actBtn.Text = actData.Text or "Action"
+                actBtn.RichText = true
                 actBtn.TextColor3 = curTheme.pri
                 actBtn.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
                 actBtn.TextSize = 14
@@ -1236,6 +1261,7 @@ local function CreateNox(data)
             btn.Size = UDim2.new(0, 0, 0, 40)
             btn.AutomaticSize = Enum.AutomaticSize.X
             btn.TextTransparency = 1
+            btn.RichText = true
             Instance.new("UICorner", btn).CornerRadius = UDim.new(1, 0)
              
             if isFilled then table.insert(objs.pri, btn) end
@@ -1674,6 +1700,419 @@ local function CreateNox(data)
         }
     end
 
+    function lib:AddRadioGroup(data)
+        local titleText = data.Title or "Radio Group"
+        local options = data.Options or {}
+        local defaultIdx = data.Default or 1
+        local cb = data.Callback
+        lib.ElementCounter += 1
+
+        local selectedIdx = defaultIdx
+
+        local groupContainer = Instance.new("Frame", lib.CurrentBuildContainer)
+        groupContainer.LayoutOrder = lib.ElementCounter
+        groupContainer.Size = UDim2.new(1, 0, 0, 0)
+        groupContainer.AutomaticSize = Enum.AutomaticSize.Y
+        groupContainer.BackgroundTransparency = 1
+
+        local layout = Instance.new("UIListLayout", groupContainer)
+        layout.SortOrder = Enum.SortOrder.LayoutOrder
+        layout.Padding = UDim.new(0, 4)
+
+        if titleText and titleText ~= "" then
+            local titleLbl = Instance.new("TextLabel", groupContainer)
+            titleLbl.LayoutOrder = 0
+            titleLbl.Size = UDim2.new(1, 0, 0, 24)
+            titleLbl.BackgroundTransparency = 1
+            titleLbl.Text = titleText
+            titleLbl.RichText = true
+            titleLbl.TextColor3 = curTheme.fg
+            titleLbl.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+            titleLbl.TextSize = 14
+            titleLbl.TextXAlignment = Enum.TextXAlignment.Left
+            table.insert(objs.fg, titleLbl)
+        end
+
+        local radioBtns = {}
+
+        local function updateSelection(newIdx)
+            if selectedIdx == newIdx and radioBtns[newIdx] and radioBtns[newIdx].isInit then return end
+            selectedIdx = newIdx
+            
+            for i, rData in ipairs(radioBtns) do
+                local isSel = (i == selectedIdx)
+                rData.isInit = true
+                rData.stateObj.selected = isSel 
+                
+                local tgtColor = isSel and curTheme.pri or curTheme.out
+                t(rData.stroke, "Color", tgtColor, 0.2)
+                
+                tw:Create(rData.dot, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    Size = isSel and UDim2.new(0, 10, 0, 10) or UDim2.new(0, 0, 0, 0)
+                }):Play()
+            end
+            if cb then cb(options[selectedIdx], selectedIdx) end
+        end
+
+        for i, opt in ipairs(options) do
+            local btn = Instance.new("TextButton", groupContainer)
+            btn.LayoutOrder = i
+            btn.Size = UDim2.new(1, 0, 0, 40)
+            btn.BackgroundTransparency = 1
+            btn.Text = ""
+            btn.AutoButtonColor = false
+            Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+            local outerCircle = Instance.new("Frame", btn)
+            outerCircle.Size = UDim2.new(0, 20, 0, 20)
+            outerCircle.AnchorPoint = Vector2.new(0, 0.5)
+            outerCircle.Position = UDim2.new(0, 12, 0.5, 0)
+            outerCircle.BackgroundTransparency = 1
+            Instance.new("UICorner", outerCircle).CornerRadius = UDim.new(1, 0)
+
+            local stroke = Instance.new("UIStroke", outerCircle)
+            stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+            stroke.Thickness = 2
+            stroke.Color = (i == selectedIdx) and curTheme.pri or curTheme.out
+
+            local dot = Instance.new("Frame", outerCircle)
+            dot.AnchorPoint = Vector2.new(0.5, 0.5)
+            dot.Position = UDim2.new(0.5, 0, 0.5, 0)
+            dot.BackgroundColor3 = curTheme.pri
+            dot.Size = (i == selectedIdx) and UDim2.new(0, 10, 0, 10) or UDim2.new(0, 0, 0, 0)
+            Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
+
+            local stateObj = {stroke = stroke, dot = dot, selected = (i == selectedIdx)}
+            table.insert(objs.radio, stateObj)
+
+            local lbl = Instance.new("TextLabel", btn)
+            lbl.Size = UDim2.new(1, -44, 1, 0)
+            lbl.Position = UDim2.new(0, 44, 0, 0)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = opt
+            lbl.RichText = true
+            lbl.TextColor3 = curTheme.fg
+            lbl.FontFace = m3Font
+            lbl.TextSize = 14
+            lbl.TextXAlignment = Enum.TextXAlignment.Left
+            table.insert(objs.fg, lbl)
+
+            btn.MouseEnter:Connect(function()
+                t(btn, "BackgroundTransparency", 0.92, 0.2)
+                t(btn, "BackgroundColor3", curTheme.fg, 0.2)
+            end)
+            btn.MouseLeave:Connect(function()
+                t(btn, "BackgroundTransparency", 1, 0.2)
+            end)
+            btn.InputBegan:Connect(function(input)
+                RippleEffect(btn, input, curTheme.fg)
+            end)
+
+            btn.MouseButton1Click:Connect(function()
+                updateSelection(i)
+            end)
+
+            table.insert(radioBtns, {btn = btn, stroke = stroke, dot = dot, stateObj = stateObj, isInit = false})
+        end
+
+        lib:RegisterElement(groupContainer, titleText, "item")
+
+        return {
+            GetValue = function(self) return options[selectedIdx], selectedIdx end,
+            SetValue = function(self, idx)
+                if options[idx] then updateSelection(idx) end
+            end
+        }
+    end
+
+    function lib:AddCheckbox(data)
+        local titleText = data.Title or "Checkbox"
+        local def = data.Default or false
+        local cb = data.Callback
+        lib.ElementCounter += 1
+
+        local isChecked = def
+
+        local container = Instance.new("Frame", lib.CurrentBuildContainer)
+        container.LayoutOrder = lib.ElementCounter
+        container.Size = UDim2.new(1, 0, 0, 40)
+        container.BackgroundTransparency = 1
+
+        local btn = Instance.new("TextButton", container)
+        btn.Size = UDim2.new(1, 0, 1, 0)
+        btn.BackgroundTransparency = 1
+        btn.Text = ""
+        btn.AutoButtonColor = false
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+        local box = Instance.new("Frame", btn)
+        box.Size = UDim2.new(0, 18, 0, 18)
+        box.AnchorPoint = Vector2.new(0, 0.5)
+        box.Position = UDim2.new(0, 12, 0.5, 0)
+        box.BackgroundColor3 = isChecked and curTheme.pri or curTheme.bg
+        box.BackgroundTransparency = isChecked and 0 or 1
+        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
+
+        local stroke = Instance.new("UIStroke", box)
+        stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        stroke.Thickness = 2
+        stroke.Color = isChecked and curTheme.pri or curTheme.out
+        
+        local checkIcon = Instance.new("TextLabel", box)
+        checkIcon.Size = UDim2.new(1, 0, 1, 0)
+        checkIcon.BackgroundTransparency = 1
+        checkIcon.Text = "check"
+        checkIcon.FontFace = iconFontFilled
+        checkIcon.TextScaled = true
+        checkIcon.TextColor3 = curTheme.onpri
+        checkIcon.TextTransparency = isChecked and 0 or 1
+
+        local stateObj = {box = box, stroke = stroke, icon = checkIcon, state = isChecked}
+        table.insert(objs.checkbox, stateObj)
+
+        local lbl = Instance.new("TextLabel", btn)
+        lbl.Size = UDim2.new(1, -44, 1, 0)
+        lbl.Position = UDim2.new(0, 44, 0, 0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = titleText
+        lbl.RichText = true
+        lbl.TextColor3 = curTheme.fg
+        lbl.FontFace = m3Font
+        lbl.TextSize = 14
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        table.insert(objs.fg, lbl)
+
+        local function updateState(anim)
+            local dur = anim and 0.2 or 0
+            if isChecked then
+                t(box, "BackgroundTransparency", 0, dur)
+                t(box, "BackgroundColor3", curTheme.pri, dur)
+                t(stroke, "Color", curTheme.pri, dur)
+                t(checkIcon, "TextTransparency", 0, dur)
+            else
+                t(box, "BackgroundTransparency", 1, dur)
+                t(box, "BackgroundColor3", curTheme.bg, dur)
+                t(stroke, "Color", curTheme.out, dur)
+                t(checkIcon, "TextTransparency", 1, dur)
+            end
+            stateObj.state = isChecked
+        end
+
+        btn.MouseEnter:Connect(function()
+            t(btn, "BackgroundTransparency", 0.92, 0.2)
+            t(btn, "BackgroundColor3", curTheme.fg, 0.2)
+        end)
+        btn.MouseLeave:Connect(function()
+            t(btn, "BackgroundTransparency", 1, 0.2)
+        end)
+        btn.InputBegan:Connect(function(input)
+            RippleEffect(btn, input, curTheme.fg)
+        end)
+
+        btn.MouseButton1Click:Connect(function()
+            isChecked = not isChecked
+            updateState(true)
+            if cb then cb(isChecked) end
+        end)
+
+        lib:RegisterElement(container, titleText, "item")
+
+        return {
+            GetValue = function(self) return isChecked end,
+            SetValue = function(self, val)
+                if isChecked == val then return end
+                isChecked = val
+                updateState(true)
+                if cb then cb(isChecked) end
+            end,
+            SetText = function(self, newTxt) lbl.Text = newTxt end
+        }
+    end
+
+    function lib:AddChipGroup(data)
+        local titleText = data.Title
+        local options = data.Options or {}
+        local chipType = string.lower(data.Type or "outlined")
+        local multi = data.Multiselect or false
+        local cb = data.Callback
+        lib.ElementCounter += 1
+
+        local selected = {}
+        local chipBtns = {}
+
+        local container = Instance.new("Frame", lib.CurrentBuildContainer)
+        container.LayoutOrder = lib.ElementCounter
+        container.Size = UDim2.new(1, 0, 0, titleText and 64 or 40)
+        container.BackgroundTransparency = 1
+
+        local yOffset = 0
+        if titleText and titleText ~= "" then
+            local lbl = Instance.new("TextLabel", container)
+            lbl.Size = UDim2.new(1, 0, 0, 20)
+            lbl.BackgroundTransparency = 1
+            lbl.Text = titleText
+            lbl.RichText = true
+            lbl.TextColor3 = curTheme.fg
+            lbl.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+            lbl.TextSize = 14
+            lbl.TextXAlignment = Enum.TextXAlignment.Left
+            table.insert(objs.fg, lbl)
+            yOffset = 24
+        end
+
+        local scroll = Instance.new("ScrollingFrame", container)
+        scroll.Size = UDim2.new(1, 0, 1, -yOffset)
+        scroll.Position = UDim2.new(0, 0, 0, yOffset)
+        scroll.BackgroundTransparency = 1
+        scroll.ScrollBarThickness = 1
+        scroll.ScrollBarImageColor3 = curTheme.out
+        scroll.AutomaticCanvasSize = Enum.AutomaticSize.X
+        scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+        scroll.ClipsDescendants = true
+
+        local sLayout = Instance.new("UIListLayout", scroll)
+        sLayout.FillDirection = Enum.FillDirection.Horizontal
+        sLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        sLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        sLayout.Padding = UDim.new(0, 8)
+
+        local function updateState(idx)
+            local isSel = selected[idx]
+            local c = chipBtns[idx]
+            if not c then return end
+            
+            if chipType == "filled" then
+                t(c.bg, "BackgroundColor3", isSel and curTheme.pri or (curTheme.inact:Lerp(curTheme.fg, 0.08)), 0.2)
+                t(c.lbl, "TextColor3", isSel and curTheme.onpri or curTheme.fg, 0.2)
+                if c.icon then setIconColor(c.icon, isSel and curTheme.onpri or curTheme.fg, 0.2) end
+            else
+                t(c.bg, "BackgroundColor3", isSel and curTheme.inact:Lerp(curTheme.pri, 0.15) or curTheme.bg, 0.2)
+                t(c.bg, "BackgroundTransparency", isSel and 0 or 1, 0.2)
+                t(c.stroke, "Color", isSel and curTheme.pri or curTheme.out, 0.2)
+            end
+        end
+
+        for i, opt in ipairs(options) do
+            local txt = type(opt) == "table" and opt.Text or opt
+            local icnStr = type(opt) == "table" and opt.Icon or nil
+
+            local btn = Instance.new("TextButton", scroll)
+            btn.LayoutOrder = i
+            btn.Size = UDim2.new(0, 0, 0, 32)
+            btn.Text = ""
+            btn.AutomaticSize = Enum.AutomaticSize.X
+            btn.AutoButtonColor = false
+            btn.ClipsDescendants = true
+
+            local uic = Instance.new("UICorner", btn)
+            uic.CornerRadius = UDim.new(0, 8)
+
+            selected[i] = false
+
+            if chipType == "filled" then
+                btn.BackgroundColor3 = curTheme.inact:Lerp(curTheme.fg, 0.08)
+                btn.BackgroundTransparency = 0
+            else
+                btn.BackgroundColor3 = curTheme.bg
+                btn.BackgroundTransparency = 1
+            end
+
+            local stroke = nil
+            if chipType == "outlined" then
+                stroke = Instance.new("UIStroke", btn)
+                stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+                stroke.Thickness = 1
+                stroke.Color = curTheme.out
+            end
+
+            local content = Instance.new("Frame", btn)
+            content.Size = UDim2.new(1, 0, 1, 0)
+            content.BackgroundTransparency = 1
+
+            local cLayout = Instance.new("UIListLayout", content)
+            cLayout.FillDirection = Enum.FillDirection.Horizontal
+            cLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+            cLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+            cLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            cLayout.Padding = UDim.new(0, 8)
+
+            local cPad = Instance.new("UIPadding", content)
+            cPad.PaddingLeft = UDim.new(0, icnStr and 8 or 16)
+            cPad.PaddingRight = UDim.new(0, 16)
+
+            local icnObj = nil
+            if icnStr then
+                icnObj = createIconObj(content, icnStr, UDim2.new(0, 18, 0, 18), nil, nil, false)
+                if icnObj then
+                    icnObj.LayoutOrder = 1
+                    setIconColor(icnObj, curTheme.fg)
+                end
+            end
+
+            local lbl = Instance.new("TextLabel", content)
+            lbl.LayoutOrder = 2
+            lbl.BackgroundTransparency = 1
+            lbl.Text = txt
+            lbl.RichText = true
+            lbl.TextColor3 = curTheme.fg
+            lbl.FontFace = m3Font
+            lbl.TextSize = 14
+            lbl.AutomaticSize = Enum.AutomaticSize.XY
+
+            local cData = {bg = btn, stroke = stroke, lbl = lbl, icon = icnObj, selected = false, type = chipType}
+            table.insert(objs.chip, cData)
+            chipBtns[i] = cData
+
+            btn.MouseEnter:Connect(function()
+                if not selected[i] then
+                    if chipType == "filled" then
+                        t(btn, "BackgroundColor3", curTheme.inact:Lerp(curTheme.fg, 0.15), 0.2)
+                    else
+                        t(btn, "BackgroundTransparency", 0.92, 0.2)
+                        t(btn, "BackgroundColor3", curTheme.fg, 0.2)
+                    end
+                end
+            end)
+
+            btn.MouseLeave:Connect(function() updateState(i) end)
+
+            btn.MouseButton1Click:Connect(function()
+                if multi then
+                    selected[i] = not selected[i]
+                else
+                    for j in pairs(selected) do selected[j] = false end
+                    selected[i] = true
+                end
+                
+                cData.selected = selected[i]
+                for j in pairs(chipBtns) do
+                    chipBtns[j].selected = selected[j]
+                    updateState(j)
+                end
+
+                if cb then
+                    if multi then
+                        local res = {}
+                        for j, val in pairs(selected) do if val then table.insert(res, options[j]) end end
+                        cb(res)
+                    else
+                        cb(opt, i)
+                    end
+                end
+            end)
+        end
+
+        lib:RegisterElement(container, titleText, "item")
+
+        return {
+            GetSelected = function(self)
+                local res = {}
+                for j, val in pairs(selected) do if val then table.insert(res, options[j]) end end
+                return multi and res or res[1]
+            end
+        }
+    end
+
     function lib:AddSlider(data)
         local txt = data.Title or "Slider"
         local m = data.Min or 0
@@ -2020,6 +2459,7 @@ local function CreateNox(data)
                     optBtn.Text = opt
                     optBtn.FontFace = m3Font
                     optBtn.TextSize = 14
+                    optBtn.RichText = true
                     optBtn.TextColor3 = curTheme.fg
                     optBtn.TextXAlignment = Enum.TextXAlignment.Left
                     optBtn.LayoutOrder = i
@@ -2119,6 +2559,32 @@ local function CreateNox(data)
             end)
         end
     end)
+
+    function lib:CloseNox()
+        local tInfo = TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+                    
+        tw:Create(win, tInfo, {
+            Size = UDim2.new(0, win.Size.X.Offset, 0, 64),
+            Transparency = 1
+        }):Play()
+                    
+        tw:Create(top, tInfo, {TextTransparency = 1}):Play()
+                    
+        if enableSearch and searchBar then
+            tw:Create(searchBar, tInfo, {BackgroundTransparency = 1}):Play()
+            tw:Create(avatarImg, tInfo, {BackgroundTransparency = 1}):Play()
+            tw:Create(avatarImg, tInfo, {ImageTransparency = 1}):Play()
+        end
+                    
+        tw:Create(btnMinMax, tInfo, {BackgroundTransparency = 1}):Play()
+        tw:Create(btnClose, tInfo, {BackgroundTransparency = 1}):Play()
+                   
+        setIconTrans(icnMinMax, 1, 0.4)
+        setIconTrans(icnClose, 1, 0.4)
+                    
+        task.wait(0.4)
+        gui:Destroy()
+    end
 
     local d, di, ds, sp
     win.InputBegan:Connect(function(i) 
