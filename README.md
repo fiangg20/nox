@@ -78,18 +78,30 @@ NoxLibrary initializes the following Roblox services on load:
 
 On first load, the library:
 1. Creates a folder named `NoxAssets` in your executor's workspace
-2. Downloads `GoogleSansFlex_24pt-Regular.ttf` from the remote repository
+2. Downloads `GoogleSans.ttf` from the remote repository
 3. Generates a JSON font configuration file (`m3font.json`)
-4. Registers the font using Roblox's `Font.new()` with `getcustomasset()`
+4. Downloads `MaterialIcons.ttf` (filled icons) and `MaterialIconsOutlined.otf` (outlined icons), along with their JSON configs.
+5. Registers the fonts using Roblox's `Font.new()` with `getcustomasset()`
 
-### Icon System
+## Icon System
 
-The library loads Lucide icons from a remote Lua module. Icons can be referenced by:
-- **Lucide icon name**: [Lucide Icon](https://lucide.dev/icons/)
+The library loads Material Icons via custom fonts. Icons can be referenced by:
+- **Material icon name**: [Material Symbols & Icons](https://fonts.google.com/icons)
 - **Direct asset ID**: `"rbxassetid://12345678"`
 - **Custom asset**: `"rbxasset://path/to/asset"`
 
-If icon loading fails, a warning is printed and icons will not render.
+### Internal Icon Mapping
+For backward compatibility and ease of use, Nox automatically maps these common icon names to their Material equivalents:
+| Input Name | Mapped Material Icon |
+|------------|----------------------|
+| `x` | `close` |
+| `minimize` | `remove` |
+| `maximize` | `crop_square` |
+| `search` | `search` |
+| `chevron-down` | `expand_more` |
+| `circle-x` | `cancel` |
+
+If icon loading fails or an invalid name is passed, a warning is printed and icons will not render.
 
 ---
 
@@ -108,7 +120,7 @@ local UI = NoxLibrary:Create(config)
 | `Title` | `string` | `"Nox"` | Window title displayed in the header |
 | `SizeX` | `number` | `380` | Initial window width in pixels |
 | `SizeY` | `number` | `520` | Initial window height in pixels |
-| `ToggleKey` | `Enum.KeyCode` | `nil` | Key to toggle minimize/restore |
+| `ToggleKey` | `Enum.KeyCode` | `Enum.KeyCode.K` | Key to toggle minimize/restore |
 | `Theme` | `string` | `"Default"` | Initial color theme name |
 | `Search` | `boolean` | `false` | Enable the search bar |
 | `SearchPlaceholder` | `string` | `"Search..."` | Placeholder text for the search box |
@@ -316,7 +328,7 @@ Any missing values fall back to the **Default** theme's colors.
 ```lua
 local MainTab = UI:AddTab({
     Title = "Main",
-    Icon = "home"  -- Lucide icon name or asset ID
+    Icon = "home"  -- Material icon name or asset ID
 })
 
 local SettingsTab = UI:AddTab({
@@ -330,7 +342,7 @@ local SettingsTab = UI:AddTab({
 | Property | Type | Description |
 |----------|------|-------------|
 | `Title` | `string` | Tab display text |
-| `Icon` | `string` | Lucide icon name or asset ID |
+| `Icon` | `string` | Material icon name or asset ID |
 
 ### Tab Scrolling
 
@@ -408,7 +420,7 @@ local label = UI:AddLabel({
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `Text` | `string` | `"Label"` | Display text (supports RichText) |
-| `Icon` | `string` | `nil` | Lucide icon name or asset ID |
+| `Icon` | `string` | `nil` | Material icon name or asset ID |
 
 #### Return Methods
 
@@ -472,6 +484,7 @@ Interactive button with multiple Material Design 3 variants.
 local button = UI:AddButton({
     Text = "Click Me",
     Type = "filled",
+    Icon = "lightbulb"
     Width = 200,        -- optional, for fixed width
     Callback = function()
         print("Button clicked!")
@@ -485,6 +498,7 @@ local button = UI:AddButton({
 |-----------|------|---------|-------------|
 | `Text` | `string` | `"Button"` | Button label text |
 | `Type` | `string` | `"filled"` | Button style variant |
+| `Icon` | `string` | `nil` | Button icon
 | `Width` | `number` | `nil` | Fixed width (full-width if omitted) |
 | `Callback` | `function` | `nil` | Function called on click |
 
@@ -531,7 +545,7 @@ local switch = UI:AddSwitch({
 |-----------|------|---------|-------------|
 | `Title` | `string` | `"Switch"` | Display label |
 | `Default` | `boolean` | `false` | Initial toggle state |
-| `Icon` | `string` | `nil` | Lucide icon name or asset ID |
+| `Icon` | `string` | `nil` | Material icon name or asset ID |
 | `Callback` | `function` | `nil` | Called with new boolean state |
 
 #### Visual States
@@ -642,7 +656,7 @@ local dropdown = UI:AddDropdown({
 | `Title` | `string` | `"Dropdown"` | Field label (always displayed floating) |
 | `Options` | `table` | `{}` | Array of option strings |
 | `Default` | `number` | `1` | Index of initially selected option |
-| `Icon` | `string` | `nil` | Lucide icon name or asset ID |
+| `Icon` | `string` | `nil` | Material icon name or asset ID |
 | `Callback` | `function` | `nil` | Called with selected option string |
 
 #### Visual States
@@ -699,7 +713,7 @@ local textbox = UI:AddTextBox({
 |-----------|------|---------|-------------|
 | `Title` | `string` | `"TextBox"` | Field label (floats on focus) |
 | `SupportText` | `string` | `nil` | Helper text displayed below the field |
-| `Icon` | `string` | `nil` | Lucide icon name or asset ID |
+| `Icon` | `string` | `nil` | Material icon name or asset ID |
 | `Callback` | `function` | `nil` | Called on focus lost with `(text, enterPressed)` |
 
 #### Floating Label Animation
@@ -1050,7 +1064,7 @@ All element-returned tables support these methods where applicable:
 ### Complete Example
 
 ```lua
-local NoxLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua"))()
+local NoxLibrary = loadstring(game:HttpGet("[https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua](https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua)"))()
 
 -- Create the main window
 local UI = NoxLibrary:Create({
@@ -1077,7 +1091,7 @@ local speedSlider = UI:AddSlider({
     Max = 200,
     Default = 16,
     Size = "m",
-    Icon = "zap",
+    Icon = "bolt",
     Callback = function(value)
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
     end
@@ -1101,7 +1115,7 @@ UI:AddSection({Text = "Combat"})
 local espSwitch = UI:AddSwitch({
     Title = "Enable ESP",
     Default = false,
-    Icon = "eye",
+    Icon = "visibility",
     Callback = function(state)
         if state then
             print("ESP Enabled")
@@ -1115,6 +1129,7 @@ local teamDropdown = UI:AddDropdown({
     Title = "Target Team",
     Options = {"All", "Red", "Blue", "Neutral"},
     Default = 1,
+    Icon = "group",
     Callback = function(selected)
         print("Targeting:", selected)
     end
@@ -1123,12 +1138,13 @@ local teamDropdown = UI:AddDropdown({
 -- Visuals tab content
 local VisualTab = UI:AddTab({
     Title = "Visuals",
-    Icon = "eye"
+    Icon = "visibility"
 })
 
 UI:AddButton({
     Text = "Apply Fullbright",
     Type = "filled",
+    Icon = "light_mode",
     Callback = function()
         game.Lighting.Brightness = 2
         game.Lighting.ClockTime = 14
@@ -1142,6 +1158,7 @@ UI:AddButton({
 UI:AddButton({
     Text = "Reset Lighting",
     Type = "tonal",
+    Icon = "refresh",
     Callback = function()
         game.Lighting.Brightness = 1
         game.Lighting.ClockTime = 12
@@ -1159,7 +1176,7 @@ UI:AddSection({Text = "Configuration"})
 local usernameBox = UI:AddTextBox({
     Title = "Display Name",
     SupportText = "This name will be shown to other players",
-    Icon = "user",
+    Icon = "person",
     Callback = function(text, enterPressed)
         if enterPressed and text ~= "" then
             UI:Notify({
@@ -1176,7 +1193,8 @@ UI:AddSection({Text = "Appearance"})
 UI:AddButton({
     Text = "Purple Theme",
     Type = "outlined",
-    Width = 120,
+    Width = 140,
+    Icon = "palette",
     Callback = function()
         UI:ChangePalette("Purple")
     end
@@ -1185,7 +1203,8 @@ UI:AddButton({
 UI:AddButton({
     Text = "Blue Theme",
     Type = "outlined",
-    Width = 120,
+    Width = 140,
+    Icon = "water_drop",
     Callback = function()
         UI:ChangePalette("Blue")
     end
@@ -1194,7 +1213,8 @@ UI:AddButton({
 UI:AddButton({
     Text = "Green Theme",
     Type = "outlined",
-    Width = 120,
+    Width = 140,
+    Icon = "eco",
     Callback = function()
         UI:ChangePalette("Green")
     end
@@ -1291,7 +1311,7 @@ UI:AddButton({
 ## Credits
 
 - **Font**: Google Sans Flex by Google
-- **Icons**: Lucide Icons ([lucide.dev](https://lucide.dev))
+- **Icons**: Material Icons by Google
 - **Design System**: Material Design 3 by Google
 - **Created by**: UltraSirius (@fyandevelopers on Roblox)
 
