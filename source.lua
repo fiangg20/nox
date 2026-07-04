@@ -1176,7 +1176,7 @@ local function CreateNox(data)
         return { SetText = function(self, newTxt) lbl.Text = newTxt end }
     end
 
-    function lib:AddLabel(data)
+function lib:AddLabel(data)
         local txt = data.Text or "Label"
         local iconStr = data.Icon
         lib.ElementCounter += 1
@@ -1184,6 +1184,7 @@ local function CreateNox(data)
         local r = Instance.new("Frame", lib.CurrentBuildContainer)
         r.LayoutOrder = lib.ElementCounter
         r.Size = UDim2.new(1, 0, 0, 32)
+        r.AutomaticSize = Enum.AutomaticSize.Y
         r.BackgroundTransparency = 1
 
         local leftOffset = 0
@@ -1198,7 +1199,7 @@ local function CreateNox(data)
         end
 
         local l = Instance.new("TextLabel", r)
-        l.Size = UDim2.new(1, -leftOffset, 1, 0)
+        l.Size = UDim2.new(1, -leftOffset, 0, 32) 
         l.Position = UDim2.new(0, leftOffset, 0, 0)
         l.BackgroundTransparency = 1
         l.Text = txt
@@ -1207,6 +1208,9 @@ local function CreateNox(data)
         l.FontFace = m3Font
         l.TextSize = 14
         l.TextXAlignment = Enum.TextXAlignment.Left
+        l.TextWrapped = true
+        l.AutomaticSize = Enum.AutomaticSize.Y
+
         table.insert(objs.fg, l)
         lib:RegisterElement(r, txt, "item")
 
