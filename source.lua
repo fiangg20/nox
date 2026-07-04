@@ -607,7 +607,7 @@ local function CreateNox(data)
                     setIconTrans(icnClose, 1, 0.4)
                     
                     task.wait(0.4)
-                    if closeCb then closeCb() end
+                    if closeCb then closeCb end
                     gui:Destroy()
                 end}
             },
