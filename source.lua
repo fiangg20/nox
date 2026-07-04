@@ -128,6 +128,7 @@ local cp = {
 }
 
 local objs = {bg={}, fg={}, pri={}, onpri={}, inact={}, out={}, s_trk={}, s_thm={}, tab_btn={}, tbox={}, icon={}, dlg_bg={}, dlg_fg={}, sl_val={}, radio={}, checkbox={}, chip={}}
+local curTheme = cp["Default"]
 
 function t(o, p, v, d)
     tw:Create(o, TweenInfo.new(d or 0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {[p] = v}):Play()
@@ -223,14 +224,18 @@ local function CreateNox(data)
                 return http:JSONDecode(readfile(path))
             end)
             
-            if success then
+            if success and type(decoded) == "table" then
                 for flag, val in pairs(decoded) do
                     lib.Flags[flag] = val
                     if lib.Setters[flag] then
-                        lib.Setters[flag](val) 
+                        task.spawn(function()
+                            pcall(function() lib.Setters[flag](val) end)
+                        end)
                     end
                 end
                 lib:Notify({Text = "Config '" .. name .. "' has been loaded!", Duration = 3})
+            else
+                lib:Notify({Text = "Failed to parse config JSON!", Duration = 3})
             end
         else
             lib:Notify({Text = "Config '" .. name .. "' not found!", Duration = 3})
@@ -1369,6 +1374,12 @@ local function CreateNox(data)
         local cb = data.Callback
         lib.ElementCounter += 1
 
+        local initText = ""
+        if flag and lib.Flags[flag] ~= nil then
+            initText = tostring(lib.Flags[flag])
+        end
+        if flag then lib.Flags[flag] = initText end
+
         local wrapper = Instance.new("Frame", lib.CurrentBuildContainer)
         wrapper.LayoutOrder = lib.ElementCounter
         wrapper.Size = UDim2.new(1, 0, 0, 0)
@@ -1421,7 +1432,7 @@ local function CreateNox(data)
         tbox.Size = UDim2.new(1, -(leftOffset + 36), 0, 24)
         tbox.Position = UDim2.new(0, leftOffset, 0, 26)
         tbox.BackgroundTransparency = 1
-        tbox.Text = ""
+        tbox.Text = initText
         tbox.PlaceholderText = ""
         tbox.TextColor3 = curTheme.fg
         tbox.FontFace = m3Font
@@ -1435,8 +1446,6 @@ local function CreateNox(data)
         
         local tbPad = Instance.new("UIPadding", tbox)
         tbPad.PaddingBottom = UDim.new(0, 8)
-        
-        if flag then lib.Flags[flag] = tbox.Text end
 
         local clearBtn = createIconObj(frame, "circle-x", UDim2.new(0, 18, 0, 18), UDim2.new(1, -12, 0.5, 0), Vector2.new(1, 0.5), true)
         setIconColor(clearBtn, curTheme.out)
@@ -1502,6 +1511,8 @@ local function CreateNox(data)
             if cb then cb(tbox.Text, enter) end
         end)
         tbox:GetPropertyChangedSignal("Text"):Connect(updateState)
+        
+        task.spawn(updateState)
 
         clearBtn.MouseButton1Click:Connect(function()
             tbox.Text = ""
@@ -1692,9 +1703,13 @@ local function CreateNox(data)
         local flag = data.Flag
 
         lib.ElementCounter += 1
-        local st = def or false
         
+        local st = def or false
+        if flag and lib.Flags[flag] ~= nil then
+            st = lib.Flags[flag]
+        end
         if flag then lib.Flags[flag] = st end
+        
         local r = Instance.new("Frame", lib.CurrentBuildContainer)
         r.LayoutOrder = lib.ElementCounter
         r.Size = UDim2.new(1, 0, 0, 48)
@@ -1791,6 +1806,9 @@ local function CreateNox(data)
         lib.ElementCounter += 1
 
         local selectedIdx = defaultIdx
+        if flag and lib.Flags[flag] ~= nil then
+            selectedIdx = tonumber(lib.Flags[flag]) or selectedIdx
+        end
         if flag then lib.Flags[flag] = selectedIdx end
 
         local groupContainer = Instance.new("Frame", lib.CurrentBuildContainer)
@@ -1928,6 +1946,7 @@ local function CreateNox(data)
         lib.ElementCounter += 1
 
         local isChecked = def
+        if flag and lib.Flags[flag] ~= nil then isChecked = lib.Flags[flag] end
         if flag then lib.Flags[flag] = isChecked end
 
         local container = Instance.new("Frame", lib.CurrentBuildContainer)
@@ -2046,6 +2065,13 @@ local function CreateNox(data)
         local selected = {}
         local chipBtns = {}
         
+        for i, _ in ipairs(options) do selected[i] = false end
+        if flag and lib.Flags[flag] ~= nil and type(lib.Flags[flag]) == "table" then
+            for k, v in pairs(lib.Flags[flag]) do
+                selected[tonumber(k) or k] = v
+            end
+        end
+        
         if flag then
             local tCopy = {}
             for k,v in pairs(selected) do tCopy[k] = v end
@@ -2128,14 +2154,12 @@ local function CreateNox(data)
             local uic = Instance.new("UICorner", btn)
             uic.CornerRadius = UDim.new(0, 8)
 
-            selected[i] = false
-
             if chipType == "filled" then
-                btn.BackgroundColor3 = curTheme.inact:Lerp(curTheme.fg, 0.08)
+                btn.BackgroundColor3 = selected[i] and curTheme.pri or curTheme.inact:Lerp(curTheme.fg, 0.08)
                 btn.BackgroundTransparency = 0
             else
-                btn.BackgroundColor3 = curTheme.bg
-                btn.BackgroundTransparency = 1
+                btn.BackgroundColor3 = selected[i] and curTheme.inact:Lerp(curTheme.pri, 0.15) or curTheme.bg
+                btn.BackgroundTransparency = selected[i] and 0 or 1
             end
 
             local stroke = nil
@@ -2143,7 +2167,7 @@ local function CreateNox(data)
                 stroke = Instance.new("UIStroke", btn)
                 stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
                 stroke.Thickness = 1
-                stroke.Color = curTheme.out
+                stroke.Color = selected[i] and curTheme.pri or curTheme.out
             end
 
             local content = Instance.new("Frame", btn)
@@ -2166,7 +2190,7 @@ local function CreateNox(data)
                 icnObj = createIconObj(content, icnStr, UDim2.new(0, 18, 0, 18), nil, nil, false)
                 if icnObj then
                     icnObj.LayoutOrder = 1
-                    setIconColor(icnObj, curTheme.fg)
+                    setIconColor(icnObj, selected[i] and (chipType == "filled" and curTheme.onpri or curTheme.fg) or curTheme.fg)
                 end
             end
 
@@ -2175,14 +2199,16 @@ local function CreateNox(data)
             lbl.BackgroundTransparency = 1
             lbl.Text = txt
             lbl.RichText = true
-            lbl.TextColor3 = curTheme.fg
+            lbl.TextColor3 = selected[i] and (chipType == "filled" and curTheme.onpri or curTheme.fg) or curTheme.fg
             lbl.FontFace = m3Font
             lbl.TextSize = 14
             lbl.AutomaticSize = Enum.AutomaticSize.XY
 
-            local cData = {bg = btn, stroke = stroke, lbl = lbl, icon = icnObj, selected = false, type = chipType}
+            local cData = {bg = btn, stroke = stroke, lbl = lbl, icon = icnObj, selected = selected[i], type = chipType}
             table.insert(objs.chip, cData)
             chipBtns[i] = cData
+            
+            task.spawn(function() updateState(i) end)
 
             btn.MouseEnter:Connect(function()
                 if not selected[i] then
@@ -2287,6 +2313,9 @@ local function CreateNox(data)
         lib.ElementCounter += 1
         
         local v = math.clamp(df or m, m, mx)
+        if flag and lib.Flags[flag] ~= nil then 
+            v = math.clamp(tonumber(lib.Flags[flag]) or v, m, mx) 
+        end
         if flag then lib.Flags[flag] = v end
         local drag = false
 
@@ -2478,10 +2507,17 @@ local function CreateNox(data)
         local cb = data.Callback
         local flag = data.Flag
         lib.ElementCounter += 1
+        
         local selectedIdx = defaultIdx or 1
         local currentOptions = options or {}
         local isOpen = false
         
+        if flag and lib.Flags[flag] ~= nil then
+            local loadedVal = lib.Flags[flag]
+            for i, val in ipairs(currentOptions) do
+                if val == loadedVal then selectedIdx = i break end
+            end
+        end
         if flag then lib.Flags[flag] = currentOptions[selectedIdx] or "" end
     
         local frame = Instance.new("Frame", lib.CurrentBuildContainer)
@@ -2821,5 +2857,4 @@ end
 function NoxLibrary:Create(data)
     return CreateNox(data)
 end
-
 return NoxLibrary
