@@ -211,9 +211,6 @@ local function CreateNox(data)
         
         if success then
             writefile(configFolder .. "/" .. name .. ".json", json)
-            lib:Notify({Text = "Config '" .. name .. "' has been saved!", Duration = 3})
-        else
-            lib:Notify({Text = "Failed to save config!", Duration = 3})
         end
     end
 
@@ -233,12 +230,7 @@ local function CreateNox(data)
                         end)
                     end
                 end
-                lib:Notify({Text = "Config '" .. name .. "' has been loaded!", Duration = 3})
-            else
-                lib:Notify({Text = "Failed to parse config JSON!", Duration = 3})
             end
-        else
-            lib:Notify({Text = "Config '" .. name .. "' not found!", Duration = 3})
         end
     end
 
@@ -246,7 +238,7 @@ local function CreateNox(data)
         local list = {}
         if isfolder(configFolder) then
             for _, file in ipairs(listfiles(configFolder)) do
-                local fileName = file:match("([^/%\\]+)%.json$")
+                local fileName = file:match("([^/\\]+)%.json$")
                 if fileName then table.insert(list, fileName) end
             end
         end
