@@ -184,6 +184,7 @@ local function CreateNox(data)
     local searchPlaceholder = data.SearchPlaceholder or "Search..."
     local searchCb = data.OnSearch
     local searchAvatar = data.SearchAvatar or "rbxthumb://type=AvatarHeadShot&id=" .. plrs.LocalPlayer.UserId .. "&w=48&h=48"
+    local closeCb = data.OnClose
 
     if cp[initTheme] then
         curTheme = cp[initTheme]
@@ -606,6 +607,7 @@ local function CreateNox(data)
                     setIconTrans(icnClose, 1, 0.4)
                     
                     task.wait(0.4)
+                    if closeCb then closeCb() end
                     gui:Destroy()
                 end}
             },
