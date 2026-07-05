@@ -58,7 +58,7 @@ local internalIconMap = {
     ["minimize"] = "remove",
     ["maximize"] = "crop_square",
     ["search"] = "search",
-    ["chevron-down"] = "expand_more",
+    ["chevron-down"] = "arrow_drop_down",
     ["circle-x"] = "cancel"
 }
 
