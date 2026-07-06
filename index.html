@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nox - Documentation</title>
-
     <style>
         @font-face {
             font-family: 'Google Sans';
@@ -13,11 +12,9 @@
             font-style: normal;
         }
     </style>
-    
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-
     <script type="importmap">
     {
         "imports": {
@@ -30,7 +27,6 @@
         import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
         document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
     </script>
-
     <style>
         :root {
             --md-sys-color-background: #1C1B1F;
@@ -44,7 +40,6 @@
             --md-sys-color-error: #F2B8B5;
             --code-bg: #1d1f21;
         }
-
         body {
             font-family: 'Google Sans', sans-serif;
             margin: 0;
@@ -55,34 +50,7 @@
             height: 100vh;
             overflow: hidden;
             letter-spacing: 0.3px;
-            position: relative;
-            z-index: 1;
         }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: -20%;
-            left: -10%;
-            width: 50vw;
-            height: 50vh;
-            background: radial-gradient(circle, rgba(208, 188, 255, 0.06) 0%, transparent 70%);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: -20%;
-            right: -10%;
-            width: 60vw;
-            height: 60vh;
-            background: radial-gradient(circle, rgba(208, 188, 255, 0.04) 0%, transparent 70%);
-            z-index: -1;
-            pointer-events: none;
-        }
-
         * {
             --md-sys-typescale-display-large-font: 'Google Sans', sans-serif;
             --md-sys-typescale-display-medium-font: 'Google Sans', sans-serif;
@@ -101,29 +69,22 @@
             --md-sys-typescale-body-small-font: 'Google Sans', sans-serif;
             font-family: 'Google Sans', sans-serif;
         }
-
         .material-symbols-outlined {
             font-family: 'Material Symbols Outlined' !important;
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             transition: font-variation-settings 0.2s ease, color 0.2s ease;
         }
-        
         .icon-filled {
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
         }
-
         header {
-            background-color: rgba(43, 41, 48, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background-color: var(--md-sys-color-surface);
             padding: 1.2rem 2.5rem;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid rgba(73, 69, 79, 0.5);
             z-index: 10;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        
         header h1 {
             margin: 0;
             color: var(--md-sys-color-primary);
@@ -132,32 +93,26 @@
             align-items: center;
             gap: 12px;
         }
-        
         header h1 .material-symbols-outlined {
             font-size: 2rem;
         }
-
         .layout-container {
             display: flex;
             flex: 1;
             overflow: hidden;
         }
-
         .sidebar {
             width: 280px;
-            background-color: transparent;
+            background-color: var(--md-sys-color-surface);
             overflow-y: auto;
             padding: 1.5rem 0;
-            border-right: 1px solid rgba(73, 69, 79, 0.3);
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
         }
-        
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background-color: var(--md-sys-color-surface-variant); border-radius: 10px; }
-
         .nav-label {
             padding: 0.5rem 2rem;
             color: var(--md-sys-color-outline);
@@ -166,7 +121,6 @@
             margin-top: 1.5rem;
         }
         .nav-label:first-child { margin-top: 0; }
-        
         .nav-item {
             text-decoration: none;
             color: var(--md-sys-color-on-surface);
@@ -192,32 +146,27 @@
         .nav-item:hover .material-symbols-outlined {
             color: var(--md-sys-color-primary);
         }
-        
         .nav-item.active {
-            background-color: rgba(208, 188, 255, 0.12); 
+            background-color: rgba(208, 188, 255, 0.12);
             color: var(--md-sys-color-primary);
         }
         .nav-item.active .material-symbols-outlined {
             color: var(--md-sys-color-primary);
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-
         .main-content {
             flex: 1;
             overflow-y: auto;
             padding: 3rem 5rem;
             scroll-behavior: smooth;
         }
-        
         .main-content::-webkit-scrollbar { width: 8px; }
-        .main-content::-webkit-scrollbar-track { background: transparent; }
+        .main-content::-webkit-scrollbar-track { background: var(--md-sys-color-background); }
         .main-content::-webkit-scrollbar-thumb { background-color: var(--md-sys-color-surface-variant); border-radius: 10px; }
-        
         .content-section {
             margin-bottom: 5rem;
             scroll-margin-top: 2rem;
         }
-        
         .content-section h2 {
             color: var(--md-sys-color-primary);
             padding-bottom: 0.5rem;
@@ -227,24 +176,18 @@
             align-items: center;
             gap: 12px;
         }
-
         .doc-card {
-            background-color: rgba(43, 41, 48, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background-color: var(--md-sys-color-surface);
             border-radius: 24px;
             padding: 2rem;
             margin-top: 1rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
         .doc-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-            background-color: rgba(43, 41, 48, 0.8);
+            box-shadow: 0 12px 40px rgba(208,188,255,0.08);
         }
-        
         .doc-desc {
             margin-top: 0;
             margin-bottom: 1.5rem;
@@ -252,23 +195,21 @@
             color: var(--md-sys-color-on-surface);
             font-size: 1.05rem;
         }
-        
         .arg-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 1.5rem;
-            background: rgba(0,0,0,0.15);
+            background: rgba(0,0,0,0.2);
             border-radius: 12px;
             overflow: hidden;
         }
         .arg-table th, .arg-table td {
             padding: 12px 16px;
             text-align: left;
-            border-bottom: 1px solid rgba(73, 69, 79, 0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .arg-table th { background: rgba(208, 188, 255, 0.08); color: var(--md-sys-color-primary); font-weight: 600; }
+        .arg-table th { background: rgba(208, 188, 255, 0.1); color: var(--md-sys-color-primary); font-weight: 600; }
         .arg-table tr:last-child td { border-bottom: none; }
-
         pre[class*="language-"] {
             position: relative;
             background-color: var(--code-bg);
@@ -276,9 +217,7 @@
             padding: 1.5rem;
             margin: 0;
             overflow-x: auto;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
         }
-
         pre[class*="language-"]::-webkit-scrollbar {
             height: 8px;
         }
@@ -291,19 +230,14 @@
             background-color: var(--md-sys-color-surface-variant);
             border-radius: 10px;
         }
-
         pre[class*="language-"], 
         code[class*="language-"], 
         code[class*="language-"] span, 
-        pre[class*="language-"] span {
-            font-family: 'JetBrains Mono', monospace !important;
-            font-size: 0.95rem;
-        }
-
-        pre[class*="language-"] *, code[class*="language-"] * {
+        pre[class*="language-"] span,
+        pre[class*="language-"] *, 
+        code[class*="language-"] * {
             font-family: 'JetBrains Mono', monospace !important;
         }
-        
         .copy-btn {
             position: absolute;
             top: 12px;
@@ -328,12 +262,11 @@
         .copy-btn .material-symbols-outlined {
             font-size: 18px;
         }
-
         .type-chip {
             display: inline-block;
-            background: rgba(208, 188, 255, 0.12);
+            background: rgba(208, 188, 255, 0.15);
             color: var(--md-sys-color-primary);
-            padding: 4px 12px;
+            padding: 6px 12px;
             border-radius: 12px;
             font-size: 0.75rem;
             font-weight: 700;
@@ -342,68 +275,124 @@
             text-transform: capitalize;
             letter-spacing: 0.05em;
         }
-
-        .hero-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            margin-bottom: 5rem;
-            min-height: 360px;
+        .hero-container {
+            display: flex;
+            background-color: var(--md-sys-color-surface);
             border-radius: 32px;
             overflow: hidden;
-            background-color: rgba(43, 41, 48, 0.7);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-bottom: 4rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            min-height: 360px;
+            position: relative;
         }
-        
-        .hero-text-panel {
-            padding: 3.5rem;
+        .hero-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(208,188,255,0.05) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .hero-content {
+            flex: 1;
+            padding: 4rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            z-index: 1;
         }
-        
-        .hero-image-panel {
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--md-sys-color-on-background);
+            margin: 0 0 1rem 0;
+            letter-spacing: -1px;
+        }
+        .hero-desc {
+            color: var(--md-sys-color-outline);
+            font-size: 1.15rem;
+            line-height: 1.7;
+            max-width: 90%;
+            margin: 0;
+        }
+        .hero-image-wrapper {
+            flex: 1;
+            background-color: #D0BCFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
-            background-color: var(--md-sys-color-surface);
+            position: relative;
         }
-        
-        .hero-image-panel img {
+        .hero-image-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
+            transition: transform 0.5s ease;
         }
-
+        .hero-container:hover .hero-image-wrapper img {
+            transform: scale(1.05);
+        }
+        .credits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
         .credit-card {
-            background-color: rgba(43, 41, 48, 0.7);
+            background: var(--md-sys-color-surface);
             padding: 1.5rem;
-            border-radius: 24px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 16px;
-            transition: transform 0.2s ease, background-color 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
         }
-
         .credit-card:hover {
-            transform: translateY(-4px);
-            background-color: rgba(73, 69, 79, 0.4);
+            background: rgba(208, 188, 255, 0.08);
+            transform: translateY(-2px);
         }
-
-        @media (max-width: 1100px) {
-            .hero-layout {
-                grid-template-columns: 1fr;
-                min-height: auto;
-            }
-            .hero-image-panel {
-                aspect-ratio: 16 / 9;
-            }
+        .credit-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--md-sys-color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--md-sys-color-on-primary);
+            font-weight: bold;
+            font-size: 1.2rem;
         }
-
+        .credit-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .credit-name {
+            font-weight: 600;
+            color: var(--md-sys-color-on-background);
+            font-size: 1.05rem;
+        }
+        .credit-role {
+            color: var(--md-sys-color-primary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        @media (max-width: 900px) {
+            .hero-container { flex-direction: column; }
+            .hero-image-wrapper { min-height: 250px; }
+        }
         @media (max-width: 768px) {
             .layout-container { flex-direction: column; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid rgba(73, 69, 79, 0.5); height: 250px; }
+            .sidebar { width: 100%; height: 250px; }
             .main-content { padding: 2rem 1.5rem; }
-            .hero-text-panel { padding: 2rem; }
+            .hero-content { padding: 2rem; }
+            .hero-title { font-size: 3rem; }
         }
     </style>
 </head>
@@ -414,22 +403,19 @@
             <span style="color: var(--md-sys-color-outline); font-size: 1.3rem; font-weight: 400; margin-left: 8px;">Documentation</span>
         </h1>
     </header>
-
     <div class="layout-container">
         <nav class="sidebar">
             <div class="nav-label">Overview</div>
             <a href="#home" class="nav-item"><span class="material-symbols-outlined">home</span> Home</a>
-            
+            <a href="#credits" class="nav-item"><span class="material-symbols-outlined">group</span> Credits</a>
             <div class="nav-label">Introduction</div>
             <a href="#init" class="nav-item"><span class="material-symbols-outlined">rocket_launch</span> Initialization</a>
-            
             <div class="nav-label">Core System</div>
             <a href="#window" class="nav-item"><span class="material-symbols-outlined">web_asset</span> Window & Base</a>
             <a href="#config" class="nav-item"><span class="material-symbols-outlined">save</span> Config System</a>
             <a href="#theme" class="nav-item"><span class="material-symbols-outlined">palette</span> Theme System</a>
             <a href="#tabs" class="nav-item"><span class="material-symbols-outlined">tab</span> Tabs</a>
             <a href="#icons" class="nav-item"><span class="material-symbols-outlined">emoji_symbols</span> Icons System</a>
-            
             <div class="nav-label">Interactive Elements</div>
             <a href="#button" class="nav-item"><span class="material-symbols-outlined">smart_button</span> Button</a>
             <a href="#switch" class="nav-item"><span class="material-symbols-outlined">toggle_on</span> Switch / Toggle</a>
@@ -439,37 +425,28 @@
             <a href="#radiogroup" class="nav-item"><span class="material-symbols-outlined">radio_button_checked</span> Radio Group</a>
             <a href="#checkbox" class="nav-item"><span class="material-symbols-outlined">check_box</span> Checkbox</a>
             <a href="#chipgroup" class="nav-item"><span class="material-symbols-outlined">smart_button</span> Chip Group</a>
-            
             <div class="nav-label">Layout Elements</div>
             <a href="#label" class="nav-item"><span class="material-symbols-outlined">label</span> Label</a>
             <a href="#section" class="nav-item"><span class="material-symbols-outlined">segment</span> Section</a>
             <a href="#divider" class="nav-item"><span class="material-symbols-outlined">horizontal_rule</span> Divider</a>
-            
             <div class="nav-label">Popups & Overlays</div>
             <a href="#notify" class="nav-item"><span class="material-symbols-outlined">notifications</span> Notification</a>
             <a href="#dialog" class="nav-item"><span class="material-symbols-outlined">chat_bubble</span> Dialog</a>
-
-            <div class="nav-label">Information</div>
-            <a href="#credits" class="nav-item"><span class="material-symbols-outlined">groups</span> Credits</a>
         </nav>
-
         <main class="main-content">
-            
-            <section id="home" class="content-section" style="margin-bottom: 2rem;">
-                <div class="hero-layout">
-                    <div class="hero-text-panel">
-                        <h1 class="md-typescale-display-large" style="margin: 0 0 1rem 0; font-weight: 700; color: var(--md-sys-color-on-surface);">Nox</h1>
-                        <p class="md-typescale-body-large" style="margin: 0; color: var(--md-sys-color-on-surface); line-height: 1.6; opacity: 0.9;">
-                            A premium UI framework for Roblox that fully adapts <b>Material Design 3 (M3)</b> guidelines. 
-                            It comes equipped with Ripple animations, a dynamic color system, auto-saving configurations, and a highly responsive built-in search feature.
+            <section id="home" class="content-section">
+                <div class="hero-container">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Nox</h1>
+                        <p class="hero-desc">
+                            A premium UI framework for Roblox that fully adapts Material Design 3 (M3) guidelines. It comes equipped with Ripple animations, a dynamic color system, auto-saving configurations, and a highly responsive built-in search feature.
                         </p>
                     </div>
-                    <div class="hero-image-panel">
-                        <img src="https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/banner.png" alt="Nox Framework Banner" onerror="this.src='https://placehold.co/1280x720/2B2930/D0BCFF?text=Nox+Banner+(16:9)'">
+                    <div class="hero-image-wrapper">
+                        <img src="https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/banner.png" alt="Nox Banner" onerror="this.src='https://placehold.co/800x600/D0BCFF/381E72?text=Nox+Banner'">
                     </div>
                 </div>
             </section>
-
             <section id="init" class="content-section">
                 <h2><span class="material-symbols-outlined">rocket_launch</span> Initialization</h2>
                 <div class="doc-card">
@@ -477,12 +454,10 @@
                     <pre><code class="language-lua">local Nox = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua"))()</code></pre>
                 </div>
             </section>
-
             <section id="window" class="content-section">
                 <h2><span class="material-symbols-outlined">web_asset</span> Window <span class="type-chip">Base</span></h2>
                 <div class="doc-card">
-                    <p class="doc-desc">Creates the main Window/GUI. This is the foundation of your script. It includes a built-in <i>Search Bar</i> that automatically registers all elements.</p>
-                    
+                    <p class="doc-desc">Creates the main Window/GUI. This is the foundation of your script. It includes a built-in search bar that automatically registers all elements.</p>
                     <table class="arg-table">
                         <tr><th>Argument</th><th>Type</th><th>Description</th></tr>
                         <tr><td>Title</td><td>string</td><td>The main title of the application.</td></tr>
@@ -491,7 +466,6 @@
                         <tr><td>Theme</td><td>string</td><td>Initial color theme. Options: Purple, Blue, Red, Green, Orange, Default.</td></tr>
                         <tr><td>Search</td><td>boolean</td><td>Displays a Search Bar at the top of the UI (Default: false).</td></tr>
                     </table>
-
                     <pre><code class="language-lua">local Window = Nox:Create({
     Title = "Nox Hub",
     SizeX = 380,
@@ -507,32 +481,26 @@
         print("UI Closed!")
     end
 })
-
 Window:SetTitle("Nox Hub V2")</code></pre>
                 </div>
             </section>
-
             <section id="config" class="content-section">
                 <h2><span class="material-symbols-outlined">save</span> Config System <span class="type-chip">System</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">Nox features a built-in JSON configuration management system. Any UI element initialized with a <code>Flag = "FlagName"</code> parameter will have its value automatically saved/loaded to this system.</p>
                     <pre><code class="language-lua">Window:SaveConfig("MyConfig")
-
 Window:LoadConfig("MyConfig")
-
 local savedConfigs = Window:GetConfigs() 
 for i, name in ipairs(savedConfigs) do
     print(i, name)
 end</code></pre>
                 </div>
             </section>
-
             <section id="theme" class="content-section">
                 <h2><span class="material-symbols-outlined">palette</span> Theme System <span class="type-chip">System</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">You can change the color palette in real-time with smooth transitions, or create your own custom themes using Material 3 Color Roles (Background, Text, Primary, etc).</p>
                     <pre><code class="language-lua">Window:ChangePalette("Red") 
-
 Window:AddTheme("MyCustomDark", {
     Background = Color3.fromRGB(20, 20, 20),      
     Text = Color3.fromRGB(240, 240, 240),         
@@ -541,11 +509,9 @@ Window:AddTheme("MyCustomDark", {
     Surface = Color3.fromRGB(35, 35, 35),         
     Outline = Color3.fromRGB(120, 120, 120)       
 })
-
 Window:ChangePalette("MyCustomDark")</code></pre>
                 </div>
             </section>
-
             <section id="tabs" class="content-section">
                 <h2><span class="material-symbols-outlined">tab</span> Tabs <span class="type-chip">Layout</span></h2>
                 <div class="doc-card">
@@ -554,395 +520,30 @@ Window:ChangePalette("MyCustomDark")</code></pre>
     Title = "Main",
     Icon = "home" 
 })
-
 local SettingsTab = Window:AddTab({
     Title = "Settings",
     Icon = "settings"
 })
-
 MainTab:SetText("Home")
-
 Window:SelectTab("Settings")</code></pre>
                 </div>
             </section>
-
             <section id="icons" class="content-section">
                 <h2><span class="material-symbols-outlined">emoji_symbols</span> Icons System <span class="type-chip">System</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">Nox fully integrates <b>Google Material Icons</b>. Any element that accepts an <code>Icon</code> parameter can use official Material Symbol names directly without needing an image ID. It also supports custom Roblox Image IDs!</p>
-                    
-                    <p class="doc-desc" style="font-size: 0.95rem; margin-top: -0.5rem; background: rgba(208, 188, 255, 0.08); padding: 12px 16px; border-radius: 12px; display: inline-block;">
+                    <p class="doc-desc" style="font-size: 0.95rem; margin-top: -0.5rem; background: rgba(208, 188, 255, 0.1); padding: 12px; border-radius: 8px; display: inline-block;">
                         <span class="material-symbols-outlined icon-filled" style="font-size: 18px; vertical-align: text-bottom; color: var(--md-sys-color-primary);">search</span> 
                         Browse all available icons here: 
                         <a href="https://fonts.google.com/icons?icon.set=Material+Symbols" target="_blank" style="color: var(--md-sys-color-primary); text-decoration: underline; font-weight: 500;">Google Fonts - Material Symbols</a>
                     </p>
-
                     <pre><code class="language-lua">MainTab:AddButton({
     Text = "Settings",
     Icon = "settings", 
     Callback = function() end
 })
-
 MainTab:AddButton({
     Text = "Custom Logo",
     Icon = "rbxassetid://1234567890", 
     Callback = function() end
 })</code></pre>
-                </div>
-            </section>
-
-            <section id="button" class="content-section">
-                <h2><span class="material-symbols-outlined">smart_button</span> Button <span class="type-chip">Element</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">Interactive buttons with M3 <i>Ripple</i> effects. Supports 4 visual types.</p>
-                    <table class="arg-table">
-                        <tr><th>Type (String)</th><th>Appearance Description</th></tr>
-                        <tr><td><code>"filled"</code></td><td>Primary color background, TextOnPrimary text color. (Default)</td></tr>
-                        <tr><td><code>"tonal"</code></td><td>Transparent Surface color background, primary text color.</td></tr>
-                        <tr><td><code>"outlined"</code></td><td>No background, features a border outline.</td></tr>
-                        <tr><td><code>"text"</code></td><td>Text (and icon) only, no border/background, Primary color.</td></tr>
-                    </table>
-                    <pre><code class="language-lua">local Btn = MainTab:AddButton({
-    Text = "Print Hello",
-    Type = "filled", 
-    Icon = "terminal", 
-    Width = nil, 
-    Callback = function()
-        print("Button Clicked!")
-    end
-})
-
-Btn:SetText("New Button Name")</code></pre>
-                </div>
-            </section>
-
-            <section id="switch" class="content-section">
-                <h2><span class="material-symbols-outlined">toggle_on</span> Switch <span class="type-chip">Element</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">Toggle elements used to adjust Boolean values (True/False). Features the signature Material 3 capsule animation.</p>
-                    <pre><code class="language-lua">local AutoFarmToggle = MainTab:AddSwitch({
-    Title = "Auto Farm",
-    Default = false,
-    Icon = "bolt",
-    Flag = "Toggle_AutoFarm", 
-    Callback = function(state)
-        print("Auto Farm is now:", state)
-    end
-})
-
-AutoFarmToggle:SetValue(true) 
-AutoFarmToggle:SetText("Auto Farm [UPDATED]")</code></pre>
-                </div>
-            </section>
-
-            <section id="slider" class="content-section">
-                <h2><span class="material-symbols-outlined">linear_scale</span> Slider <span class="type-chip">Element</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">Select number/float values. Uniquely, Nox supports various slider sizes ranging from XS to XL.</p>
-                    <table class="arg-table">
-                        <tr><th>Size (String)</th><th>Handle Height</th><th>Contains Icon?</th></tr>
-                        <tr><td><code>"xs"</code></td><td>Small (16px)</td><td>No</td></tr>
-                        <tr><td><code>"s"</code></td><td>Medium (24px)</td><td>No</td></tr>
-                        <tr><td><code>"m"</code></td><td>Normal (40px)</td><td>Yes (24px)</td></tr>
-                        <tr><td><code>"l"</code></td><td>Large (56px)</td><td>Yes (24px)</td></tr>
-                        <tr><td><code>"xl"</code></td><td>Extra Large (96px)</td><td>Yes (32px)</td></tr>
-                    </table>
-                    <pre><code class="language-lua">local SpeedSlider = MainTab:AddSlider({
-    Title = "WalkSpeed",
-    Min = 16,
-    Max = 200,
-    Default = 16,
-    ShowValue = true,
-    Size = "m", 
-    Icon = "speed", 
-    Flag = "Slider_WS",
-    Callback = function(value)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
-    end
-})
-
-SpeedSlider:SetValue(50)
-SpeedSlider:SetText("Run Speed")
-SpeedSlider:SetIcon("directions_run") </code></pre>
-                </div>
-            </section>
-
-            <section id="textbox" class="content-section">
-                <h2><span class="material-symbols-outlined">text_fields</span> Text Box <span class="type-chip">Element</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">Text input field. Features the M3 Floating Label animations seamlessly.</p>
-                    <pre><code class="language-lua">local TargetBox = MainTab:AddTextBox({
-    Title = "Target Player",
-    SupportText = "Enter the name of the player you want to target", 
-    Icon = "person",
-    Flag = "Text_Target",
-    Callback = function(text, enterPressed)
-        print("Target set to:", text, "| Enter Pressed:", enterPressed)
-    end
-})
-
-TargetBox:SetValue("RobloxPlayer123")
-TargetBox:SetText("Target (Username)")</code></pre>
-                </div>
-            </section>
-
-            <section id="dropdown" class="content-section">
-                <h2><span class="material-symbols-outlined">arrow_drop_down_circle</span> Dropdown <span class="type-chip">Element</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">Select one item from a drop-down list.</p>
-                    <pre><code class="language-lua">local LocationDrop = MainTab:AddDropdown({
-    Title = "Teleport Location",
-    Options = {"Spawn", "Shop", "Arena", "Boss Area"},
-    Default = 1, 
-    Icon = "map",
-    Flag = "Drop_Location",
-    Callback = function(selectedOption)
-        print("Teleporting to:", selectedOption)
-    end
-})
-
-LocationDrop:SetValue("Arena") 
-LocationDrop:Refresh({"New Area 1", "New Area 2"}, 1) 
-LocationDrop:SetText("Select Location")</code></pre>
-                </div>
-            </section>
-
-            <section id="radiogroup" class="content-section">
-                <h2><span class="material-symbols-outlined">radio_button_checked</span> Radio Group <span class="type-chip">Element</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">Similar to a dropdown (selecting one from many options), but displayed directly on the screen.</p>
-                    <pre><code class="language-lua">local ModeRadio = MainTab:AddRadioGroup({
-    Title = "Hitbox Mode",
-    Options = {"Head", "Torso", "Random"},
-    Default = 1,
-    Flag = "Radio_Hitbox",
-    Callback = function(selectedString, index)
-        print("Hitbox set to:", selectedString)
-    end
-})
-
-local currentString, currentIndex = ModeRadio:GetValue()
-ModeRadio:SetValue(2) </code></pre>
-                </div>
-            </section>
-
-            <section id="checkbox" class="content-section">
-                <h2><span class="material-symbols-outlined">check_box</span> Checkbox <span class="type-chip">Element</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">A visual alternative to the Switch component.</p>
-                    <pre><code class="language-lua">local NoclipCheck = MainTab:AddCheckbox({
-    Title = "Enable Noclip",
-    Default = false,
-    Flag = "Check_Noclip",
-    Callback = function(state)
-        print("Noclip:", state)
-    end
-})
-
-local isChecked = NoclipCheck:GetValue()
-NoclipCheck:SetValue(true)
-NoclipCheck:SetText("Noclip (Walk through walls)")</code></pre>
-                </div>
-            </section>
-
-            <section id="chipgroup" class="content-section">
-                <h2><span class="material-symbols-outlined">smart_button</span> Chip Group <span class="type-chip">Element</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">Groups of small buttons (Chips) that can be horizontally scrolled. Supports Single-Select or Multi-Select modes.</p>
-                    <pre><code class="language-lua">local FilterChips = MainTab:AddChipGroup({
-    Title = "Item Rarity Filter",
-    Type = "outlined", 
-    Multiselect = true, 
-    Options = {
-        "Common", 
-        "Uncommon", 
-        {Text = "Rare", Icon = "star"}, 
-        {Text = "Legendary", Icon = "diamond"}
-    },
-    Flag = "Chips_Filter",
-    Callback = function(selectedItems)
-        for _, v in ipairs(selectedItems) do print(v) end
-    end
-})
-
-local selected = FilterChips:GetSelected()
-
-FilterChips:SetValue({
-    [1] = true,  
-    [3] = false  
-})</code></pre>
-                </div>
-            </section>
-
-            <section id="label" class="content-section">
-                <h2><span class="material-symbols-outlined">label</span> Label & Layout <span class="type-chip">Element</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">Passive elements to beautify and organize your UI layout.</p>
-                    <pre><code class="language-lua">MainTab:AddSection({ Text = "PLAYER SETTINGS" })
-
-MainTab:AddDivider()
-
-local InfoLabel = MainTab:AddLabel({
-    Text = "Make sure you are in a Safe Zone before enabling the features below.",
-    Icon = "info"
-})
-
-InfoLabel:SetText("Status: Active")</code></pre>
-                </div>
-            </section>
-
-            <section id="notify" class="content-section">
-                <h2><span class="material-symbols-outlined">notifications</span> Notification (Snackbar) <span class="type-chip">Overlay</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">Displays a notification Snackbar at the bottom of the screen. Supports adding interactive action buttons.</p>
-                    <pre><code class="language-lua">Window:Notify({
-    Text = "Successfully loaded auto configuration.",
-    Duration = 5, 
-    Actions = {
-        {
-            Text = "Undo",
-            Callback = function()
-                print("Action Cancelled!")
-            end
-        }
-    }
-})</code></pre>
-                </div>
-            </section>
-
-            <section id="dialog" class="content-section">
-                <h2><span class="material-symbols-outlined">chat_bubble</span> Dialog <span class="type-chip">Overlay</span></h2>
-                <div class="doc-card">
-                    <p class="doc-desc">Pops up a modal dialog in the center of the screen, blocking interactions behind it until a button is pressed.</p>
-                    <pre><code class="language-lua">Window:AddDialog({
-    Title = "Ban Warning",
-    Description = "This feature is highly risky and may lead to account bans. Proceed?",
-    Buttons = {
-        {
-            Text = "Cancel", 
-            Type = "text", 
-            Callback = function() print("Cancelled") end
-        },
-        {
-            Text = "I Understand, Proceed", 
-            Type = "filled", 
-            Callback = function() print("Executing risky feature...") end
-        }
-    }
-})</code></pre>
-                </div>
-            </section>
-
-            <section id="credits" class="content-section">
-                <h2><span class="material-symbols-outlined">groups</span> Credits</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 1.5rem;">
-                    
-                    <div class="credit-card">
-                        <span class="material-symbols-outlined icon-filled" style="font-size: 42px; color: var(--md-sys-color-primary);">corporate_fare</span>
-                        <div>
-                            <div style="font-weight: 700; font-size: 1.15rem; color: var(--md-sys-color-on-surface); margin-bottom: 4px;">UltraSirius Inc.</div>
-                            <div style="font-size: 0.9rem; color: var(--md-sys-color-outline);">Main Development & Design</div>
-                        </div>
-                    </div>
-
-                    <div class="credit-card">
-                        <span class="material-symbols-outlined icon-filled" style="font-size: 42px; color: var(--md-sys-color-primary);">code</span>
-                        <div>
-                            <div style="font-weight: 700; font-size: 1.15rem; color: var(--md-sys-color-on-surface); margin-bottom: 4px;">fiangg20</div>
-                            <div style="font-size: 0.9rem; color: var(--md-sys-color-outline);">Framework Architecture</div>
-                        </div>
-                    </div>
-
-                    <div class="credit-card">
-                        <span class="material-symbols-outlined icon-filled" style="font-size: 42px; color: var(--md-sys-color-primary);">brush</span>
-                        <div>
-                            <div style="font-weight: 700; font-size: 1.15rem; color: var(--md-sys-color-on-surface); margin-bottom: 4px;">Material Design</div>
-                            <div style="font-size: 0.9rem; color: var(--md-sys-color-outline);">UI/UX Guidelines</div>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-        </main>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const codeBlocks = document.querySelectorAll('pre[class*="language-"]');
-            
-            codeBlocks.forEach((pre) => {
-                const copyBtn = document.createElement('button');
-                copyBtn.className = 'copy-btn';
-                copyBtn.title = 'Copy code';
-                copyBtn.innerHTML = '<span class="material-symbols-outlined">content_copy</span>';
-                
-                copyBtn.addEventListener('click', () => {
-                    const codeElement = pre.querySelector('code');
-                    if (!codeElement) return;
-
-                    const codeText = codeElement.innerText;
-
-                    const textarea = document.createElement('textarea');
-                    textarea.value = codeText;
-                    textarea.style.position = 'fixed'; 
-                    textarea.style.left = '-99999px';
-                    document.body.appendChild(textarea);
-                    
-                    textarea.select();
-                    
-                    try {
-                        document.execCommand('copy');
-                        
-                        copyBtn.innerHTML = '<span class="material-symbols-outlined icon-filled" style="color: var(--md-sys-color-primary);">check</span>';
-                        copyBtn.style.background = 'rgba(208, 188, 255, 0.1)';
-                        
-                    setTimeout(() => {
-                        copyBtn.innerHTML = '<span class="material-symbols-outlined">content_copy</span>';
-                        copyBtn.style.background = '';
-                    }, 2000);
-                } catch (err) {
-                    console.error('Failed to copy text', err);
-                } finally {
-                    document.body.removeChild(textarea);
-                }
-            });
-
-            pre.appendChild(copyBtn);
-        });
-        
-        const sections = document.querySelectorAll('.content-section');
-        const navItems = document.querySelectorAll('.nav-item');
-
-        const observerOptions = {
-            root: document.querySelector('.main-content'),
-            rootMargin: '0px 0px -70% 0px', 
-            threshold: 0
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    navItems.forEach(item => item.classList.remove('active'));
-                    
-                    const id = entry.target.getAttribute('id');
-                    const correspondingNavItem = document.querySelector(`.nav-item[href="#${id}"]`);
-                    
-                    if (correspondingNavItem) {
-                        correspondingNavItem.classList.add('active');
-                        correspondingNavItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }
-                }
-            });
-        }, observerOptions);
-
-        sections.forEach(section => {
-            observer.observe(section);
-        });
-    });
-</script>
-</body>
-</html>
