@@ -57,7 +57,7 @@
             letter-spacing: 0.3px;
         }
 
-        *:not(pre):not(code):not(pre *) {
+        * {
             --md-sys-typescale-display-large-font: 'Google Sans', sans-serif;
             --md-sys-typescale-display-medium-font: 'Google Sans', sans-serif;
             --md-sys-typescale-display-small-font: 'Google Sans', sans-serif;
@@ -257,13 +257,12 @@
             background-color: var(--md-sys-color-surface-variant);
             border-radius: 10px;
         }
-        pre[class*="language-"],
-        code[class*="language-"],
-        pre[class*="language-"] *,
+
+        pre[class*="language-"], 
         code[class*="language-"], 
-        .token {
+        code[class*="language-"] span, 
+        pre[class*="language-"] span {
             font-family: 'JetBrains Mono', monospace !important;
-            font-size: 0.95rem;
         }
 
         pre[class*="language-"] *, code[class*="language-"] * {
