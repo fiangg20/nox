@@ -241,7 +241,6 @@
             padding: 1.5rem;
             margin: 0;
             border: 1px solid #111;
-            font-family: 'JetBrains Mono', monospace !important;
             overflow-x: auto;
         }
 
@@ -257,12 +256,13 @@
             background-color: var(--md-sys-color-surface-variant);
             border-radius: 10px;
         }
-
-        code[class*="language-"] {
+        pre[class*="language-"],
+        code[class*="language-"],
+        pre[class*="language-"] *,
+        code[class*="language-"] * {
             font-family: 'JetBrains Mono', monospace !important;
             font-size: 0.95rem;
         }
-
         pre[class*="language-"] *, code[class*="language-"] * {
             font-family: 'JetBrains Mono', monospace !important;
         }
