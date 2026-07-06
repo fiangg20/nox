@@ -73,7 +73,6 @@
             --md-sys-typescale-body-large-font: 'Google Sans', sans-serif;
             --md-sys-typescale-body-medium-font: 'Google Sans', sans-serif;
             --md-sys-typescale-body-small-font: 'Google Sans', sans-serif;
-            font-family: 'Google Sans', sans-serif;
         }
 
         .material-symbols-outlined {
@@ -393,8 +392,7 @@
                 <div class="doc-card">
                     <p class="doc-desc">Load the library into your script. This library will automatically download <code>Google Sans</code> and <code>Material Icons</code> assets into your workspace folder if they don't already exist.</p>
                     <pre><code class="language-lua">-- Via Loadstring (External)
-local Nox = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua"))()
-                </code></pre>
+local Nox = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua"))()</code></pre>
                 </div>
             </section>
 
