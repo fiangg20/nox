@@ -57,7 +57,7 @@
             letter-spacing: 0.3px;
         }
 
-        * {
+        *:not(pre):not(code):not(pre *) {
             --md-sys-typescale-display-large-font: 'Google Sans', sans-serif;
             --md-sys-typescale-display-medium-font: 'Google Sans', sans-serif;
             --md-sys-typescale-display-small-font: 'Google Sans', sans-serif;
@@ -241,6 +241,7 @@
             padding: 1.5rem;
             margin: 0;
             border: 1px solid #111;
+            font-family: 'JetBrains Mono', monospace !important;
             overflow-x: auto;
         }
 
@@ -259,10 +260,12 @@
         pre[class*="language-"],
         code[class*="language-"],
         pre[class*="language-"] *,
-        code[class*="language-"] * {
+        code[class*="language-"], 
+        .token {
             font-family: 'JetBrains Mono', monospace !important;
             font-size: 0.95rem;
         }
+
         pre[class*="language-"] *, code[class*="language-"] * {
             font-family: 'JetBrains Mono', monospace !important;
         }
