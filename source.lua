@@ -180,7 +180,7 @@ local function CreateNox(data)
     local finalSizeX = data.SizeX or 380
     local finalSizeY = data.SizeY or 520
     local toggleKey = data.ToggleKey or Enum.KeyCode.K
-    local initTheme = data.Theme or "Default" 
+    local initTheme = data.Theme or "Default"
     local enableSearch = data.Search or false
     local searchPlaceholder = data.SearchPlaceholder or "Search..."
     local searchCb = data.OnSearch
@@ -238,7 +238,7 @@ local function CreateNox(data)
         local list = {}
         if isfolder(configFolder) then
             for _, file in ipairs(listfiles(configFolder)) do
-                local fileName = file:match("([^/\\]+)%.json$")
+                local fileName = file:match("([^/\]+)%.json$")
                 if fileName then table.insert(list, fileName) end
             end
         end
@@ -277,6 +277,7 @@ local function CreateNox(data)
     win.BackgroundColor3 = curTheme.bg
     win.BorderSizePixel = 0
     win.ClipsDescendants = true
+    win.Active = true
     win.Transparency = 1
     table.insert(objs.bg, win)
     Instance.new("UICorner", win).CornerRadius = UDim.new(0, 16)
