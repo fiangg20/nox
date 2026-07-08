@@ -129,9 +129,16 @@ local cp = {
 
 local objs = {bg={}, fg={}, pri={}, onpri={}, inact={}, out={}, s_trk={}, s_thm={}, tab_btn={}, tbox={}, icon={}, dlg_bg={}, dlg_fg={}, sl_val={}, radio={}, checkbox={}, chip={}}
 local curTheme = cp["Default"]
+local activeTweens = {}
 
 function t(o, p, v, d)
-    tw:Create(o, TweenInfo.new(d or 0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {[p] = v}):Play()
+    if not activeTweens[o] then activeTweens[o] = {} end
+    if activeTweens[o][p] then
+        activeTweens[o][p]:Cancel()
+    end
+    local tween = tw:Create(o, TweenInfo.new(d or 0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {[p] = v})
+    activeTweens[o][p] = tween
+    tween:Play()
 end
 
 local function RippleEffect(btn, input, color)
@@ -238,7 +245,7 @@ local function CreateNox(data)
         local list = {}
         if isfolder(configFolder) then
             for _, file in ipairs(listfiles(configFolder)) do
-                local fileName = file:match("([^/\]+)%.json$")
+                local fileName = file:match("([^/]+).json$")
                 if fileName then table.insert(list, fileName) end
             end
         end
@@ -743,12 +750,13 @@ local function CreateNox(data)
         for _,v in pairs(objs.bg) do t(v, "BackgroundColor3", curTheme.bg, d) end
         for _,v in pairs(objs.fg) do t(v, "TextColor3", curTheme.fg, d) end
         for _,v in pairs(objs.pri) do 
-            if v:IsA("TextLabel") then
-                t(v, "TextColor3", curTheme.pri, d)
-            elseif v:IsA("TextButton") and v.Text ~= "" then
-                t(v, "TextColor3", curTheme.pri, d)
-            else
-                t(v, "BackgroundColor3", curTheme.pri, d)
+            local obj = (type(v) == "table" and v.obj) or v
+            if obj and obj:IsA("TextLabel") then
+                t(obj, "TextColor3", curTheme.pri, d)
+            elseif obj and obj:IsA("TextButton") and obj.Text ~= "" then
+                t(obj, "TextColor3", curTheme.pri, d)
+            elseif obj then
+                t(obj, "BackgroundColor3", curTheme.pri, d)
             end
         end
 
@@ -768,7 +776,17 @@ local function CreateNox(data)
         
         for _,v in pairs(objs.inact) do t(v, "BackgroundColor3", curTheme.inact, d) end
         for _,x in pairs(objs.s_trk) do t(x.obj, "BackgroundColor3", x.state and curTheme.pri or curTheme.inact, d) end
-        for _,x in pairs(objs.s_thm) do t(x.obj, "BackgroundColor3", x.state and curTheme.onpri or curTheme.out, d) end
+        for _,x in pairs(objs.s_thm) do 
+            if type(x) == "table" and x.obj then
+                if x.obj:IsA("UIStroke") then
+                    t(x.obj, "Color", x.state and curTheme.onpri or curTheme.out, d)
+                elseif x.obj:IsA("TextLabel") then
+                     t(x.obj, "TextColor3", x.state and curTheme.onpri or curTheme.out, d)
+                else
+                    t(x.obj, "BackgroundColor3", x.state and curTheme.onpri or curTheme.out, d) 
+                end
+            end
+        end
         for _,x in pairs(objs.tab_btn) do 
             t(x.lbl, "TextColor3", x.active and curTheme.pri or curTheme.out, d)
             if x.icon then setIconColor(x.icon, x.active and curTheme.pri or curTheme.out, d) end
@@ -793,9 +811,13 @@ local function CreateNox(data)
             t(tb.line, "BackgroundColor3", tb.focused and curTheme.pri or curTheme.out, d)
             t(tb.bg, "BackgroundColor3", curTheme.inact, d)
         end
-        for _, v in pairs (objs.out) do  
-            t(v, "BorderColor3", curTheme.fg, d)
-            t(v, "TextColor3", curTheme.fg, d)
+        for _, v in pairs (objs.out) do
+            if v:IsA("UIStroke") then
+                t(v, "Color", curTheme.out, d)
+            else
+                t(v, "BorderColor3", curTheme.fg, d)
+                t(v, "TextColor3", curTheme.fg, d)
+            end
         end
         for _,x in pairs(objs.radio) do 
             t(x.stroke, "Color", x.selected and curTheme.pri or curTheme.out, d)
@@ -1696,6 +1718,7 @@ function lib:AddLabel(data)
         local txt = data.Title or "Switch"
         local def = data.Default or false
         local iconStr = data.Icon
+        local checkIcon = data.ShowCheckIcon or false
         local cb = data.Callback
         local flag = data.Flag
 
@@ -1746,6 +1769,19 @@ function lib:AddLabel(data)
         local tData = {obj=trk, state=st}
         table.insert(objs.s_trk, tData)
 
+        local crnrcont = Instance.new("Frame", trk)
+        crnrcont.Size = UDim2.new(1, -4, 1, -4)
+        crnrcont.AnchorPoint = Vector2.new(0.5, 0.5)
+        crnrcont.Position = UDim2.new(0.5, 0, 0.5, 0)
+        crnrcont.BackgroundTransparency = 1
+        Instance.new("UICorner", crnrcont).CornerRadius = UDim.new(1, 0)
+
+        local crnr = Instance.new("UIStroke", crnrcont)
+        crnr.Thickness = 2
+        crnr.Transparency = st and 1 or 0
+        crnr.Color = curTheme.out
+        table.insert(objs.out, crnr)
+
         local thm = Instance.new("Frame", trk)
         thm.AnchorPoint = Vector2.new(0.5, 0.5)
         thm.Size = st and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 16, 0, 16)
@@ -1755,17 +1791,71 @@ function lib:AddLabel(data)
         local thData = {obj=thm, state=st}
         table.insert(objs.s_thm, thData)
 
+        local chkIcn = Instance.new("TextLabel", thm)
+        chkIcn.AnchorPoint = Vector2.new(0.5, 0.5)
+        chkIcn.Position = UDim2.new(0.5, 0, 0.5, 0)
+        chkIcn.Size = UDim2.new(1, -6, 1, -6)
+        chkIcn.BackgroundTransparency = 1
+        chkIcn.Text = "check"
+        chkIcn.FontFace = iconFontFilled
+        chkIcn.TextScaled = true
+        chkIcn.Visible = checkIcon
+        chkIcn.TextColor3 = curTheme.pri
+        chkIcn.TextTransparency = st and 0 or 1
+        table.insert(objs.pri, chkIcn)
+
+        local stateLayer = Instance.new("Frame", thm)
+        stateLayer.AnchorPoint = Vector2.new(0.5, 0.5)
+        stateLayer.Position = UDim2.new(0.5, 0, 0.5, 0)
+        stateLayer.Size = UDim2.new(0, 40, 0, 40)
+        stateLayer.BackgroundColor3 = st and curTheme.onpri or curTheme.fg
+        stateLayer.BackgroundTransparency = 1
+        stateLayer.ZIndex = 0
+        Instance.new("UICorner", stateLayer).CornerRadius = UDim.new(1, 0)
+
         trk.MouseButton1Click:Connect(function()
             st = not st
             tData.state = st; thData.state = st
             t(trk, "BackgroundColor3", st and curTheme.pri or curTheme.inact, 0.3)
-            tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+            
+            tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
                 Size = st and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 16, 0, 16),
                 Position = st and UDim2.new(0, 36, 0.5, 0) or UDim2.new(0, 16, 0.5, 0),
                 BackgroundColor3 = st and curTheme.onpri or curTheme.out
             }):Play()
+            
+            tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                Transparency = st and 1 or 0
+            }):Play()
+
+            t(chkIcn, "TextTransparency", st and 0 or 1, 0.2)
+            t(stateLayer, "BackgroundColor3", st and curTheme.onpri or curTheme.fg, 0.2)
+
             if flag then lib.Flags[flag] = st end
             if cb then cb(st) end
+        end)
+
+        trk.MouseEnter:Connect(function()
+            t(stateLayer, "BackgroundTransparency", 0.88, 0.2)
+        end)
+        trk.MouseLeave:Connect(function()
+            t(stateLayer, "BackgroundTransparency", 1, 0.2)
+        end)
+
+        trk.InputBegan:Connect(function(input)
+            if input.UserInputType.Name == "MouseButton1" or input.UserInputType.Name == "Touch" then
+                tw:Create(thm, TweenInfo.new(0.2, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(0, 28, 0, 28)
+                }):Play()
+            end
+        end)
+
+        trk.InputEnded:Connect(function(input)
+            if input.UserInputType.Name == "MouseButton1" or input.UserInputType.Name == "Touch" then
+                tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    Size = st and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 16, 0, 16)
+                }):Play()
+            end
         end)
 
         lib:RegisterElement(r, txt, "item")
@@ -1777,11 +1867,16 @@ function lib:AddLabel(data)
                 st = newState
                 tData.state = st; thData.state = st
                 t(trk, "BackgroundColor3", st and curTheme.pri or curTheme.inact, 0.3)
+                
                 tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                     Size = st and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 16, 0, 16),
                     Position = st and UDim2.new(0, 36, 0.5, 0) or UDim2.new(0, 16, 0.5, 0),
                     BackgroundColor3 = st and curTheme.onpri or curTheme.out
                 }):Play()
+                
+                t(chkIcn, "TextTransparency", st and 0 or 1, 0.2)
+                t(stateLayer, "BackgroundColor3", st and curTheme.onpri or curTheme.fg, 0.2)
+                
                 if flag then lib.Flags[flag] = st end
                 if cb then cb(st) end
             end
@@ -2332,7 +2427,7 @@ function lib:AddLabel(data)
         r.BackgroundTransparency = 1
 
         local vl = Instance.new("TextLabel", r)
-        vl.Size = UDim2.new(1, -50, 0, 20) 
+        vl.Size = UDim2.new(1, 0, 0, 20) 
         vl.BackgroundTransparency = 1
         vl.Text = txt
         vl.TextColor3 = curTheme.fg
@@ -2341,20 +2436,6 @@ function lib:AddLabel(data)
         vl.TextSize = 14
         vl.TextXAlignment = Enum.TextXAlignment.Left
         table.insert(objs.fg, vl)
-
-        local valLbl = Instance.new("TextLabel", r)
-        valLbl.Size = UDim2.new(0, 50, 0, 20)
-        valLbl.AnchorPoint = Vector2.new(1, 0)
-        valLbl.Position = UDim2.new(1, 0, 0, 0)
-        valLbl.BackgroundTransparency = 1
-        valLbl.Visible = lblval
-        valLbl.Text = string.format("%.2f", v)
-        valLbl.TextColor3 = curTheme.out
-        valLbl.FontFace = Font.new(m3Font.Family, Enum.FontWeight.SemiBold, Enum.FontStyle.Normal)
-        valLbl.RichText = true
-        valLbl.TextSize = 14
-        valLbl.TextXAlignment = Enum.TextXAlignment.Right
-        table.insert(objs.sl_val, valLbl)
 
         local hb = Instance.new("TextButton", r)
         hb.Size = UDim2.new(1, 0, 0, cfg.th)
@@ -2407,13 +2488,34 @@ function lib:AddLabel(data)
         Instance.new("UICorner", thm).CornerRadius = UDim.new(0, 2)
         table.insert(objs.pri, thm)
 
+        local valTooltip = Instance.new("Frame", thm)
+        valTooltip.AnchorPoint = Vector2.new(0.5, 1)
+        valTooltip.Position = UDim2.new(0.5, 0, 0, -5) 
+        valTooltip.Size = UDim2.new(0, 0, 0, 0)
+        valTooltip.BackgroundColor3 = curTheme.fg
+        valTooltip.ClipsDescendants = true
+        Instance.new("UICorner", valTooltip).CornerRadius = UDim.new(0.5, 0) 
+        table.insert(objs.pri, valTooltip)
+
+        local valTooltipTxt = Instance.new("TextLabel", valTooltip)
+        valTooltipTxt.Size = UDim2.new(1, 0, 1, 0)
+        valTooltipTxt.BackgroundTransparency = 1
+        valTooltipTxt.Text = string.format("%.2f", v)
+        valTooltipTxt.TextColor3 = curTheme.onpri
+        valTooltipTxt.TextWrapped = false
+        valTooltipTxt.ClipsDescendants = false
+        valTooltipTxt.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+        valTooltipTxt.TextSize = 13
+        valTooltipTxt.TextTransparency = 1
+        table.insert(objs.onpri, valTooltipTxt)
+
         local totalGap = 12
         local halfGap = totalGap / 2 
 
         local function upd(inp, isClick)
             local pc = math.clamp((inp.Position.X - hb.AbsolutePosition.X) / hb.AbsoluteSize.X, 0, 1)
             v = m + ((mx - m) * pc)
-            valLbl.Text = string.format("%.2f", v)
+            valTooltipTxt.Text = string.format("%.2f", v)
             
             local tx = hb.AbsoluteSize.X * pc
             local newActSize = UDim2.new(0, math.max(0, tx - halfGap), 0, cfg.h)
@@ -2426,6 +2528,13 @@ function lib:AddLabel(data)
             tw:Create(act, tweenInfo, {Size = newActSize}):Play()
             tw:Create(inact, tweenInfo, {Size = newInactSize}):Play()
             tw:Create(thm, tweenInfo, {Position = newThmPos}):Play()
+
+            if drag and lblval then
+                local txtWidth = math.max(32, valTooltipTxt.TextBounds.X + 16)
+                tw:Create(valTooltip, TweenInfo.new(0.1, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(0, txtWidth, 0, 32)
+                }):Play()
+            end
         end
 
         task.defer(function()
@@ -2445,15 +2554,40 @@ function lib:AddLabel(data)
         end)
 
         hb.InputBegan:Connect(function(i) 
-            if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then drag = true; upd(i, true) end 
+            if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then 
+                drag = true
+                upd(i, true)
+                
+                if lblval then
+                    local txtWidth = math.max(32, valTooltipTxt.TextBounds.X + 16) 
+                    
+                    tw:Create(valTooltip, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                        Size = UDim2.new(0, txtWidth, 0, 32),
+                        Position = UDim2.new(0.5, 0, 0, -12)
+                    }):Play()
+                    tw:Create(valTooltipTxt, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
+                end
+            end 
         end)
+
         uis.InputChanged:Connect(function(i) 
-            if drag and (i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch")) then upd(i, false) end
+            if drag and (i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch")) then 
+                upd(i, false) 
+            end
         end)
+
         uis.InputEnded:Connect(function(i) 
             if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then 
                 if drag then 
                     drag = false
+                    if lblval then
+                        tw:Create(valTooltip, TweenInfo.new(0.25, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                            Size = UDim2.new(0, 0, 0, 0),
+                            Position = UDim2.new(0.5, 0, 0, -5)
+                        }):Play()
+                        tw:Create(valTooltipTxt, TweenInfo.new(0.15), {TextTransparency = 1}):Play()
+                    end
+
                     if flag then lib.Flags[flag] = v end
                     if cb then cb(v) end 
                 end
@@ -2466,7 +2600,7 @@ function lib:AddLabel(data)
             SetText = function(self, newTxt) vl.Text = newTxt end,
             SetValue = function(self, newVal)
                 v = math.clamp(newVal, m, mx)
-                valLbl.Text = string.format("%.2f", v)
+                valTooltipTxt.Text = string.format("%.2f", v)
                 
                 local p = (v - m) / (mx - m)
                 local tX = hb.AbsoluteSize.X * p
@@ -2854,4 +2988,5 @@ end
 function NoxLibrary:Create(data)
     return CreateNox(data)
 end
+
 return NoxLibrary
