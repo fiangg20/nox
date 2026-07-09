@@ -3,7 +3,7 @@
     A comprehensive, Material Design 3 inspired UI library for Roblox with theming, animations, and an extensive component system.
     by UltraSirius (@fyandevelopers on Roblox)
 
-    Version 2.4
+    Version 2.5
 ]]
 
 local NoxLibrary = {}
@@ -402,6 +402,12 @@ local function CreateNox(data)
 
             if unlockMouse and uis.MouseEnabled then
                 modalHandler.Modal = false
+                if toggleKey and uis.KeyboardEnabled then
+                    lib:Notify({
+                        Text = "Press <b>" .. toggleKey.Name .. "</b> to maximize " .. titleText .. ".",
+                        Duration = 10
+                    })
+                end
             end
         end
     end
@@ -1213,7 +1219,7 @@ local function CreateNox(data)
             BackgroundTransparency = 0, Position = UDim2.new(0, 0, 0, 0)
         }):Play()
         
-        tw:Create(uiScale, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        tw:Create(uiScale, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
             Scale = 1
         }):Play()
         
@@ -3153,6 +3159,10 @@ function lib:AddLabel(data)
     tw:Create(win, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, finalSizeX, 0, finalSizeY), Transparency = 0
     }):Play()
+
+    if unlockMouse and uis.MouseEnabled then
+        modalHandler.Modal = true
+    end
 
     return setmetatable(lib, {
         __index = { SetTitle = function(self, newTitle) top.Text = newTitle end }
