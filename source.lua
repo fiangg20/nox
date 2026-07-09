@@ -3043,5 +3043,3 @@ function NoxLibrary:Create(data)
 end
 
 return NoxLibrary
-})
-win:SelectTab("Dashboard")
