@@ -1,3 +1,11 @@
+-- Nox
+--[[
+    A comprehensive, Material Design 3 inspired UI library for Roblox with theming, animations, and an extensive component system.
+    by UltraSirius (@fyandevelopers on Roblox)
+
+    Version 2.3
+]]
+
 local NoxLibrary = {}
 local tw = game:GetService("TweenService")
 local uis = game:GetService("UserInputService")
@@ -10,6 +18,18 @@ local folderName = "NoxAssets"
 local jsonName = "m3font.json"
 local ttfName = "GoogleSans.ttf"
 local fontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/font.ttf"
+
+local function getDefaultAvatar()
+    local success, player = pcall(function()
+        return plrs.LocalPlayer
+    end)
+
+    if success and player and typeof(player.UserId) == "number" then
+        return "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=48&h=48"
+    end
+
+    return ""
+end
 
 if not isfolder(folderName) then makefolder(folderName) end
 
@@ -126,6 +146,7 @@ local cp = {
     ["Orange"] = {bg=Color3.fromRGB(32,27,24), fg=Color3.fromRGB(236,224,219), pri=Color3.fromRGB(255,183,123), onpri=Color3.fromRGB(76,38,0), inact=Color3.fromRGB(50,42,38), out=Color3.fromRGB(159,141,132)},
     ["Default"] = {bg=Color3.fromRGB(0,0,0), fg=Color3.fromRGB(230,225,229), pri=Color3.fromRGB(208,188,255), onpri=Color3.fromRGB(56,30,114), inact=Color3.fromRGB(28,28,30), out=Color3.fromRGB(147,143,153)}
 }
+--fun fact: im indonesian btw :)
 
 local objs = {bg={}, fg={}, pri={}, onpri={}, inact={}, out={}, s_trk={}, s_thm={}, tab_btn={}, tbox={}, icon={}, dlg_bg={}, dlg_fg={}, sl_val={}, radio={}, checkbox={}, chip={}}
 local curTheme = cp["Default"]
@@ -191,7 +212,7 @@ local function CreateNox(data)
     local enableSearch = data.Search or false
     local searchPlaceholder = data.SearchPlaceholder or "Search..."
     local searchCb = data.OnSearch
-    local searchAvatar = data.SearchAvatar or "rbxthumb://type=AvatarHeadShot&id=" .. plrs.LocalPlayer.UserId .. "&w=48&h=48"
+    local searchAvatar = data.SearchAvatar or getDefaultAvatar()
     local closeCb = data.OnClose
 
     if cp[initTheme] then
@@ -376,6 +397,9 @@ local function CreateNox(data)
     end
 
     local searchOffset = 0
+    local searchBar
+    local searchBox
+    local avatarImg
     if enableSearch then
         searchOffset = 82
 
@@ -695,7 +719,7 @@ local function CreateNox(data)
     Instance.new("UICorner", indicator).CornerRadius = UDim.new(1, 0)
     table.insert(objs.pri, indicator)
 
-    local defaultCont = Instance.new("ScrollingFrame", win)
+    defaultCont = Instance.new("ScrollingFrame", win)
     defaultCont.Size = UDim2.new(1, 0, 1, -(70 + searchOffset))
     defaultCont.Position = UDim2.new(0, 0, 0, 60 + searchOffset)
     defaultCont.BackgroundTransparency = 1
@@ -1815,21 +1839,39 @@ function lib:AddLabel(data)
 
         trk.MouseButton1Click:Connect(function()
             st = not st
-            tData.state = st; thData.state = st
-            t(trk, "BackgroundColor3", st and curTheme.pri or curTheme.inact, 0.3)
-            
-            tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                Size = st and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 16, 0, 16),
-                Position = st and UDim2.new(0, 36, 0.5, 0) or UDim2.new(0, 16, 0.5, 0),
-                BackgroundColor3 = st and curTheme.onpri or curTheme.out
-            }):Play()
-            
-            tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                Transparency = st and 1 or 0
-            }):Play()
+            tData.state = st
+            thData.state = st
 
-            t(chkIcn, "TextTransparency", st and 0 or 1, 0.2)
-            t(stateLayer, "BackgroundColor3", st and curTheme.onpri or curTheme.fg, 0.2)
+            if st then
+                t(trk, "BackgroundColor3", curTheme.pri, 0.3)
+                tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(0, 24, 0, 24),
+                    Position = UDim2.new(0, 36, 0.5, 0),
+                }):Play()
+                tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    BackgroundColor3 = curTheme.onpri
+                }):Play()
+                tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    Transparency = 1
+                }):Play()
+                t(chkIcn, "TextTransparency", 0, 0.2)
+                t(stateLayer, "BackgroundColor3", curTheme.onpri, 0.2)
+            else
+                t(trk, "BackgroundColor3", curTheme.inact, 0.3)
+                tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(0, 16, 0, 16),
+                    Position = UDim2.new(0, 16, 0.5, 0),
+                    BackgroundColor3 = curTheme.out
+                }):Play()
+                tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    BackgroundColor3 = curTheme.out
+                }):Play()
+                tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    Transparency = 0
+                }):Play()
+                t(chkIcn, "TextTransparency", 1, 0.2)
+                t(stateLayer, "BackgroundColor3", curTheme.fg, 0.2)
+            end
 
             if flag then lib.Flags[flag] = st end
             if cb then cb(st) end
@@ -1865,17 +1907,28 @@ function lib:AddLabel(data)
             SetValue = function(self, newState)
                 if st == newState then return end
                 st = newState
-                tData.state = st; thData.state = st
-                t(trk, "BackgroundColor3", st and curTheme.pri or curTheme.inact, 0.3)
-                
-                tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                    Size = st and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 16, 0, 16),
-                    Position = st and UDim2.new(0, 36, 0.5, 0) or UDim2.new(0, 16, 0.5, 0),
-                    BackgroundColor3 = st and curTheme.onpri or curTheme.out
-                }):Play()
-                
-                t(chkIcn, "TextTransparency", st and 0 or 1, 0.2)
-                t(stateLayer, "BackgroundColor3", st and curTheme.onpri or curTheme.fg, 0.2)
+                tData.state = st
+                thData.state = st
+
+                if st then
+                    t(trk, "BackgroundColor3", curTheme.pri, 0.3)
+                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        Size = UDim2.new(0, 24, 0, 24),
+                        Position = UDim2.new(0, 36, 0.5, 0),
+                        BackgroundColor3 = curTheme.onpri
+                    }):Play()
+                    t(chkIcn, "TextTransparency", 0, 0.2)
+                    t(stateLayer, "BackgroundColor3", curTheme.onpri, 0.2)
+                else
+                    t(trk, "BackgroundColor3", curTheme.inact, 0.3)
+                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        Size = UDim2.new(0, 16, 0, 16),
+                        Position = UDim2.new(0, 16, 0.5, 0),
+                        BackgroundColor3 = curTheme.out
+                    }):Play()
+                    t(chkIcn, "TextTransparency", 1, 0.2)
+                    t(stateLayer, "BackgroundColor3", curTheme.fg, 0.2)
+                end
                 
                 if flag then lib.Flags[flag] = st end
                 if cb then cb(st) end
@@ -2989,4 +3042,272 @@ function NoxLibrary:Create(data)
     return CreateNox(data)
 end
 
-return NoxLibrary
+-- Asumsi library lu udah di-load ke variable NoxLibrary
+local Nox = NoxLibrary 
+
+-- ==================== 1. INISIASI UI ====================
+local win = Nox:Create({
+    Title = "Nox Full Showcase",
+    SizeX = 420,
+    SizeY = 600,
+    Theme = "Default", 
+    Search = true,
+    SearchPlaceholder = "Cari fitur bang...",
+    ToggleKey = Enum.KeyCode.RightControl
+})
+
+-- ==================== 2. TEMA LIGHT MODE ====================
+win:AddTheme("Light", {
+    bg = Color3.fromRGB(254, 247, 255),    -- M3 Light Surface
+    fg = Color3.fromRGB(29, 27, 32),       -- Teks gelap
+    pri = Color3.fromRGB(103, 80, 164),    -- Primary ungu M3
+    onpri = Color3.fromRGB(255, 255, 255), -- Teks putih
+    inact = Color3.fromRGB(243, 237, 247), -- Inactive / Surface Container
+    out = Color3.fromRGB(121, 116, 126)    -- Outline / Border
+})
+
+
+-- ==================== TAB 1: DASHBOARD ====================
+local tabDash = win:AddTab({Title = "Dashboard", Icon = "dashboard"})
+
+win:AddSection({Text = "Informasi Umum"})
+
+local lblStatus = win:AddLabel({
+    Text = "Status: <b>Menunggu perintah...</b>",
+    Icon = "info"
+})
+
+win:AddDivider()
+
+win:AddSection({Text = "Koleksi Tombol (Semua Tipe)"})
+
+-- Tipe Filled (Nyala full)
+win:AddButton({
+    Text = "Filled Button",
+    Icon = "play_arrow",
+    Type = "filled",
+    Callback = function()
+        win:Notify({Text = "Tombol Filled dipencet!"})
+    end
+})
+
+-- Tipe Tonal (Warna kalem)
+win:AddButton({
+    Text = "Tonal Button",
+    Icon = "pause",
+    Type = "tonal",
+    Callback = function()
+        lblStatus:SetText("Status: <b>Tonal button aktif!</b>")
+    end
+})
+
+-- Tipe Outlined (Cuma garis luar)
+win:AddButton({
+    Text = "Outlined Button",
+    Icon = "stop",
+    Type = "outlined",
+    Callback = function()
+        win:Notify({Text = "Stop ngab!"})
+    end
+})
+
+-- Tipe Text (Cuma tulisan doang)
+win:AddButton({
+    Text = "Text Only Button",
+    Type = "text",
+    Callback = function()
+        print("Text button clicked")
+    end
+})
+
+
+-- ==================== TAB 2: KONTROL & INPUT ====================
+local tabControl = win:AddTab({Title = "Kontrol", Icon = "tune"})
+
+win:AddSection({Text = "Pengaturan Dasar"})
+
+local switchAuto = win:AddSwitch({
+    Title = "Auto Farm Silent Night",
+    Icon = "bolt",
+    ShowCheckIcon = true,
+    Default = false,
+    Callback = function(state)
+        if state then
+            win:Notify({Text = "Auto Farm nyala cil! Ditinggal AFK aja."})
+        else
+            win:Notify({Text = "Auto Farm mati."})
+        end
+    end
+})
+
+win:AddCheckbox({
+    Title = "Sembunyiin Notifikasi",
+    Default = false,
+    Callback = function(state)
+        print("Hide notif:", state)
+    end
+})
+
+win:AddDivider()
+win:AddSection({Text = "Slider Variasi"})
+
+win:AddSlider({
+    Title = "WalkSpeed (Ukuran XS)",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Size = "xs",
+    Callback = function(val)
+        -- Contoh ganti walkspeed
+        -- game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = val
+    end
+})
+
+win:AddSlider({
+    Title = "JumpPower (Ukuran M)",
+    Min = 50,
+    Max = 500,
+    Default = 50,
+    Size = "m",
+    Icon = "flight_takeoff",
+    Callback = function(val)
+        print("JumpPower:", val)
+    end
+})
+
+
+-- ==================== TAB 3: PILIHAN & TEKS ====================
+local tabMenu = win:AddTab({Title = "Menu", Icon = "list"})
+
+win:AddSection({Text = "Input Data"})
+
+local boxTarget = win:AddTextBox({
+    Title = "Nama Target",
+    Icon = "person",
+    SupportText = "Ketik nama player trus pencet Enter",
+    Callback = function(text, enter)
+        if enter then
+            win:Notify({Text = "Ngelock target: " .. text, Duration = 2})
+        end
+    end
+})
+
+win:AddDropdown({
+    Title = "Pilih Lokasi Teleport",
+    Icon = "place",
+    Options = {"Spawn", "VIP Area", "Boss Arena", "Safezone"},
+    Default = 1,
+    Callback = function(opt)
+        print("Teleporting to", opt)
+    end
+})
+
+win:AddDivider()
+win:AddSection({Text = "Grup Pilihan (Radio & Chips)"})
+
+win:AddRadioGroup({
+    Title = "Mode Serangan",
+    Options = {"Melee", "Ranged", "Magic"},
+    Default = 1,
+    Callback = function(opt, idx)
+        win:Notify({Text = "Mode diubah ke: " .. opt})
+    end
+})
+
+win:AddChipGroup({
+    Title = "Buff Aktif (Pilih Banyak)",
+    Options = {
+        {Text = "Damage", Icon = "local_fire_department"},
+        {Text = "Speed", Icon = "speed"},
+        {Text = "Health", Icon = "favorite"}
+    },
+    Type = "outlined",
+    Multiselect = true,
+    Callback = function(selected)
+        print("Total buff aktif:", #selected)
+    end
+})
+
+
+-- ==================== TAB 4: MODAL & AKSI ====================
+local tabAksi = win:AddTab({Title = "Sistem", Icon = "computer"})
+
+win:AddSection({Text = "Dialog & Pop-up"})
+
+win:AddButton({
+    Text = "Munculin Notif Ber-Action",
+    Icon = "notifications_active",
+    Type = "filled",
+    Callback = function()
+        win:Notify({
+            Text = "Ada update script baru nih!",
+            Duration = 5,
+            Actions = {
+                {
+                    Text = "UPDATE",
+                    Callback = function()
+                        print("Updating script...")
+                    end
+                }
+            }
+        })
+    end
+})
+
+win:AddDropdown({
+    Title = "Ganti Tema",
+    Icon = "palette",
+    Options = {"Light", "Purple", "Blue", "Red", "Default"},
+    Default = 1,
+    Callback = function(pilihan)
+        win:ChangePalette(pilihan)
+        win:Notify({Text = "Tema berhasil diganti ke " .. pilihan})
+    end
+})
+
+win:AddButton({
+    Text = "Munculin Dialog Konfirmasi",
+    Icon = "warning",
+    Type = "tonal",
+    Callback = function()
+        win:AddDialog({
+            Title = "Yakin mau nge-kill semua?",
+            Description = "Kalau lu pencet OK, satu server bakal rata tanah. Pikir-pikir dulu cil.",
+            Buttons = {
+                {
+                    Text = "Gak Jadi", 
+                    Type = "text"
+                },
+                {
+                    Text = "Bantai!", 
+                    Type = "filled", 
+                    Callback = function()
+                        win:Notify({Text = "DUARRR!"})
+                    end
+                }
+            }
+        })
+    end
+})
+
+win:AddDivider()
+
+win:AddButton({
+    Text = "Tutup UI (Destruct)",
+    Icon = "exit_to_app",
+    Type = "outlined",
+    Callback = function()
+        -- Confirm sebelum tutup beneran
+        win:AddDialog({
+            Title = "Keluar?",
+            Description = "Yakin mau tutup Nox UI ini?",
+            Buttons = {
+                {Text = "Batal", Type = "text"},
+                {Text = "Keluar", Type = "filled", Callback = function()
+                    win:CloseNox()
+                end}
+            }
+        })
+    end
+})
+win:SelectTab("Dashboard")
