@@ -473,6 +473,7 @@
                         <tr><td>ToggleKey</td><td>Enum.KeyCode</td><td>Keyboard key to Minimize/Maximize the UI (Default: K).</td></tr>
                         <tr><td>Theme</td><td>string</td><td>Initial color theme. Options: Purple, Blue, Red, Green, Orange, Default.</td></tr>
                         <tr><td>Search</td><td>boolean</td><td>Displays a Search Bar at the top of the UI (Default: false).</td></tr>
+                        <tr><td>UnlockMouse</td><td>boolean</td><td>Unlock mouse while in FPS (Default: true).</td></tr>
                     </table>
                     <pre><code class="language-lua">local Window = Nox:Create({
     Title = "Nox Hub",
@@ -481,6 +482,7 @@
     ToggleKey = Enum.KeyCode.RightControl,
     Theme = "Purple", 
     Search = true,
+    UnlockMouse = true,
     SearchPlaceholder = "Search features...",
     OnSearch = function(text)
     end,
