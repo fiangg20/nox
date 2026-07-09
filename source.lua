@@ -148,7 +148,7 @@ local cp = {
 }
 --fun fact: im indonesian btw :)
 
-local objs = {bg={}, fg={}, pri={}, onpri={}, inact={}, out={}, s_trk={}, s_thm={}, tab_btn={}, tbox={}, icon={}, dlg_bg={}, dlg_fg={}, sl_val={}, radio={}, checkbox={}, chip={}}
+local objs = {bg={}, fg={}, pri={}, onpri={}, inact={}, out={}, s_trk={}, s_thm={}, tab_btn={}, tbox={}, icon={}, dlg_bg={}, dlg_fg={}, sl_val={}, radio={}, checkbox={}, chip={}, dropdown={}, dlg_btn={}, slider={}}
 local curTheme = cp["Default"]
 local activeTweens = {}
 
@@ -282,7 +282,7 @@ local function CreateNox(data)
     gui.Name = titleText or "Nox"
     gui.IgnoreGuiInset = true
     gui.ResetOnSpawn = false
-    gui.DisplayOrder = 1e6
+    gui.DisplayOrder = 2147483646
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     gui.Parent = cg
 
@@ -421,7 +421,7 @@ local function CreateNox(data)
     local searchBox
     local avatarImg
     if enableSearch then
-        searchOffset = 82
+        searchOffset = 78
 
         searchBar = Instance.new("Frame", win)
         searchBar.Size = UDim2.new(1, -48, 0, 56) 
@@ -758,8 +758,8 @@ local function CreateNox(data)
     defLayout.Padding = UDim.new(0, 18)
 
     local contClip = Instance.new("Frame", win)
-    contClip.Size = UDim2.new(1, 0, 1, -(100 + searchOffset))
-    contClip.Position = UDim2.new(0, 0, 0, 100 + searchOffset)
+    contClip.Size = UDim2.new(1, 0, 1, -173)
+    contClip.Position = UDim2.new(0, 0, 0, 173)
     contClip.BackgroundTransparency = 1
     contClip.ClipsDescendants = true
     contClip.Visible = false
@@ -885,6 +885,25 @@ local function CreateNox(data)
                 if c.icon then setIconColor(c.icon, curTheme.fg, d) end
             end
         end
+        for _, dd in pairs(objs.dropdown) do
+            local open = dd.getState()
+            t(dd.lbl, "TextColor3", open and curTheme.pri or curTheme.out, d)
+            t(dd.line, "BackgroundColor3", open and curTheme.pri or curTheme.out, d)
+        end
+
+        for _, bData in pairs(objs.dlg_btn) do
+            if bData.isFilled then
+                t(bData.btn, "BackgroundColor3", curTheme.pri, d)
+                t(bData.btn, "TextColor3", curTheme.onpri, d)
+            else
+                t(bData.btn, "BackgroundColor3", curTheme.bg, d)
+                t(bData.btn, "TextColor3", curTheme.pri, d)
+            end
+        end
+
+        for _, updateSlider in pairs(objs.slider) do
+            updateSlider(d)
+        end
     end
 
     function lib:AddTheme(themeName, themeData)
@@ -933,9 +952,11 @@ local function CreateNox(data)
                     local btnCenterX = (btn.AbsolutePosition.X - tabListCont.AbsolutePosition.X) + tabListCont.CanvasPosition.X + (btn.AbsoluteSize.X / 2)
                     local contentWidth = tData.data.lbl.TextBounds.X
                    
-                    tw:Create(indicator, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                         Position = UDim2.new(0, btnCenterX, 1, 0),
+                    tw:Create(indicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                          Size = UDim2.new(0, contentWidth, 0, 3)
+                    }):Play()
+                    tw:Create(indicator, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                         Position = UDim2.new(0, btnCenterX, 1, 0)
                     }):Play()
                 end)
             else
@@ -1092,8 +1113,12 @@ local function CreateNox(data)
         snk.Size = UDim2.new(0, 0, 0, 48)
         snk.AutomaticSize = Enum.AutomaticSize.X
         snk.BackgroundTransparency = 1 
+        snk.AnchorPoint = Vector2.new(0.5, 0.5) 
         Instance.new("UICorner", snk).CornerRadius = UDim.new(0, 4)
         
+        local uiScale = Instance.new("UIScale", snk)
+        uiScale.Scale = 0
+
         local layout = Instance.new("UIListLayout", snk)
         layout.FillDirection = Enum.FillDirection.Horizontal
         layout.VerticalAlignment = Enum.VerticalAlignment.Center
@@ -1143,6 +1168,10 @@ local function CreateNox(data)
                         BackgroundTransparency = 1, Position = UDim2.new(0, 0, 0, 20)
                     }):Play()
                     
+                    tw:Create(uiScale, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.In), {
+                        Scale = 0
+                    }):Play()
+                    
                     for _, v in pairs(snk:GetDescendants()) do
                         if v:IsA("TextLabel") or v:IsA("TextButton") then tw:Create(v, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
                         elseif v:IsA("ImageButton") or v:IsA("ImageLabel") then tw:Create(v, TweenInfo.new(0.3), {ImageTransparency = 1}):Play() end
@@ -1164,6 +1193,10 @@ local function CreateNox(data)
                 BackgroundTransparency = 1, Position = UDim2.new(0, 0, 0, 20)
             }):Play()
             
+            tw:Create(uiScale, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.In), {
+                Scale = 0
+            }):Play()
+            
             for _, v in pairs(snk:GetDescendants()) do
                 if v:IsA("TextLabel") or v:IsA("TextButton") then tw:Create(v, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
                 elseif v:IsA("ImageButton") or v:IsA("ImageLabel") then tw:Create(v, TweenInfo.new(0.3), {ImageTransparency = 1}):Play() end
@@ -1175,8 +1208,13 @@ local function CreateNox(data)
         
         snk.Parent = notifCont
         snk.Position = UDim2.new(0, 0, 0, 20)
+        
         tw:Create(snk, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
             BackgroundTransparency = 0, Position = UDim2.new(0, 0, 0, 0)
+        }):Play()
+        
+        tw:Create(uiScale, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Scale = 1
         }):Play()
         
         for _, v in pairs(snk:GetDescendants()) do
@@ -1194,6 +1232,10 @@ local function CreateNox(data)
             
             tw:Create(snk, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.In), {
                 BackgroundTransparency = 1, Position = UDim2.new(0, 0, 0, 20)
+            }):Play()
+            
+            tw:Create(uiScale, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.In), {
+                Scale = 0
             }):Play()
             
             for _, v in pairs(snk:GetDescendants()) do
@@ -1389,8 +1431,7 @@ function lib:AddLabel(data)
             btn.RichText = true
             Instance.new("UICorner", btn).CornerRadius = UDim.new(1, 0)
              
-            if isFilled then table.insert(objs.pri, btn) end
-            table.insert(objs.pri, btn)
+            table.insert(objs.dlg_btn, {btn = btn, isFilled = isFilled})
             
             local padding = Instance.new("UIPadding", btn)
             padding.PaddingLeft = UDim.new(0, 16)
@@ -1540,6 +1581,13 @@ function lib:AddLabel(data)
 
         local tbData = {box = tbox, line = botLine, lbl = lbl, bg = frame, focused = false}
         table.insert(objs.tbox, tbData)
+
+        local ddData = {
+            lbl = lbl, 
+            line = botLine, 
+            getState = function() return isOpen end
+        }
+        table.insert(objs.dropdown, ddData)
 
         local function updateState()
             local hasText = #tbox.Text > 0
@@ -2483,6 +2531,8 @@ function lib:AddLabel(data)
         end
         if flag then lib.Flags[flag] = v end
         local drag = false
+        local titleIconObj = nil
+        local trackIconObj = nil
 
         local sType = string.lower(sizeStr or "xs")
         local configs = {
@@ -2499,8 +2549,19 @@ function lib:AddLabel(data)
         r.Size = UDim2.new(1, 0, 0, 35 + cfg.th) 
         r.BackgroundTransparency = 1
 
+        local leftOffset = 0
+        if iconStr and iconStr ~= "" and (sType == "xs" or sType == "s") then
+            titleIconObj = createIconObj(r, iconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0, 10), Vector2.new(0, 0.5), false)
+            if titleIconObj then
+                setIconColor(titleIconObj, curTheme.out)
+                table.insert(objs.icon, titleIconObj)
+                leftOffset = 32
+            end
+        end
+
         local vl = Instance.new("TextLabel", r)
-        vl.Size = UDim2.new(1, 0, 0, 20) 
+        vl.Size = UDim2.new(1, -leftOffset, 0, 20) 
+        vl.Position = UDim2.new(0, leftOffset, 0, 0)
         vl.BackgroundTransparency = 1
         vl.Text = txt
         vl.TextColor3 = curTheme.fg
@@ -2527,11 +2588,10 @@ function lib:AddLabel(data)
         actuic.BottomRightRadius = UDim.new(0, 2)
         table.insert(objs.pri, act)
 
-        if cfg.icn > 0 and iconStr and iconStr ~= "" then
-            local slIcn = createIconObj(act, iconStr, UDim2.new(0, cfg.icn, 0, cfg.icn), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
-            if slIcn then
-                setIconColor(slIcn, curTheme.onpri)
-                table.insert(objs.onpri, slIcn)
+        if iconStr and iconStr ~= "" and cfg.icn > 0 and (sType ~= "xs" and sType ~= "s") then
+            trackIconObj = createIconObj(hb, iconStr, UDim2.new(0, cfg.icn, 0, cfg.icn), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
+            if trackIconObj then
+                trackIconObj.ZIndex = 2
             end
         end
 
@@ -2565,7 +2625,7 @@ function lib:AddLabel(data)
         valTooltip.AnchorPoint = Vector2.new(0.5, 1)
         valTooltip.Position = UDim2.new(0.5, 0, 0, -5) 
         valTooltip.Size = UDim2.new(0, 0, 0, 0)
-        valTooltip.BackgroundColor3 = curTheme.fg
+        valTooltip.BackgroundColor3 = curTheme.pri
         valTooltip.ClipsDescendants = true
         Instance.new("UICorner", valTooltip).CornerRadius = UDim.new(0.5, 0) 
         table.insert(objs.pri, valTooltip)
@@ -2585,6 +2645,25 @@ function lib:AddLabel(data)
         local totalGap = 12
         local halfGap = totalGap / 2 
 
+        local function updateTrackIcon(thumbX, animTime)
+            if not trackIconObj then return end
+            
+            local iconStart = 12
+            local iconEnd = 12 + cfg.icn
+            local thumbLeft = thumbX - 2
+            local thumbRight = thumbX + 2
+            
+            if thumbRight >= iconStart and thumbLeft <= iconEnd then
+                setIconTrans(trackIconObj, 1, animTime)
+            elseif thumbLeft > iconEnd then
+                setIconTrans(trackIconObj, 0, animTime)
+                setIconColor(trackIconObj, curTheme.onpri, animTime)
+            elseif thumbRight < iconStart then
+                setIconTrans(trackIconObj, 0, animTime)
+                setIconColor(trackIconObj, curTheme.pri, animTime)
+            end
+        end
+
         local function upd(inp, isClick)
             local pc = math.clamp((inp.Position.X - hb.AbsolutePosition.X) / hb.AbsoluteSize.X, 0, 1)
             v = m + ((mx - m) * pc)
@@ -2601,6 +2680,8 @@ function lib:AddLabel(data)
             tw:Create(act, tweenInfo, {Size = newActSize}):Play()
             tw:Create(inact, tweenInfo, {Size = newInactSize}):Play()
             tw:Create(thm, tweenInfo, {Position = newThmPos}):Play()
+            
+            updateTrackIcon(tx, animTime)
 
             if drag and lblval then
                 local txtWidth = math.max(32, valTooltipTxt.TextBounds.X + 16)
@@ -2616,6 +2697,7 @@ function lib:AddLabel(data)
             act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
             inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
             thm.Position = UDim2.new(0, tX, 0.5, 0)
+            updateTrackIcon(tX, 0)
         end)
 
         hb:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
@@ -2624,6 +2706,7 @@ function lib:AddLabel(data)
             act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
             inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
             thm.Position = UDim2.new(0, tX, 0.5, 0)
+            updateTrackIcon(tX, 0)
         end)
 
         hb.InputBegan:Connect(function(i) 
@@ -2681,16 +2764,29 @@ function lib:AddLabel(data)
                 inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
                 thm.Position = UDim2.new(0, tX, 0.5, 0)
                 
+                updateTrackIcon(tX, 0.2)
+                
                 if flag then lib.Flags[flag] = v end
                 if cb then cb(v) end
             end,
             SetIcon = function(self, newIcon)
                 if not newIcon or newIcon == "" then return end
-                if cfg.icn > 0 then
-                    local slIcn = createIconObj(act, newIcon, UDim2.new(0, cfg.icn, 0, cfg.icn), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
-                    if slIcn then
-                        setIconColor(slIcn, curTheme.onpri)
-                        table.insert(objs.onpri, slIcn)
+                if sType == "xs" or sType == "s" then
+                    if titleIconObj then titleIconObj:Destroy() end
+                    titleIconObj = createIconObj(r, newIcon, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0, 10), Vector2.new(0, 0.5), false)
+                    if titleIconObj then
+                        setIconColor(titleIconObj, curTheme.out)
+                        table.insert(objs.icon, titleIconObj)
+                        vl.Position = UDim2.new(0, 32, 0, 0)
+                        vl.Size = UDim2.new(1, -32, 0, 20)
+                    end
+                elseif cfg.icn > 0 then
+                    if trackIconObj then trackIconObj:Destroy() end
+                    trackIconObj = createIconObj(hb, newIcon, UDim2.new(0, cfg.icn, 0, cfg.icn), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
+                    if trackIconObj then
+                        trackIconObj.ZIndex = 2
+                        local p = (v - m) / (mx - m)
+                        updateTrackIcon(hb.AbsoluteSize.X * p, 0)
                     end
                 end
             end
@@ -2699,6 +2795,11 @@ function lib:AddLabel(data)
         if flag then
             lib.Setters[flag] = function(val) returnObj:SetValue(val) end
         end
+        
+        table.insert(objs.slider, function(animDuration) 
+            local p = (v - m) / (mx - m)
+            updateTrackIcon(hb.AbsoluteSize.X * p, animDuration or 0.5) 
+        end)
         
         return returnObj
     end
