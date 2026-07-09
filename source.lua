@@ -3,7 +3,7 @@
     A comprehensive, Material Design 3 inspired UI library for Roblox with theming, animations, and an extensive component system.
     by UltraSirius (@fyandevelopers on Roblox)
 
-    Version 2.3
+    Version 2.4
 ]]
 
 local NoxLibrary = {}
@@ -211,6 +211,8 @@ local function CreateNox(data)
     local initTheme = data.Theme or "Default"
     local enableSearch = data.Search or false
     local searchPlaceholder = data.SearchPlaceholder or "Search..."
+    local unlockMouse = data.UnlockMouse
+    if unlockMouse == nil then unlockMouse = true end
     local searchCb = data.OnSearch
     local searchAvatar = data.SearchAvatar or getDefaultAvatar()
     local closeCb = data.OnClose
@@ -283,6 +285,13 @@ local function CreateNox(data)
     gui.DisplayOrder = 1e6
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     gui.Parent = cg
+
+    local modalHandler = Instance.new("TextButton", gui)
+    modalHandler.Name = "NoxModalHandler"
+    modalHandler.Size = UDim2.new(0, 0, 0, 0)
+    modalHandler.BackgroundTransparency = 1
+    modalHandler.Text = ""
+    modalHandler.Modal = false
 
     local notifCont = Instance.new("Frame", gui)
     notifCont.Name = "NotifyContainer"
@@ -370,12 +379,19 @@ local function CreateNox(data)
     local preSize = UDim2.new(0, finalSizeX, 0, finalSizeY) 
     local prePos = win.Position
 
+    local savedMouseBehavior = nil
+    local forceUnlockConn = nil
+
     local function toggleWindow()
         if isMin then
             isMin = false
             if icnMinMax:IsA("ImageLabel") then icnMinMax.Image = parsedMin.val else icnMinMax.Text = parsedMin.val end
             t(win, "Size", preSize, 0.4)
             if resizeHandle then resizeHandle.Visible = true end
+
+            if unlockMouse and uis.MouseEnabled then
+                modalHandler.Modal = true
+            end
         else
             if not isMax then preSize = win.Size end
             isMin = true
@@ -383,6 +399,10 @@ local function CreateNox(data)
             if icnMinMax:IsA("ImageLabel") then icnMinMax.Image = parsedMax.val else icnMinMax.Text = parsedMax.val end
             t(win, "Size", UDim2.new(0, win.Size.X.Offset, 0, 64), 0.4)
             if resizeHandle then resizeHandle.Visible = false end
+
+            if unlockMouse and uis.MouseEnabled then
+                modalHandler.Modal = false
+            end
         end
     end
 
