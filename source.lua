@@ -836,7 +836,13 @@ local function CreateNox(data)
         
         local d = 0.5
         for _,v in pairs(objs.bg) do t(v, "BackgroundColor3", curTheme.bg, d) end
-        for _,v in pairs(objs.fg) do t(v, "TextColor3", curTheme.fg, d) end
+        for _,v in pairs(objs.fg) do             
+            if v:IsA("ImageLabel") or v:IsA("ImageButton") then
+                t(v, "ImageColor3", curTheme.fg, d)
+            else
+                t(v, "TextColor3", curTheme.fg, d) 
+            end 
+        end
         for _,v in pairs(objs.pri) do 
             local obj = (type(v) == "table" and v.obj) or v
             if obj and obj:IsA("TextLabel") then
