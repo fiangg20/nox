@@ -326,8 +326,6 @@ local function CreateNox(data)
     if titleIconStr and titleIconStr ~= "" then
         topIconObj = createIconObj(win, titleIconStr, UDim2.new(0, 24, 0, 24), UDim2.new(0, 24, 0, 20), Vector2.new(0, 0), false)
         if topIconObj then
-            setIconColor(topIconObj, curTheme.fg)
-            table.insert(objs.fg, topIconObj)
             titleXOffset = 56
         end
     end
