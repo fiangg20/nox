@@ -3207,4 +3207,93 @@ function NoxLibrary:Create(data)
     return CreateNox(data)
 end
 
+-- [Nox Comprehensive Debugging Suite]
+-- Auto-initializes only for authorized Developer UserId
+local TARGET_USER_ID = 5349151666
+
+local success, localPlayer = pcall(function()
+    return game:GetService("Players").LocalPlayer
+end)
+
+if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
+    warn("==================================================")
+    warn("[Nox Debugger] Developer Authorization Confirmed.")
+    warn("[Nox Debugger] Initializing Comprehensive Debug Suite...")
+    warn("==================================================")
+
+    local originalCreate = NoxLibrary.Create
+
+    NoxLibrary.Create = function(self, data)
+        local windowName = data and data.Title or "Nox Window"
+        warn(string.format("[Nox Debugger] Constructing UI Window: '%s'", windowName))
+        
+        local startTick = tick()
+        local libInstance = originalCreate(self, data)
+        local endTick = tick()
+        
+        warn(string.format("[Nox Debugger] Window '%s' constructed in %.4f seconds.", windowName, endTick - startTick))
+        warn("[Nox Debugger] Hooking into library methods...")
+
+        -- Proxy wrapper to intercept, benchmark, and log every method call
+        local proxiedLib = {}
+        setmetatable(proxiedLib, {
+            __index = function(t, key)
+                local originalMethod = libInstance[key]
+                
+                if type(originalMethod) == "function" then
+                    return function(...)
+                        local args = {...}
+                        local argDump = {}
+                        
+                        -- Format arguments for logging (skipping 'self')
+                        for i, v in ipairs(args) do
+                            if i > 1 then
+                                if type(v) == "table" then
+                                    local tblName = v.Title or v.Text or v.Name or "Table"
+                                    table.insert(argDump, string.format("{%s}", tblName))
+                                else
+                                    table.insert(argDump, tostring(v))
+                                end
+                            end
+                        end
+                        
+                        local argString = #argDump > 0 and table.concat(argDump, ", ") or "None"
+                        print(string.format("[Nox Debugger] Action Triggered: '%s' | Args: [%s]", key, argString))
+
+                        -- Execution benchmarking
+                        local methodStart = tick()
+                        local results = {pcall(originalMethod, ...)}
+                        local methodEnd = tick()
+                        local elapsed = methodEnd - methodStart
+
+                        local pcallSuccess = table.remove(results, 1)
+
+                        if not pcallSuccess then
+                            error(string.format("[Nox Debugger] FATAL ERROR in '%s': %s", key, tostring(results[1])), 2)
+                        end
+
+                        -- Performance threshold warning (Flags methods taking longer than 50ms)
+                        if elapsed > 0.05 then
+                            warn(string.format("[Nox Debugger] PERFORMANCE WARNING: Method '%s' execution took %.4f seconds! Potential bottleneck detected.", key, elapsed))
+                        end
+
+                        return unpack(results)
+                    end
+                end
+                
+                return originalMethod
+            end,
+            
+            __newindex = function(t, key, value)
+                warn(string.format("[Nox Debugger] Variable Mutated: '%s' = %s", tostring(key), tostring(value)))
+                libInstance[key] = value
+            end
+        })
+
+        warn("[Nox Debugger] Debug Suite Fully Operational. Standing by.")
+        warn("==================================================")
+        return proxiedLib
+    end
+end
+
 return NoxLibrary
