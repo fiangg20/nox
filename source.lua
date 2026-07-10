@@ -379,8 +379,11 @@ local function CreateNox(data)
     local preSize = UDim2.new(0, finalSizeX, 0, finalSizeY) 
     local prePos = win.Position
 
-    local savedMouseBehavior = nil
-    local forceUnlockConn = nil
+    local localPlayer = plrs.LocalPlayer
+    local playerMouse = localPlayer and localPlayer:GetMouse() or nil
+    
+    local savedIconEnabled = nil
+    local savedIcon = nil
 
     local function toggleWindow()
         if isMin then
@@ -391,6 +394,14 @@ local function CreateNox(data)
 
             if unlockMouse and uis.MouseEnabled then
                 modalHandler.Modal = true
+                
+                savedIconEnabled = uis.MouseIconEnabled
+                uis.MouseIconEnabled = true
+                
+                if playerMouse then
+                    savedIcon = playerMouse.Icon
+                    playerMouse.Icon = ""
+                end
             end
         else
             if not isMax then preSize = win.Size end
@@ -402,6 +413,15 @@ local function CreateNox(data)
 
             if unlockMouse and uis.MouseEnabled then
                 modalHandler.Modal = false
+                
+                if savedIconEnabled ~= nil then
+                    uis.MouseIconEnabled = savedIconEnabled
+                end
+                
+                if playerMouse and savedIcon ~= nil and uis.KeyboardEnabled then
+                    playerMouse.Icon = savedIcon
+                end
+
                 if toggleKey and uis.KeyboardEnabled then
                     lib:Notify({
                         Text = "Press <b>" .. toggleKey.Name .. "</b> to maximize " .. titleText .. ".",
@@ -3162,6 +3182,14 @@ function lib:AddLabel(data)
 
     if unlockMouse and uis.MouseEnabled then
         modalHandler.Modal = true
+
+        savedIconEnabled = uis.MouseIconEnabled
+        uis.MouseIconEnabled = true
+
+        if playerMouse and uis.KeyboardEnabled then
+            savedIcon = playerMouse.Icon
+            playerMouse.Icon = ""
+        end
     end
 
     return setmetatable(lib, {
