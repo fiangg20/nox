@@ -997,7 +997,7 @@ local function CreateNox(data)
                     local contentWidth = tData.data.lbl.TextBounds.X
                    
                     tw:Create(indicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                         Size = UDim2.new(0, contentWidth, 0, 3)
+                         Size = UDim2.new(0, contentWidth, 0, 3),
                          Position = UDim2.new(0, btnCenterX, 1, 0)
                     }):Play()
                 end)
