@@ -404,7 +404,7 @@ local function CreateNox(data)
                 
                 if playerMouse and uis.KeyboardEnabled then
                     savedIcon = playerMouse.Icon
-                    playerMouse.Icon = "rbxasset://textures/Cursors/KeyboardMouse/ArrowCursor.png" 
+                    playerMouse.Icon = "rbxasset://textures/Cursors/KeyboardMouse/ArrowFarCursor.png" 
                 end
             end
         else
@@ -3194,7 +3194,7 @@ function lib:AddLabel(data)
         
         if playerMouse and uis.KeyboardEnabled then
             savedIcon = playerMouse.Icon
-            playerMouse.Icon = "rbxasset://textures/Cursors/KeyboardMouse/ArrowCursor.png"
+            playerMouse.Icon = "rbxasset://textures/Cursors/KeyboardMouse/ArrowFarCursor.png"
         end
     end
 
