@@ -379,10 +379,11 @@ local function CreateNox(data)
     local preSize = UDim2.new(0, finalSizeX, 0, finalSizeY) 
     local prePos = win.Position
 
+    local savedMouseBehavior = nil
+    local savedIconOverride = nil
+    
     local localPlayer = plrs.LocalPlayer
     local playerMouse = localPlayer and localPlayer:GetMouse() or nil
-    
-    local savedIconEnabled = nil
     local savedIcon = nil
 
     local function toggleWindow()
@@ -395,12 +396,15 @@ local function CreateNox(data)
             if unlockMouse and uis.MouseEnabled then
                 modalHandler.Modal = true
                 
-                savedIconEnabled = uis.MouseIconEnabled
-                uis.MouseIconEnabled = true
+                savedMouseBehavior = uis.MouseBehavior
+                uis.MouseBehavior = Enum.MouseBehavior.Default
                 
-                if playerMouse then
+                savedIconOverride = uis.OverrideMouseIconBehavior
+                uis.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceShow
+                
+                if playerMouse and uis.KeyboardEnabled then
                     savedIcon = playerMouse.Icon
-                    playerMouse.Icon = ""
+                    playerMouse.Icon = "rbxasset://textures/Cursors/KeyboardMouse/ArrowCursor.png" 
                 end
             end
         else
@@ -414,9 +418,8 @@ local function CreateNox(data)
             if unlockMouse and uis.MouseEnabled then
                 modalHandler.Modal = false
                 
-                if savedIconEnabled ~= nil then
-                    uis.MouseIconEnabled = savedIconEnabled
-                end
+                if savedMouseBehavior then uis.MouseBehavior = savedMouseBehavior end
+                if savedIconOverride then uis.OverrideMouseIconBehavior = savedIconOverride end
                 
                 if playerMouse and savedIcon ~= nil and uis.KeyboardEnabled then
                     playerMouse.Icon = savedIcon
@@ -3182,13 +3185,16 @@ function lib:AddLabel(data)
 
     if unlockMouse and uis.MouseEnabled then
         modalHandler.Modal = true
-
-        savedIconEnabled = uis.MouseIconEnabled
-        uis.MouseIconEnabled = true
-
+        
+        savedMouseBehavior = uis.MouseBehavior
+        uis.MouseBehavior = Enum.MouseBehavior.Default
+        
+        savedIconOverride = uis.OverrideMouseIconBehavior
+        uis.OverrideMouseIconBehavior = Enum.OverrideMouseIconBehavior.ForceShow
+        
         if playerMouse and uis.KeyboardEnabled then
             savedIcon = playerMouse.Icon
-            playerMouse.Icon = ""
+            playerMouse.Icon = "rbxasset://textures/Cursors/KeyboardMouse/ArrowCursor.png"
         end
     end
 
