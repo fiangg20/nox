@@ -494,14 +494,14 @@ local function CreateNox(data)
             rightMargin = -56 
         end
 
-        local searchBox = Instance.new("TextBox", searchBar)
+        searchBox = Instance.new("TextBox", searchBar)
         searchBox.Size = UDim2.new(1, rightMargin - 48, 1, 0)
         searchBox.Position = UDim2.new(0, 48, 0, 0)
         searchBox.BackgroundTransparency = 1
         searchBox.Text = ""
         searchBox.PlaceholderText = searchPlaceholder
         searchBox.PlaceholderColor3 = curTheme.out
-        searchBox.TextColor3 = curTheme.inact
+        searchBox.TextColor3 = curTheme.fg
         searchBox.FontFace = m3Font
         searchBox.TextSize = 15
         searchBox.TextXAlignment = Enum.TextXAlignment.Left
@@ -840,6 +840,10 @@ local function CreateNox(data)
             else
                 t(v, "TextColor3", curTheme.fg, d) 
             end 
+        end
+        if searchBox then
+            t(searchBox, "TextColor3", curTheme.fg, d)
+            t(searchBox, "PlaceholderColor3", curTheme.out, d)
         end
         for _,v in pairs(objs.pri) do 
             local obj = (type(v) == "table" and v.obj) or v
