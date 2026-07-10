@@ -983,8 +983,6 @@ local function CreateNox(data)
                    
                     tw:Create(indicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                          Size = UDim2.new(0, contentWidth, 0, 3)
-                    }):Play()
-                    tw:Create(indicator, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
                          Position = UDim2.new(0, btnCenterX, 1, 0)
                     }):Play()
                 end)
