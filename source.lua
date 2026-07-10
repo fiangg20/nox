@@ -3216,25 +3216,73 @@ local success, localPlayer = pcall(function()
 end)
 
 if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
-    warn("==================================================")
+    warn("--------------------------------------------------")
     warn("[Nox Debugger] Developer Authorization Confirmed.")
-    warn("[Nox Debugger] Initializing Comprehensive Debug Suite...")
-    warn("==================================================")
+    warn("[Nox Debugger] Initializing Advanced Diagnostics Mode...")
+    warn("--------------------------------------------------")
 
     local originalCreate = NoxLibrary.Create
+    local elementsCreated = 0
+    local memoryStart = gcinfo()
+
+    -- Function to create a deep proxy for component return objects
+    local function createComponentProxy(component, componentName)
+        if type(component) ~= "table" then return component end
+        
+        local proxiedComponent = {}
+        setmetatable(proxiedComponent, {
+            __index = function(t, key)
+                local originalMethod = component[key]
+                if type(originalMethod) == "function" then
+                    return function(...)
+                        local args = {...}
+                        local argDump = {}
+                        for i, v in ipairs(args) do
+                            if i > 1 then table.insert(argDump, tostring(v)) end
+                        end
+                        local argString = #argDump > 0 and table.concat(argDump, ", ") or "None"
+                        
+                        print(string.format("[Nox Debugger] [Component: %s] Method Called: '%s' | Args: [%s]", componentName, tostring(key), argString))
+                        
+                        local startT = tick()
+                        local results = {pcall(originalMethod, ...)}
+                        local endT = tick()
+                        local elapsed = endT - startT
+                        
+                        local pcallSuccess = table.remove(results, 1)
+                        if not pcallSuccess then
+                            error(string.format("[Nox Debugger] FATAL ERROR in Component '%s', Method '%s': %s\nTraceback: %s", componentName, tostring(key), tostring(results[1]), debug.traceback()), 2)
+                        end
+                        
+                        if elapsed > 0.01 then
+                            warn(string.format("[Nox Debugger] [Component: %s] Warning: Method '%s' took %.4f ms.", componentName, tostring(key), elapsed * 1000))
+                        end
+                        
+                        return unpack(results)
+                    end
+                end
+                return originalMethod
+            end,
+            __newindex = function(t, key, value)
+                warn(string.format("[Nox Debugger] [Component: %s] Property Mutated: '%s' = %s", componentName, tostring(key), tostring(value)))
+                component[key] = value
+            end
+        })
+        return proxiedComponent
+    end
 
     NoxLibrary.Create = function(self, data)
-        local windowName = data and data.Title or "Nox Window"
+        local windowName = data and data.Title or "Untitled Window"
         warn(string.format("[Nox Debugger] Constructing UI Window: '%s'", windowName))
+        warn(string.format("[Nox Debugger] Current Memory Usage: %d KB", gcinfo()))
         
         local startTick = tick()
         local libInstance = originalCreate(self, data)
         local endTick = tick()
         
         warn(string.format("[Nox Debugger] Window '%s' constructed in %.4f seconds.", windowName, endTick - startTick))
-        warn("[Nox Debugger] Hooking into library methods...")
+        warn("[Nox Debugger] Injecting deep hooks into library methods...")
 
-        -- Proxy wrapper to intercept, benchmark, and log every method call
         local proxiedLib = {}
         setmetatable(proxiedLib, {
             __index = function(t, key)
@@ -3244,13 +3292,15 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
                     return function(...)
                         local args = {...}
                         local argDump = {}
+                        local elementLabel = "Unknown"
                         
-                        -- Format arguments for logging (skipping 'self')
+                        -- Format arguments and extract names/titles for labeling
                         for i, v in ipairs(args) do
                             if i > 1 then
                                 if type(v) == "table" then
-                                    local tblName = v.Title or v.Text or v.Name or "Table"
-                                    table.insert(argDump, string.format("{%s}", tblName))
+                                    local tblName = v.Title or v.Text or v.Name or v.Flag or "Table"
+                                    elementLabel = tblName
+                                    table.insert(argDump, string.format("{Title/Text: %s}", tostring(tblName)))
                                 else
                                     table.insert(argDump, tostring(v))
                                 end
@@ -3258,9 +3308,14 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
                         end
                         
                         local argString = #argDump > 0 and table.concat(argDump, ", ") or "None"
-                        print(string.format("[Nox Debugger] Action Triggered: '%s' | Args: [%s]", key, argString))
+                        print(string.format("[Nox Debugger] -> [Library Action] Executing: '%s' | Args: [%s]", key, argString))
 
-                        -- Execution benchmarking
+                        if string.find(key, "Add") then
+                            elementsCreated = elementsCreated + 1
+                            print(string.format("[Nox Debugger] Element Counter: %d element(s) registered.", elementsCreated))
+                        end
+
+                        -- Execute and benchmark
                         local methodStart = tick()
                         local results = {pcall(originalMethod, ...)}
                         local methodEnd = tick()
@@ -3269,12 +3324,17 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
                         local pcallSuccess = table.remove(results, 1)
 
                         if not pcallSuccess then
-                            error(string.format("[Nox Debugger] FATAL ERROR in '%s': %s", key, tostring(results[1])), 2)
+                            error(string.format("[Nox Debugger] FATAL ERROR in Library Method '%s': %s\nTraceback: %s", key, tostring(results[1]), debug.traceback()), 2)
                         end
 
-                        -- Performance threshold warning (Flags methods taking longer than 50ms)
                         if elapsed > 0.05 then
-                            warn(string.format("[Nox Debugger] PERFORMANCE WARNING: Method '%s' execution took %.4f seconds! Potential bottleneck detected.", key, elapsed))
+                            warn(string.format("[Nox Debugger] PERFORMANCE WARNING: Method '%s' execution took %.4f seconds (%.2f ms)! Potential bottleneck.", key, elapsed, elapsed * 1000))
+                        end
+
+                        -- If the method returns an object (like a component API), wrap it in a proxy
+                        if type(results[1]) == "table" and string.find(key, "Add") then
+                            results[1] = createComponentProxy(results[1], elementLabel .. " (" .. key .. ")")
+                            print(string.format("[Nox Debugger] Successfully attached deep proxy to component '%s'.", elementLabel))
                         end
 
                         return unpack(results)
@@ -3285,13 +3345,21 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
             end,
             
             __newindex = function(t, key, value)
-                warn(string.format("[Nox Debugger] Variable Mutated: '%s' = %s", tostring(key), tostring(value)))
+                warn(string.format("[Nox Debugger] Library Variable Mutated: '%s' = %s", tostring(key), tostring(value)))
                 libInstance[key] = value
             end
         })
 
-        warn("[Nox Debugger] Debug Suite Fully Operational. Standing by.")
-        warn("==================================================")
+        -- Inject custom stats method
+        proxiedLib.GetDebugStats = function()
+            warn("=== [Nox Debugger] Diagnostics Report ===")
+            warn(string.format("Total Elements Constructed: %d", elementsCreated))
+            warn(string.format("Memory Usage Delta: %d KB", gcinfo() - memoryStart))
+            warn("=========================================")
+        end
+
+        warn("[Nox Debugger] Advanced Debug Suite Fully Operational. Standing by.")
+        warn("--------------------------------------------------")
         return proxiedLib
     end
 end
