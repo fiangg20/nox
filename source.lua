@@ -205,6 +205,7 @@ end
 local function CreateNox(data)
     data = data or {}
     local titleText = data.Title or "Nox"
+    local titleIconStr = data.Icon
     local finalSizeX = data.SizeX or 380
     local finalSizeY = data.SizeY or 520
     local toggleKey = data.ToggleKey or Enum.KeyCode.K
@@ -319,9 +320,21 @@ local function CreateNox(data)
     table.insert(objs.bg, win)
     Instance.new("UICorner", win).CornerRadius = UDim.new(0, 16)
 
+    local topIconObj = nil
+    local titleXOffset = 24
+
+    if titleIconStr and titleIconStr ~= "" then
+        topIconObj = createIconObj(win, titleIconStr, UDim2.new(0, 24, 0, 24), UDim2.new(0, 24, 0, 20), Vector2.new(0, 0), false)
+        if topIconObj then
+            setIconColor(topIconObj, curTheme.fg)
+            table.insert(objs.fg, topIconObj)
+            titleXOffset = 56
+        end
+    end
+
     local top = Instance.new("TextLabel", win)
-    top.Size = UDim2.new(1, -120, 0, 45) 
-    top.Position = UDim2.new(0, 24, 0, 10)
+    top.Size = UDim2.new(1, -(100 + titleXOffset), 0, 45)
+    top.Position = UDim2.new(0, titleXOffset, 0, 10)
     top.BackgroundTransparency = 1
     top.RichText = true
     top.Text = titleText or "Nox"
@@ -671,6 +684,8 @@ local function CreateNox(data)
                     }):Play()
                     
                     tw:Create(top, tInfo, {TextTransparency = 1}):Play()
+                    tw:Create(top, tInfo, {TextTransparency = 1}):Play()
+                    if topIconObj then setIconTrans(topIconObj, 1, 0.4) end
                     
                     if enableSearch and searchBar then
                         tw:Create(searchBar, tInfo, {BackgroundTransparency = 1}):Play()
@@ -3141,6 +3156,8 @@ function lib:AddLabel(data)
         }):Play()
                     
         tw:Create(top, tInfo, {TextTransparency = 1}):Play()
+        tw:Create(top, tInfo, {TextTransparency = 1}):Play()
+        if topIconObj then setIconTrans(topIconObj, 1, 0.4) end
                     
         if enableSearch and searchBar then
             tw:Create(searchBar, tInfo, {BackgroundTransparency = 1}):Play()
