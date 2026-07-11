@@ -475,7 +475,7 @@
                         <tr><td>Theme</td><td>string</td><td>Initial color theme. Options: Purple, Blue, Red, Green, Orange, Default.</td></tr>
                         <tr><td>Search</td><td>boolean</td><td>Displays a Search Bar at the top of the UI (Default: false).</td></tr>
                         <tr><td>UnlockMouse</td><td>boolean</td><td>Unlock mouse while in FPS (Default: true).</td></tr>
-                        <tr><td>ConfigurationSaving</td><td>table</td><td>Save and load configuration for Nox (Default: false).</td></tr>
+                        <tr><td>ConfigurationSaving</td><td>table</td><td>Save and load configuration for Nox (Default: true).</td></tr>
                     </table>
                     <pre><code class="language-lua">local Window = Nox:Create({
     Title = "Nox Hub",
@@ -536,17 +536,9 @@ Window:ChangePalette("MyCustomDark")</code></pre>
     Title = "Main",
     Icon = "home" 
 })
-Window:AddButton({
-    Text = "Button on MainTab/Main",
-    Callback = function() end
-})
 local SettingsTab = Window:AddTab({
     Title = "Settings",
     Icon = "settings"
-})
-Window:AddButton({
-    Text = "Button on SettingsTab/Settings",
-    Callback = function() end
 })
 MainTab:SetText("Home")
 MainTab:SetIcon("settings_account_box")
@@ -562,12 +554,12 @@ Window:SelectTab("Settings")</code></pre>
                         Browse all available icons here: 
                         <a href="https://fonts.google.com/icons?icon.set=Material+Symbols" target="_blank" style="color: var(--md-sys-color-primary); text-decoration: underline; font-weight: 500;">Google Fonts - Material Symbols</a>
                     </p>
-                    <pre><code class="language-lua">Window:AddButton({
+                    <pre><code class="language-lua">MainTab:AddButton({
     Text = "Settings",
     Icon = "settings", 
     Callback = function() end
 })
-Window:AddButton({
+MainTab:AddButton({
     Text = "Custom Logo",
     Icon = "rbxassetid://1234567890", 
     Callback = function() end
@@ -585,7 +577,7 @@ Window:AddButton({
                         <tr><td><code>"outlined"</code></td><td>No background, features a border outline.</td></tr>
                         <tr><td><code>"text"</code></td><td>Text (and icon) only, no border/background, Primary color.</td></tr>
                     </table>
-                    <pre><code class="language-lua">local Btn = Window:AddButton({
+                    <pre><code class="language-lua">local Btn = MainTab:AddButton({
     Text = "Print Hello",
     Type = "filled", 
     Icon = "terminal", 
@@ -602,7 +594,7 @@ Btn:SetIcon("terminal_2")</code></pre>
                 <h2><span class="material-symbols-outlined">toggle_on</span> Switch <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">Toggle elements used to adjust Boolean values (True/False). Features the signature Material 3 capsule animation.</p>
-                    <pre><code class="language-lua">local AutoFarmToggle = Window:AddSwitch({
+                    <pre><code class="language-lua">local AutoFarmToggle = MainTab:AddSwitch({
     Title = "Auto Farm",
     Default = false,
     ShowCheckIcon = true,
@@ -629,7 +621,7 @@ AutoFarmToggle:SetIcon("bolt_boost")</code></pre>
                         <tr><td><code>"l"</code></td><td>Large (56px)</td><td>Yes (24px)</td></tr>
                         <tr><td><code>"xl"</code></td><td>Extra Large (96px)</td><td>Yes (32px)</td></tr>
                     </table>
-                    <pre><code class="language-lua">local SpeedSlider = Window:AddSlider({
+                    <pre><code class="language-lua">local SpeedSlider = MainTab:AddSlider({
     Title = "WalkSpeed",
     Min = 16,
     Max = 200,
@@ -651,7 +643,7 @@ SpeedSlider:SetIcon("directions_run")</code></pre>
                 <h2><span class="material-symbols-outlined">text_fields</span> Text Box <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">Text input field. Features the M3 Floating Label animations seamlessly.</p>
-                    <pre><code class="language-lua">local TargetBox = Window:AddTextBox({
+                    <pre><code class="language-lua">local TargetBox = MainTab:AddTextBox({
     Title = "Target Player",
     SupportText = "Enter the name of the player you want to target", 
     ClearTextOnFocus = false,
@@ -670,7 +662,7 @@ TargetBox:SetIcon("person_check")</code></pre>
                 <h2><span class="material-symbols-outlined">arrow_drop_down_circle</span> Dropdown <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">Select one item from a drop-down list.</p>
-                    <pre><code class="language-lua">local LocationDrop = Window:AddDropdown({
+                    <pre><code class="language-lua">local LocationDrop = MainTab:AddDropdown({
     Title = "Teleport Location",
     Options = {"Spawn", "Shop", "Arena", "Boss Area"},
     Default = 1, 
@@ -690,7 +682,7 @@ LocatuonDrop:SetIcon("map_pin_heart")</code></pre>
                 <h2><span class="material-symbols-outlined">radio_button_checked</span> Radio Group <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">Similar to a dropdown (selecting one from many options), but displayed directly on the screen.</p>
-                    <pre><code class="language-lua">local ModeRadio = Window:AddRadioGroup({
+                    <pre><code class="language-lua">local ModeRadio = MainTab:AddRadioGroup({
     Title = "Hitbox Mode",
     Options = {"Head", "Torso", "Random"},
     Default = 1,
@@ -707,7 +699,7 @@ ModeRadio:SetValue(2)</code></pre>
                 <h2><span class="material-symbols-outlined">check_box</span> Checkbox <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">A visual alternative to the Switch component.</p>
-                    <pre><code class="language-lua">local NoclipCheck = Window:AddCheckbox({
+                    <pre><code class="language-lua">local NoclipCheck = MainTab:AddCheckbox({
     Title = "Enable Noclip",
     Default = false,
     Flag = "Check_Noclip",
@@ -724,7 +716,7 @@ NoclipCheck:SetText("Noclip (Walk through walls)")</code></pre>
                 <h2><span class="material-symbols-outlined">smart_button</span> Chip Group <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">Groups of small buttons (Chips) that can be horizontally scrolled. Supports Single-Select or Multi-Select modes.</p>
-                    <pre><code class="language-lua">local FilterChips = Window:AddChipGroup({
+                    <pre><code class="language-lua">local FilterChips = MainTab:AddChipGroup({
     Title = "Item Rarity Filter",
     Type = "outlined", 
     Multiselect = true, 
@@ -750,9 +742,9 @@ FilterChips:SetValue({
                 <h2><span class="material-symbols-outlined">label</span> Label & Layout <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">Passive elements to beautify and organize your UI layout.</p>
-                    <pre><code class="language-lua">Window:AddSection({ Text = "PLAYER SETTINGS" })
-Window:AddDivider()
-local InfoLabel = Window:AddLabel({
+                    <pre><code class="language-lua">MainTab:AddSection({ Text = "PLAYER SETTINGS" })
+MainTab:AddDivider()
+local InfoLabel = MainTab:AddLabel({
     Text = "Make sure you are in a Safe Zone before enabling the features below.",
     Icon = "info"
 })
