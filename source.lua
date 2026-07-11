@@ -275,10 +275,10 @@ local function CreateNox(data)
                     end
                 end
             else
-                warn("[Nox] Error: Config JSON rusak atau gagal di-decode!")
+                lib:Notify({ Text = "[Nox] Error: Config JSON is corrupt or failed to decode!" })
             end
         else
-            warn("[Nox] Error: Config tidak ditemukan -> " .. tostring(path))
+            lib:Notify({ Text = "[Nox] Error: Config not found -> " .. tostring(path) })
         end
     end
 
