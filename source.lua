@@ -345,6 +345,8 @@ local function CreateNox(data)
         if topIconObj then
             titleXOffset = 56
         end
+        setIconColor(topIconObj, curTheme.fg)
+        table.insert(objs.icon, topIconObj)
     end
 
     local top = Instance.new("TextLabel", win)
@@ -3301,6 +3303,7 @@ local function CreateNox(data)
     function lib:AddColorPicker(data)
         local titleText = data.Title or "Color Picker"
         local defColor = data.Default or Color3.new(1, 1, 1)
+        local iconStr = data.Icon
         local cb = data.Callback
         local flag = data.Flag
         lib.ElementCounter += 1
@@ -3342,9 +3345,20 @@ local function CreateNox(data)
         r.Size = UDim2.new(1, 0, 0, 48)
         r.BackgroundTransparency = 1
 
+        local leftOffset = 0
+        
+        if iconStr and iconStr ~= "" then
+            local icn = createIconObj(r, iconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
+            if icn then
+                setIconColor(icn, curTheme.out)
+                table.insert(objs.icon, icn)
+                leftOffset = 32
+            end
+        end
+
         local lbl = Instance.new("TextLabel", r)
-        lbl.Size = UDim2.new(1, -60, 1, 0)
-        lbl.Position = UDim2.new(0, 0, 0, 0)
+        lbl.Size = UDim2.new(1, -(60 + leftOffset), 1, 0)
+        lbl.Position = UDim2.new(0, leftOffset, 0, 0)
         lbl.BackgroundTransparency = 1
         lbl.Text = titleText
         lbl.TextColor3 = curTheme.fg
@@ -3713,7 +3727,27 @@ local function CreateNox(data)
                 end
             end,
             GetValue = function(self) return currentColor end,
-            SetText = function(self, newTxt) lbl.Text = newTxt end
+            SetText = function(self, newTxt) lbl.Text = newTxt end,
+            SetIcon = function(self, newIconStr)
+                for _, child in pairs(r:GetChildren()) do
+                    if child ~= lbl and child ~= btn and not child:IsA("UIListLayout") then
+                        child:Destroy()
+                    end
+                end
+                
+                leftOffset = 0
+                if newIconStr and newIconStr ~= "" then
+                    local icn = createIconObj(r, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
+                    if icn then
+                        setIconColor(icn, curTheme.out)
+                        table.insert(objs.icon, icn)
+                        leftOffset = 32
+                    end
+                end
+                
+                lbl.Size = UDim2.new(1, -(60 + leftOffset), 1, 0)
+                lbl.Position = UDim2.new(0, leftOffset, 0, 0)
+            end
         }
         
         if flag then lib.Setters[flag] = function(val) returnObj:SetValue(val) end end
