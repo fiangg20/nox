@@ -532,16 +532,24 @@ Window:ChangePalette("MyCustomDark")</code></pre>
                 <h2><span class="material-symbols-outlined">tab</span> Tabs <span class="type-chip">Layout</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">Divides content into multiple pages (Tabs). When AddTab is called for the first time, the UI will automatically spawn a tab navigation area below the header.</p>
-                    <pre><code class="language-lua">local Window = Window:AddTab({
+                    <pre><code class="language-lua">local MainTab = Window:AddTab({
     Title = "Main",
     Icon = "home" 
+})
+Window:AddButton({
+    Text = "Button on MainTab/Main",
+    Callback = function() end
 })
 local SettingsTab = Window:AddTab({
     Title = "Settings",
     Icon = "settings"
 })
-Window:SetText("Home")
-Window:SetIcon("settings_account_box")
+Window:AddButton({
+    Text = "Button on SettingsTab/Settings",
+    Callback = function() end
+})
+MainTab:SetText("Home")
+MainTab:SetIcon("settings_account_box")
 Window:SelectTab("Settings")</code></pre>
                 </div>
             </section>
