@@ -1551,7 +1551,7 @@ local function CreateNox(data)
             
             btn.BackgroundTransparency = isFilled and 0 or 1
             btn.BackgroundColor3 = isFilled and curTheme.pri or curTheme.bg
-            btn.Text = bData.Text or "Button"
+            btn.Text = bData.Text
             btn.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
             btn.TextSize = 14
             btn.TextColor3 = isFilled and curTheme.onpri or curTheme.pri
@@ -1820,7 +1820,7 @@ local function CreateNox(data)
     end
 
     function lib:AddButton(data)
-        local txt = data.Text or "Button"
+        local txt = data.Text
         local btnType = data.Type or "filled"
         local wdth = data.Width
         local iconStr = data.Icon
