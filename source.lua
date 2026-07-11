@@ -1166,6 +1166,27 @@ local function CreateNox(data)
                 if lib.ActiveTabIndex > 0 and lib.Tabs[lib.ActiveTabIndex].btn == btn then
                     lib:SelectTab(newTxt)
                 end
+            end,
+            SetIcon = function(self, newIconStr)
+                if iconImg then iconImg:Destroy() iconImg = nil end
+                
+                if newIconStr and newIconStr ~= "" then
+                    iconImg, iconType = createIconObj(contentContainer, newIconStr, UDim2.new(0, 18, 0, 18), nil, nil, false)
+                    if iconImg then
+                        iconImg.LayoutOrder = 1
+                        iconImg.ZIndex = 2
+
+                        local clr = tData.active and curTheme.pri or curTheme.out
+                        setIconColor(iconImg, clr)
+                        
+                        if iconType == "font" then
+                            iconImg.FontFace = tData.active and iconFontFilled or iconFontOutlined
+                        end
+                    end
+                end
+
+                tData.icon = iconImg
+                tData.iconType = iconType
             end
         }
     end
@@ -1352,7 +1373,7 @@ local function CreateNox(data)
         return { SetText = function(self, newTxt) lbl.Text = newTxt end }
     end
 
-function lib:AddLabel(data)
+    function lib:AddLabel(data)
         local txt = data.Text or "Label"
         local iconStr = data.Icon
         lib.ElementCounter += 1
@@ -1390,7 +1411,27 @@ function lib:AddLabel(data)
         table.insert(objs.fg, l)
         lib:RegisterElement(r, txt, "item")
 
-        return { SetText = function(self, newTxt) l.Text = newTxt end }
+        return {
+            SetText = function(self, newTxt) l.Text = newTxt end,
+            SetIcon = function(self, newIconStr)
+                for _, child in pairs(r:GetChildren()) do
+                    if child ~= l and not child:IsA("UIListLayout") then child:Destroy() end
+                end
+                
+                leftOffset = 0
+                if newIconStr and newIconStr ~= "" then
+                    local icn = createIconObj(r, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
+                    if icn then
+                        setIconColor(icn, curTheme.out)
+                        table.insert(objs.icon, icn)
+                        leftOffset = 32
+                    end
+                end
+                
+                l.Size = UDim2.new(1, -leftOffset, 0, 32)
+                l.Position = UDim2.new(0, leftOffset, 0, 0)
+            end
+        }
     end
 
     function lib:AddDialog(data)
@@ -1540,6 +1581,7 @@ function lib:AddLabel(data)
     function lib:AddTextBox(data)
         local labelTxt = data.Title or "TextBox"
         local supportTxt = data.SupportText
+        local saveText = data.ClearTextOnFocus or false
         local iconStr = data.Icon
         local flag = data.Flag
         local cb = data.Callback
@@ -1610,7 +1652,7 @@ function lib:AddLabel(data)
         tbox.TextSize = 15
         tbox.TextXAlignment = Enum.TextXAlignment.Left
         tbox.TextYAlignment = Enum.TextYAlignment.Top
-        tbox.ClearTextOnFocus = false
+        tbox.ClearTextOnFocus = saveText
         
         tbox.TextWrapped = true
         tbox.AutomaticSize = Enum.AutomaticSize.Y
@@ -1718,6 +1760,33 @@ function lib:AddLabel(data)
                 updateState()
                 if flag then lib.Flags[flag] = tbox.Text end
                 if cb then cb(tbox.Text, false) end
+            end,
+            SetIcon = function(self, newIconStr)
+                for _, child in pairs(frame:GetChildren()) do
+                    if child ~= lbl and child ~= tbox and child ~= botLine and child ~= flatBot and child ~= clearBtn then
+                        child:Destroy()
+                    end
+                end
+                
+                leftOffset = 16
+                if newIconStr and newIconStr ~= "" then
+                    local lIcn = createIconObj(frame, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
+                    if lIcn then
+                        setIconColor(lIcn, curTheme.out)
+                        table.insert(objs.icon, lIcn)
+                        leftOffset = 44
+                    end
+                end
+                
+                lbl.Size = UDim2.new(1, -(leftOffset + 40), 0, 20)
+                tbox.Size = UDim2.new(1, -(leftOffset + 36), 0, 24)
+                
+                if tbData.focused or #tbox.Text > 0 then
+                    lbl.Position = UDim2.new(0, leftOffset, 0, 6)
+                else
+                    lbl.Position = UDim2.new(0, leftOffset, 0, 18)
+                end
+                tbox.Position = UDim2.new(0, leftOffset, 0, 26)
             end
         }
         
@@ -1870,7 +1939,27 @@ function lib:AddLabel(data)
         b.MouseButton1Click:Connect(function() if cb then cb() end end)
         lib:RegisterElement(container, txt, "item")
         
-        return { SetText = function(self, newTxt) txl.Text = newTxt end }
+        return {
+            SetText = function(self, newTxt) txl.Text = newTxt end,
+            SetIcon = function(self, newIconStr)
+                if btnIcn then btnIcn:Destroy() btnIcn = nil end
+                if newIconStr and newIconStr ~= "" then
+                    btnIcn = createIconObj(contentCont, newIconStr, UDim2.new(0, 18, 0, 18), nil, nil, false)
+                    if btnIcn then
+                        btnIcn.LayoutOrder = 1
+                        local clr
+                        if bType == "tonal" then clr = curTheme.fg
+                        elseif bType == "outlined" then 
+                            clr = curTheme.fg
+                            btnIcn.FontFace = iconFontOutlined
+                        elseif bType == "text" then clr = curTheme.pri
+                        else clr = curTheme.onpri end
+                        
+                        setIconColor(btnIcn, clr)
+                    end
+                end
+            end
+        }
     end
 
     function lib:AddSwitch(data)
@@ -2047,30 +2136,19 @@ function lib:AddLabel(data)
 
                 if st then
                     t(trk, "BackgroundColor3", curTheme.pri, 0.3)
-                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         Size = UDim2.new(0, 24, 0, 24),
                         Position = UDim2.new(0, 36, 0.5, 0),
-                    }):Play()
-                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         BackgroundColor3 = curTheme.onpri
-                    }):Play()
-                    tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        Transparency = 1
                     }):Play()
                     t(chkIcn, "TextTransparency", 0, 0.2)
                     t(stateLayer, "BackgroundColor3", curTheme.onpri, 0.2)
                 else
                     t(trk, "BackgroundColor3", curTheme.inact, 0.3)
-                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(0, 16, 0, 16),
-                    Position = UDim2.new(0, 16, 0.5, 0),
-                    BackgroundColor3 = curTheme.out
-                    }):Play()
                     tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        Size = UDim2.new(0, 16, 0, 16),
+                        Position = UDim2.new(0, 16, 0.5, 0),
                         BackgroundColor3 = curTheme.out
-                    }):Play()
-                    tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        Transparency = 0
                     }):Play()
                     t(chkIcn, "TextTransparency", 1, 0.2)
                     t(stateLayer, "BackgroundColor3", curTheme.fg, 0.2)
@@ -2078,6 +2156,26 @@ function lib:AddLabel(data)
                 
                 if flag then lib.Flags[flag] = st end
                 if cb then cb(st) end
+            end,
+            SetIcon = function(self, newIconStr)
+                for _, child in pairs(r:GetChildren()) do
+                    if child ~= l and child ~= trk and not child:IsA("UIListLayout") then
+                        child:Destroy()
+                    end
+                end
+                
+                leftOffset = 0
+                if newIconStr and newIconStr ~= "" then
+                    local icn = createIconObj(r, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
+                    if icn then
+                        setIconColor(icn, curTheme.out)
+                        table.insert(objs.icon, icn)
+                        leftOffset = 32
+                    end
+                end
+                
+                l.Size = UDim2.new(1, -(60 + leftOffset), 1, 0)
+                l.Position = UDim2.new(0, leftOffset, 0, 0)
             end
         }
         
@@ -3135,6 +3233,28 @@ function lib:AddLabel(data)
                 selectedIdx = newDefaultIdx or 1
                 valLbl.Text = currentOptions[selectedIdx] or ""
                 if isOpen then closeMenu() end
+            end,
+            SetIcon = function(self, newIconStr)
+                for _, child in pairs(frame:GetChildren()) do
+                    if child ~= lbl and child ~= valLbl and child ~= btn and child ~= botLine and child ~= flatBot and child ~= icn then
+                        child:Destroy()
+                    end
+                end
+                
+                leftOffset = 16
+                if newIconStr and newIconStr ~= "" then
+                    local lIcn = createIconObj(frame, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
+                    if lIcn then
+                        setIconColor(lIcn, curTheme.out)
+                        table.insert(objs.icon, lIcn)
+                        leftOffset = 44
+                    end
+                end
+                
+                lbl.Size = UDim2.new(1, -(leftOffset + 40), 0, 20)
+                lbl.Position = UDim2.new(0, leftOffset, 0, 6)
+                valLbl.Size = UDim2.new(1, -(leftOffset + 36), 0, 24)
+                valLbl.Position = UDim2.new(0, leftOffset, 0, 26)
             end
         }
         
