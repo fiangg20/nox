@@ -817,8 +817,13 @@ local function CreateNox(data)
     defLayout.Padding = UDim.new(0, 18)
 
     local contClip = Instance.new("Frame", win)
-    contClip.Size = UDim2.new(1, 0, 1, -173)
-    contClip.Position = UDim2.new(0, 0, 0, 173)
+    if enableSearch then
+        contClip.Size = UDim2.new(1, 0, 1, -173)
+        contClip.Position = UDim2.new(0, 0, 0, 173)
+    else
+        contClip.Size = UDim2.new(1, 0, 1, -95)
+        contClip.Position = UDim2.new(0, 0, 0, 95)
+    end
     contClip.BackgroundTransparency = 1
     contClip.ClipsDescendants = true
     contClip.Visible = false
