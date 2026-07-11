@@ -3,7 +3,7 @@
     A comprehensive, Material Design 3 inspired UI library for Roblox with theming, animations, and an extensive component system.
     by UltraSirius (@fyandevelopers on Roblox)
 
-    Version 2.5
+    Version 2.6
 ]]
 
 local NoxLibrary = {}
@@ -2047,19 +2047,30 @@ function lib:AddLabel(data)
 
                 if st then
                     t(trk, "BackgroundColor3", curTheme.pri, 0.3)
-                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
                         Size = UDim2.new(0, 24, 0, 24),
                         Position = UDim2.new(0, 36, 0.5, 0),
+                    }):Play()
+                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                         BackgroundColor3 = curTheme.onpri
+                    }):Play()
+                    tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        Transparency = 1
                     }):Play()
                     t(chkIcn, "TextTransparency", 0, 0.2)
                     t(stateLayer, "BackgroundColor3", curTheme.onpri, 0.2)
                 else
                     t(trk, "BackgroundColor3", curTheme.inact, 0.3)
+                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(0, 16, 0, 16),
+                    Position = UDim2.new(0, 16, 0.5, 0),
+                    BackgroundColor3 = curTheme.out
+                    }):Play()
                     tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        Size = UDim2.new(0, 16, 0, 16),
-                        Position = UDim2.new(0, 16, 0.5, 0),
                         BackgroundColor3 = curTheme.out
+                    }):Play()
+                    tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        Transparency = 0
                     }):Play()
                     t(chkIcn, "TextTransparency", 1, 0.2)
                     t(stateLayer, "BackgroundColor3", curTheme.fg, 0.2)
