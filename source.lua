@@ -1158,8 +1158,8 @@ local function CreateNox(data)
         end)
 
         if #lib.Tabs == 1 then lib:SelectTab(txt) end
-        
-        return {
+
+        local tabObj = {
             SetText = function(self, newTxt)
                 btn.Text = newTxt
                 txtLbl.Text = newTxt
@@ -1189,6 +1189,23 @@ local function CreateNox(data)
                 tData.iconType = iconType
             end
         }
+
+        setmetatable(tabObj, {
+            __index = function(_, key)
+                if type(lib[key]) == "function" and string.sub(key, 1, 3) == "Add" then
+                    return function(_, ...)
+                        local prevContainer = lib.CurrentBuildContainer
+                        lib.CurrentBuildContainer = c
+                        local result = lib[key](lib, ...)
+                        lib.CurrentBuildContainer = prevContainer
+                        return result
+                    end
+                end
+                return lib[key]
+            end
+        })
+
+        return tabObj
     end
 
     function lib:Notify(data)
