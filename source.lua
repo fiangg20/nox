@@ -214,6 +214,11 @@ local function CreateNox(data)
     local searchPlaceholder = data.SearchPlaceholder or "Search..."
     local unlockMouse = data.UnlockMouse
     if unlockMouse == nil then unlockMouse = true end
+    local configData = data.ConfigurationSaving or {}
+    local configEnabled = configData.Enabled or false
+    local configFolder = configData.FolderName or "NoxConfigs"
+    local configDefaultFile = configData.FileName or "NoxConfig"
+    local configExt = ".ultrs"
     local searchCb = data.OnSearch
     local searchAvatar = data.SearchAvatar or getDefaultAvatar()
     local closeCb = data.OnClose
@@ -230,23 +235,31 @@ local function CreateNox(data)
 
     lib.Flags = {}
     lib.Setters = {}
-    local configFolder = "NoxConfigs"
 
-    if not isfolder(configFolder) then makefolder(configFolder) end
+    if configEnabled then
+        if not isfolder(configFolder) then makefolder(configFolder) end
+    end
 
     function lib:SaveConfig(name)
-        if not name or name == "" then return end
+        if not configEnabled then return end
+        local finalName = name or configDefaultFile
+        if finalName == "" then return end
+        
         local success, json = pcall(function()
             return http:JSONEncode(lib.Flags)
         end)
         
         if success then
-            writefile(configFolder .. "/" .. name .. ".json", json)
+            writefile(configFolder .. "/" .. finalName .. configExt, json)
         end
     end
 
     function lib:LoadConfig(name)
-        local path = configFolder .. "/" .. name .. ".json"
+        if not configEnabled then return end
+        
+        local finalName = name or configDefaultFile
+        local path = configFolder .. "/" .. finalName .. configExt
+        
         if isfile(path) then
             local success, decoded = pcall(function()
                 return http:JSONDecode(readfile(path))
@@ -261,15 +274,19 @@ local function CreateNox(data)
                         end)
                     end
                 end
+            else
+                warn("[Nox] Error: Config JSON rusak atau gagal di-decode!")
             end
+        else
+            warn("[Nox] Error: Config tidak ditemukan -> " .. tostring(path))
         end
     end
 
     function lib:GetConfigs()
         local list = {}
-        if isfolder(configFolder) then
+        if configEnabled and isfolder(configFolder) then
             for _, file in ipairs(listfiles(configFolder)) do
-                local fileName = file:match("([^/]+).json$")
+                local fileName = file:match("([^/\\]+)%" .. configExt .. "$")
                 if fileName then table.insert(list, fileName) end
             end
         end
