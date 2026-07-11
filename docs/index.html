@@ -541,6 +541,7 @@ local SettingsTab = Window:AddTab({
     Icon = "settings"
 })
 MainTab:SetText("Home")
+MainTab:SetIcon("settings_account_box")
 Window:SelectTab("Settings")</code></pre>
                 </div>
             </section>
@@ -585,7 +586,8 @@ MainTab:AddButton({
         print("Button Clicked!")
     end
 })
-Btn:SetText("New Button Name")</code></pre>
+Btn:SetText("New Button Name")
+Btn:SetIcon("terminal_2")</code></pre>
                 </div>
             </section>
             <section id="switch" class="content-section">
@@ -603,7 +605,8 @@ Btn:SetText("New Button Name")</code></pre>
     end
 })
 AutoFarmToggle:SetValue(true) 
-AutoFarmToggle:SetText("Auto Farm [UPDATED]")</code></pre>
+AutoFarmToggle:SetText("Auto Farm [UPDATED]")
+AutoFarmToggle:SetIcon("bolt_boost")</code></pre>
                 </div>
             </section>
             <section id="slider" class="content-section">
@@ -643,6 +646,7 @@ SpeedSlider:SetIcon("directions_run")</code></pre>
                     <pre><code class="language-lua">local TargetBox = MainTab:AddTextBox({
     Title = "Target Player",
     SupportText = "Enter the name of the player you want to target", 
+    ClearTextOnFocus = false,
     Icon = "person",
     Flag = "Text_Target",
     Callback = function(text, enterPressed)
@@ -650,7 +654,8 @@ SpeedSlider:SetIcon("directions_run")</code></pre>
     end
 })
 TargetBox:SetValue("RobloxPlayer123")
-TargetBox:SetText("Target (Username)")</code></pre>
+TargetBox:SetText("Target (Username)")
+TargetBox:SetIcon("person_check")</code></pre>
                 </div>
             </section>
             <section id="dropdown" class="content-section">
@@ -669,7 +674,8 @@ TargetBox:SetText("Target (Username)")</code></pre>
 })
 LocationDrop:SetValue("Arena") 
 LocationDrop:Refresh({"New Area 1", "New Area 2"}, 1) 
-LocationDrop:SetText("Select Location")</code></pre>
+LocationDrop:SetText("Select Location")
+LocatuonDrop:SetIcon("map_pin_heart")</code></pre>
                 </div>
             </section>
             <section id="radiogroup" class="content-section">
@@ -742,7 +748,8 @@ local InfoLabel = MainTab:AddLabel({
     Text = "Make sure you are in a Safe Zone before enabling the features below.",
     Icon = "info"
 })
-InfoLabel:SetText("Status: Active")</code></pre>
+InfoLabel:SetText("Status: Active")
+infoLabel:SetIcon("info_i")</code></pre>
                 </div>
             </section>
             <section id="notify" class="content-section">
