@@ -1821,272 +1821,399 @@ local function CreateNox(data)
         return returnObj
     end
 
-    function lib:AddButton(data)
-        local txt = data.Text
-        local btnType = data.Type or "filled"
-        local wdth = data.Width
-        local iconStr = data.Icon
-        local cb = data.Callback
-        lib.ElementCounter += 1
+function lib:AddButton(data)
+    local txt = data.Text
+    local btnType = data.Type or "filled"
+    local wdth = data.Width
+    local supportTxt = data.SupportText
+    local iconStr = data.Icon
+    local cb = data.Callback
+    lib.ElementCounter += 1
 
-        local container = Instance.new("Frame", lib.CurrentBuildContainer)
-        container.LayoutOrder = lib.ElementCounter
-        container.Size = UDim2.new(1, 0, 0, 44)
-        container.BackgroundTransparency = 1
+    local wrapper = Instance.new("Frame", lib.CurrentBuildContainer)
+    wrapper.LayoutOrder = lib.ElementCounter
+    wrapper.Size = UDim2.new(1, 0, 0, 0)
+    wrapper.AutomaticSize = Enum.AutomaticSize.Y
+    wrapper.BackgroundTransparency = 1
 
-        local b = Instance.new("TextButton", container)
+    local wrapLayout = Instance.new("UIListLayout", wrapper)
+    wrapLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    wrapLayout.Padding = UDim.new(0, 4)
+    wrapLayout.HorizontalAlignment = wdth and Enum.HorizontalAlignment.Center or Enum.HorizontalAlignment.Left
 
-        if wdth then
-            b.Size = UDim2.new(0, wdth, 1, 0)
-            b.AnchorPoint = Vector2.new(0.5, 0.5)
-            b.Position = UDim2.new(0.5, 0, 0.5, 0)
-        else
-            b.Size = UDim2.new(1, 0, 1, 0)
-            b.Position = UDim2.new(0, 0, 0, 0)
-        end
-        
-        b.Text = ""
-        b.AutoButtonColor = false
-        Instance.new("UICorner", b).CornerRadius = UDim.new(1, 0)
+    local container = Instance.new("Frame", wrapper)
+    container.LayoutOrder = 1
+    container.Size = wdth and UDim2.new(0, wdth, 0, 44) or UDim2.new(1, 0, 0, 44)
+    container.BackgroundTransparency = 1
 
-        local contentCont = Instance.new("Frame", b)
-        contentCont.Size = UDim2.new(1, 0, 1, 0)
-        contentCont.BackgroundTransparency = 1
+    local b = Instance.new("TextButton", container)
 
-        local contentLayout = Instance.new("UIListLayout", contentCont)
-        contentLayout.FillDirection = Enum.FillDirection.Horizontal
-        contentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-        contentLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-        contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        contentLayout.Padding = UDim.new(0, 8)
+    b.Size = UDim2.new(1, 0, 1, 0)
+    b.Position = UDim2.new(0, 0, 0, 0)
+    
+    b.Text = ""
+    b.AutoButtonColor = false
+    Instance.new("UICorner", b).CornerRadius = UDim.new(1, 0)
 
-        local btnIcn = nil
-        if iconStr and iconStr ~= "" then
-            btnIcn = createIconObj(contentCont, iconStr, UDim2.new(0, 18, 0, 18), nil, nil, false)
-            if btnIcn then btnIcn.LayoutOrder = 1 end
-        end
+    local contentCont = Instance.new("Frame", b)
+    contentCont.Size = UDim2.new(1, 0, 1, 0)
+    contentCont.BackgroundTransparency = 1
 
-        local txl = Instance.new("TextLabel", contentCont)
-        txl.BackgroundTransparency = 1
-        txl.Text = txt
-        txl.RichText = true
-        txl.FontFace = m3Font
-        txl.TextSize = 15
-        txl.AutomaticSize = Enum.AutomaticSize.XY
-        txl.LayoutOrder = 2
+    local contentLayout = Instance.new("UIListLayout", contentCont)
+    contentLayout.FillDirection = Enum.FillDirection.Horizontal
+    contentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    contentLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    contentLayout.Padding = UDim.new(0, 8)
 
-        local bType = string.lower(btnType or "filled")
-        local idleBgColor, hoverBgColor, idleTrans
-        
-        local function setElementsColor(targetColor)
-            txl.TextColor3 = targetColor
-            if btnIcn then setIconColor(btnIcn, targetColor) end
-        end
-
-        if bType == "tonal" then
-            idleBgColor = curTheme.inact:Lerp(curTheme.pri, 0.15)
-            idleTrans = 0
-            b.BackgroundTransparency = idleTrans
-            b.BackgroundColor3 = idleBgColor
-
-            setElementsColor(curTheme.fg)
-            table.insert(objs.fg, txl) 
-            if btnIcn then table.insert(objs.fg, btnIcn) end
-            
-            if not objs.tonal_bg then objs.tonal_bg = {} end
-            table.insert(objs.tonal_bg, b)
-            
-        elseif bType == "outlined" then
-            idleBgColor = curTheme.inact:Lerp(curTheme.fg, 0.05)
-            idleTrans = 1
-            b.BackgroundTransparency = idleTrans
-            b.BackgroundColor3 = idleBgColor
-
-            if iconStr and iconStr ~= "" then 
-                btnIcn.FontFace = iconFontOutlined
-            end
-            
-            setElementsColor(curTheme.fg)
-            table.insert(objs.out, txl)
-            if btnIcn then table.insert(objs.out, btnIcn) end
-            
-            local stroke = Instance.new("UIStroke", b)
-            stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            stroke.Color = curTheme.out
-            stroke.Transparency = 0.3
-            stroke.Thickness = 1.3
-            table.insert(objs.icon, stroke) 
-            
-        elseif bType == "text" then
-            idleBgColor = curTheme.inact:Lerp(curTheme.fg, 0.05)
-            idleTrans = 1
-            b.BackgroundTransparency = idleTrans
-            b.BackgroundColor3 = idleBgColor
-            
-            setElementsColor(curTheme.pri)
-            table.insert(objs.pri, txl)
-            if btnIcn then table.insert(objs.pri, btnIcn) end
-            
-        else
-            idleBgColor = curTheme.pri
-            idleTrans = 0
-            b.BackgroundTransparency = idleTrans
-            b.BackgroundColor3 = idleBgColor
-            
-            setElementsColor(curTheme.onpri)
-            table.insert(objs.onpri, txl)
-            table.insert(objs.pri, b)
-            if btnIcn then table.insert(objs.onpri, btnIcn) end
-        end
-
-        b.MouseEnter:Connect(function() 
-            local hBg
-            if bType == "tonal" then hBg = curTheme.inact:Lerp(curTheme.pri, 0.25)
-            elseif bType == "outlined" or bType == "text" then hBg = curTheme.inact:Lerp(curTheme.fg, 0.05)
-            else hBg = curTheme.pri end
-            
-            t(b, "BackgroundColor3", hBg, 0.2)
-            if bType == "outlined" or bType == "text" then t(b, "BackgroundTransparency", 0.9, 0.2) end
-        end)
-
-        b.MouseLeave:Connect(function() 
-            local iBg, iTr
-            if bType == "tonal" then iBg = curTheme.inact:Lerp(curTheme.pri, 0.15); iTr = 0
-            elseif bType == "outlined" or bType == "text" then iBg = curTheme.inact:Lerp(curTheme.fg, 0.05); iTr = 1
-            else iBg = curTheme.pri; iTr = 0 end
-            
-            t(b, "BackgroundColor3", iBg, 0.2)
-            t(b, "BackgroundTransparency", iTr, 0.2)
-        end)
-
-        b.InputBegan:Connect(function(input) RippleEffect(b, input, curTheme.onpri) end)
-        b.MouseButton1Click:Connect(function() if cb then cb() end end)
-        lib:RegisterElement(container, txt, "item")
-        
-        return {
-            SetText = function(self, newTxt) txl.Text = newTxt end,
-            SetIcon = function(self, newIconStr)
-                if btnIcn then btnIcn:Destroy() btnIcn = nil end
-                if newIconStr and newIconStr ~= "" then
-                    btnIcn = createIconObj(contentCont, newIconStr, UDim2.new(0, 18, 0, 18), nil, nil, false)
-                    if btnIcn then
-                        btnIcn.LayoutOrder = 1
-                        local clr
-                        if bType == "tonal" then clr = curTheme.fg
-                        elseif bType == "outlined" then 
-                            clr = curTheme.fg
-                            btnIcn.FontFace = iconFontOutlined
-                        elseif bType == "text" then clr = curTheme.pri
-                        else clr = curTheme.onpri end
-                        
-                        setIconColor(btnIcn, clr)
-                    end
-                end
-            end
-        }
+    local btnIcn = nil
+    if iconStr and iconStr ~= "" then
+        btnIcn = createIconObj(contentCont, iconStr, UDim2.new(0, 18, 0, 18), nil, nil, false)
+        if btnIcn then btnIcn.LayoutOrder = 1 end
     end
 
-    function lib:AddSwitch(data)
-        local txt = data.Title or "Switch"
-        local def = data.Default or false
-        local iconStr = data.Icon
-        local checkIcon = data.ShowCheckIcon or false
-        local cb = data.Callback
-        local flag = data.Flag
+    local txl = Instance.new("TextLabel", contentCont)
+    txl.BackgroundTransparency = 1
+    txl.Text = txt
+    txl.RichText = true
+    txl.FontFace = m3Font
+    txl.TextSize = 15
+    txl.AutomaticSize = Enum.AutomaticSize.XY
+    txl.LayoutOrder = 2
 
-        lib.ElementCounter += 1
+    local bType = string.lower(btnType or "filled")
+    local idleBgColor, hoverBgColor, idleTrans
+    
+    local function setElementsColor(targetColor)
+        txl.TextColor3 = targetColor
+        if btnIcn then setIconColor(btnIcn, targetColor) end
+    end
+
+    if bType == "tonal" then
+        idleBgColor = curTheme.inact:Lerp(curTheme.pri, 0.15)
+        idleTrans = 0
+        b.BackgroundTransparency = idleTrans
+        b.BackgroundColor3 = idleBgColor
+
+        setElementsColor(curTheme.fg)
+        table.insert(objs.fg, txl) 
+        if btnIcn then table.insert(objs.fg, btnIcn) end
         
-        local st = def or false
-        if flag and lib.Flags[flag] ~= nil then
-            st = lib.Flags[flag]
+        if not objs.tonal_bg then objs.tonal_bg = {} end
+        table.insert(objs.tonal_bg, b)
+        
+    elseif bType == "outlined" then
+        idleBgColor = curTheme.inact:Lerp(curTheme.fg, 0.05)
+        idleTrans = 1
+        b.BackgroundTransparency = idleTrans
+        b.BackgroundColor3 = idleBgColor
+
+        if iconStr and iconStr ~= "" then 
+            btnIcn.FontFace = iconFontOutlined
         end
-        if flag then lib.Flags[flag] = st end
         
-        local r = Instance.new("Frame", lib.CurrentBuildContainer)
-        r.LayoutOrder = lib.ElementCounter
-        r.Size = UDim2.new(1, 0, 0, 48)
-        r.BackgroundTransparency = 1
+        setElementsColor(curTheme.fg)
+        table.insert(objs.out, txl)
+        if btnIcn then table.insert(objs.out, btnIcn) end
+        
+        local stroke = Instance.new("UIStroke", b)
+        stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        stroke.Color = curTheme.out
+        stroke.Transparency = 0.3
+        stroke.Thickness = 1.3
+        table.insert(objs.icon, stroke) 
+        
+    elseif bType == "text" then
+        idleBgColor = curTheme.inact:Lerp(curTheme.fg, 0.05)
+        idleTrans = 1
+        b.BackgroundTransparency = idleTrans
+        b.BackgroundColor3 = idleBgColor
+        
+        setElementsColor(curTheme.pri)
+        table.insert(objs.pri, txl)
+        if btnIcn then table.insert(objs.pri, btnIcn) end
+        
+    else
+        idleBgColor = curTheme.pri
+        idleTrans = 0
+        b.BackgroundTransparency = idleTrans
+        b.BackgroundColor3 = idleBgColor
+        
+        setElementsColor(curTheme.onpri)
+        table.insert(objs.onpri, txl)
+        table.insert(objs.pri, b)
+        if btnIcn then table.insert(objs.onpri, btnIcn) end
+    end
 
-        local leftOffset = 0
+    b.MouseEnter:Connect(function() 
+        local hBg
+        if bType == "tonal" then hBg = curTheme.inact:Lerp(curTheme.pri, 0.25)
+        elseif bType == "outlined" or bType == "text" then hBg = curTheme.inact:Lerp(curTheme.fg, 0.05)
+        else hBg = curTheme.pri end
         
-        if iconStr and iconStr ~= "" then
-            local icn = createIconObj(r, iconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
-            if icn then
-                setIconColor(icn, curTheme.out)
-                table.insert(objs.icon, icn)
-                leftOffset = 32
+        t(b, "BackgroundColor3", hBg, 0.2)
+        if bType == "outlined" or bType == "text" then t(b, "BackgroundTransparency", 0.9, 0.2) end
+    end)
+
+    b.MouseLeave:Connect(function() 
+        local iBg, iTr
+        if bType == "tonal" then iBg = curTheme.inact:Lerp(curTheme.pri, 0.15); iTr = 0
+        elseif bType == "outlined" or bType == "text" then iBg = curTheme.inact:Lerp(curTheme.fg, 0.05); iTr = 1
+        else iBg = curTheme.pri; iTr = 0 end
+        
+        t(b, "BackgroundColor3", iBg, 0.2)
+        t(b, "BackgroundTransparency", iTr, 0.2)
+    end)
+
+    if supportTxt and supportTxt ~= "" then
+        local suppLbl = Instance.new("TextLabel", wrapper)
+        suppLbl.LayoutOrder = 2
+        suppLbl.Size = UDim2.new(1, 0, 0, 16)
+        suppLbl.BackgroundTransparency = 1
+        suppLbl.Text = supportTxt
+        suppLbl.RichText = true
+        suppLbl.TextColor3 = curTheme.out
+        suppLbl.FontFace = m3Font
+        suppLbl.TextSize = 12
+        suppLbl.TextXAlignment = wdth and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
+        suppLbl.TextWrapped = true
+        suppLbl.AutomaticSize = Enum.AutomaticSize.Y
+        table.insert(objs.fg, suppLbl)
+    end
+
+    b.InputBegan:Connect(function(input) RippleEffect(b, input, curTheme.onpri) end)
+    b.MouseButton1Click:Connect(function() if cb then cb() end end)
+    lib:RegisterElement(wrapper, txt, "item")
+    
+    return {
+        SetText = function(self, newTxt) txl.Text = newTxt end,
+        SetIcon = function(self, newIconStr)
+            if btnIcn then btnIcn:Destroy() btnIcn = nil end
+            if newIconStr and newIconStr ~= "" then
+                btnIcn = createIconObj(contentCont, newIconStr, UDim2.new(0, 18, 0, 18), nil, nil, false)
+                if btnIcn then
+                    btnIcn.LayoutOrder = 1
+                    local clr
+                    if bType == "tonal" then clr = curTheme.fg
+                    elseif bType == "outlined" then 
+                        clr = curTheme.fg
+                        btnIcn.FontFace = iconFontOutlined
+                    elseif bType == "text" then clr = curTheme.pri
+                    else clr = curTheme.onpri end
+                    
+                    setIconColor(btnIcn, clr)
+                end
             end
         end
+    }
+end
 
-        local l = Instance.new("TextLabel", r)
-        l.Size = UDim2.new(1, -(60 + leftOffset), 1, 0)
-        l.Position = UDim2.new(0, leftOffset, 0, 0)
-        l.BackgroundTransparency = 1
-        l.Text = txt
-        l.TextColor3 = curTheme.fg
-        l.FontFace = m3Font
-        l.RichText = true
-        l.TextSize = 16
-        l.TextXAlignment = Enum.TextXAlignment.Left
-        table.insert(objs.fg, l)
+function lib:AddSwitch(data)
+    local txt = data.Title or "Switch"
+    local supportTxt = data.SupportText
+    local def = data.Default or false
+    local iconStr = data.Icon
+    local checkIcon = data.ShowCheckIcon or false
+    local cb = data.Callback
+    local flag = data.Flag
 
-        local trk = Instance.new("TextButton", r)
-        trk.Size = UDim2.new(0, 52, 0, 32)
-        trk.AnchorPoint = Vector2.new(1, 0.5)
-        trk.Position = UDim2.new(1, 0, 0.5, 0)
-        trk.BackgroundColor3 = st and curTheme.pri or curTheme.inact
-        trk.Text = ""
-        trk.AutoButtonColor = false
-        Instance.new("UICorner", trk).CornerRadius = UDim.new(1, 0)
-        local tData = {obj=trk, state=st}
-        table.insert(objs.s_trk, tData)
+    lib.ElementCounter += 1
+    
+    local st = def or false
+    if flag and lib.Flags[flag] ~= nil then
+        st = lib.Flags[flag]
+    end
+    if flag then lib.Flags[flag] = st end
 
-        local crnrcont = Instance.new("Frame", trk)
-        crnrcont.Size = UDim2.new(1, -4, 1, -4)
-        crnrcont.AnchorPoint = Vector2.new(0.5, 0.5)
-        crnrcont.Position = UDim2.new(0.5, 0, 0.5, 0)
-        crnrcont.BackgroundTransparency = 1
-        Instance.new("UICorner", crnrcont).CornerRadius = UDim.new(1, 0)
+    local wrapper = Instance.new("Frame", lib.CurrentBuildContainer)
+    wrapper.LayoutOrder = lib.ElementCounter
+    wrapper.Size = UDim2.new(1, 0, 0, 0)
+    wrapper.AutomaticSize = Enum.AutomaticSize.Y
+    wrapper.BackgroundTransparency = 1
 
-        local crnr = Instance.new("UIStroke", crnrcont)
-        crnr.Thickness = 2
-        crnr.Transparency = st and 1 or 0
-        crnr.Color = curTheme.out
-        table.insert(objs.out, crnr)
+    local wrapLayout = Instance.new("UIListLayout", wrapper)
+    wrapLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    wrapLayout.Padding = UDim.new(0, 0)
+    
+    local r = Instance.new("Frame", wrapper)
+    r.LayoutOrder = 1
+    r.Size = UDim2.new(1, 0, 0, 48)
+    r.AutomaticSize = Enum.AutomaticSize.Y
+    r.BackgroundTransparency = 1
 
-        local thm = Instance.new("Frame", trk)
-        thm.AnchorPoint = Vector2.new(0.5, 0.5)
-        thm.Size = st and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 16, 0, 16)
-        thm.Position = st and UDim2.new(0, 36, 0.5, 0) or UDim2.new(0, 16, 0.5, 0)
-        thm.BackgroundColor3 = st and curTheme.onpri or curTheme.out
-        Instance.new("UICorner", thm).CornerRadius = UDim.new(1, 0)
-        local thData = {obj=thm, state=st}
-        table.insert(objs.s_thm, thData)
+    local leftOffset = 0
+    
+    if iconStr and iconStr ~= "" then
+        local icn = createIconObj(r, iconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
+        if icn then
+            setIconColor(icn, curTheme.out)
+            table.insert(objs.icon, icn)
+            leftOffset = 32
+        end
+    end
 
-        local chkIcn = Instance.new("TextLabel", thm)
-        chkIcn.AnchorPoint = Vector2.new(0.5, 0.5)
-        chkIcn.Position = UDim2.new(0.5, 0, 0.5, 0)
-        chkIcn.Size = UDim2.new(1, -6, 1, -6)
-        chkIcn.BackgroundTransparency = 1
-        chkIcn.Text = "check"
-        chkIcn.FontFace = iconFontFilled
-        chkIcn.TextScaled = true
-        chkIcn.Visible = checkIcon
-        chkIcn.TextColor3 = curTheme.pri
-        chkIcn.TextTransparency = st and 0 or 1
-        table.insert(objs.pri, chkIcn)
+    local l = Instance.new("TextLabel", r)
+    l.Size = UDim2.new(1, -(60 + leftOffset), 0, 48)
+    l.Position = UDim2.new(0, leftOffset, 0, 0)
+    l.BackgroundTransparency = 1
+    l.Text = txt
+    l.TextColor3 = curTheme.fg
+    l.FontFace = m3Font
+    l.RichText = true
+    l.TextSize = 16
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.TextYAlignment = Enum.TextYAlignment.Center
+    l.TextWrapped = true
+    l.AutomaticSize = Enum.AutomaticSize.Y
+    table.insert(objs.fg, l)
 
-        local stateLayer = Instance.new("Frame", thm)
-        stateLayer.AnchorPoint = Vector2.new(0.5, 0.5)
-        stateLayer.Position = UDim2.new(0.5, 0, 0.5, 0)
-        stateLayer.Size = UDim2.new(0, 40, 0, 40)
-        stateLayer.BackgroundColor3 = st and curTheme.onpri or curTheme.fg
-        stateLayer.BackgroundTransparency = 1
-        stateLayer.ZIndex = 0
-        Instance.new("UICorner", stateLayer).CornerRadius = UDim.new(1, 0)
+    local trk = Instance.new("TextButton", r)
+    trk.Size = UDim2.new(0, 52, 0, 32)
+    trk.AnchorPoint = Vector2.new(1, 0.5)
+    trk.Position = UDim2.new(1, 0, 0.5, 0)
+    trk.BackgroundColor3 = st and curTheme.pri or curTheme.inact
+    trk.Text = ""
+    trk.AutoButtonColor = false
+    Instance.new("UICorner", trk).CornerRadius = UDim.new(1, 0)
+    local tData = {obj=trk, state=st}
+    table.insert(objs.s_trk, tData)
 
-        trk.MouseButton1Click:Connect(function()
-            st = not st
+    local crnrcont = Instance.new("Frame", trk)
+    crnrcont.Size = UDim2.new(1, -4, 1, -4)
+    crnrcont.AnchorPoint = Vector2.new(0.5, 0.5)
+    crnrcont.Position = UDim2.new(0.5, 0, 0.5, 0)
+    crnrcont.BackgroundTransparency = 1
+    Instance.new("UICorner", crnrcont).CornerRadius = UDim.new(1, 0)
+
+    local crnr = Instance.new("UIStroke", crnrcont)
+    crnr.Thickness = 2
+    crnr.Transparency = st and 1 or 0
+    crnr.Color = curTheme.out
+    table.insert(objs.out, crnr)
+
+    local thm = Instance.new("Frame", trk)
+    thm.AnchorPoint = Vector2.new(0.5, 0.5)
+    thm.Size = st and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 16, 0, 16)
+    thm.Position = st and UDim2.new(0, 36, 0.5, 0) or UDim2.new(0, 16, 0.5, 0)
+    thm.BackgroundColor3 = st and curTheme.onpri or curTheme.out
+    Instance.new("UICorner", thm).CornerRadius = UDim.new(1, 0)
+    local thData = {obj=thm, state=st}
+    table.insert(objs.s_thm, thData)
+
+    local chkIcn = Instance.new("TextLabel", thm)
+    chkIcn.AnchorPoint = Vector2.new(0.5, 0.5)
+    chkIcn.Position = UDim2.new(0.5, 0, 0.5, 0)
+    chkIcn.Size = UDim2.new(1, -6, 1, -6)
+    chkIcn.BackgroundTransparency = 1
+    chkIcn.Text = "check"
+    chkIcn.FontFace = iconFontFilled
+    chkIcn.TextScaled = true
+    chkIcn.Visible = checkIcon
+    chkIcn.TextColor3 = curTheme.pri
+    chkIcn.TextTransparency = st and 0 or 1
+    table.insert(objs.pri, chkIcn)
+
+    local stateLayer = Instance.new("Frame", thm)
+    stateLayer.AnchorPoint = Vector2.new(0.5, 0.5)
+    stateLayer.Position = UDim2.new(0.5, 0, 0.5, 0)
+    stateLayer.Size = UDim2.new(0, 40, 0, 40)
+    stateLayer.BackgroundColor3 = st and curTheme.onpri or curTheme.fg
+    stateLayer.BackgroundTransparency = 1
+    stateLayer.ZIndex = 0
+    Instance.new("UICorner", stateLayer).CornerRadius = UDim.new(1, 0)
+
+    if supportTxt and supportTxt ~= "" then
+        l.TextYAlignment = Enum.TextYAlignment.Top
+        local suppLbl = Instance.new("TextLabel", wrapper)
+        suppLbl.LayoutOrder = 2
+        suppLbl.Size = UDim2.new(1, -(60 + leftOffset), 0, 16)
+        suppLbl.Position = UDim2.new(0, leftOffset, 0, 0)
+        suppLbl.BackgroundTransparency = 1
+        suppLbl.Text = supportTxt
+        suppLbl.RichText = true
+        suppLbl.TextColor3 = curTheme.out
+        suppLbl.FontFace = m3Font
+        suppLbl.TextSize = 12
+        suppLbl.TextXAlignment = Enum.TextXAlignment.Left
+        suppLbl.TextWrapped = true
+        suppLbl.AutomaticSize = Enum.AutomaticSize.Y
+        
+        local sPad = Instance.new("UIPadding", suppLbl)
+        sPad.PaddingLeft = UDim.new(0, leftOffset)
+        
+        table.insert(objs.fg, suppLbl)
+    end
+
+    trk.MouseButton1Click:Connect(function()
+        st = not st
+        tData.state = st
+        thData.state = st
+
+        if st then
+            t(trk, "BackgroundColor3", curTheme.pri, 0.3)
+            tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 24, 0, 24),
+                Position = UDim2.new(0, 36, 0.5, 0),
+            }):Play()
+            tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                BackgroundColor3 = curTheme.onpri
+            }):Play()
+            tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                Transparency = 1
+            }):Play()
+            t(chkIcn, "TextTransparency", 0, 0.2)
+            t(stateLayer, "BackgroundColor3", curTheme.onpri, 0.2)
+        else
+            t(trk, "BackgroundColor3", curTheme.inact, 0.3)
+            tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 16, 0, 16),
+                Position = UDim2.new(0, 16, 0.5, 0),
+                BackgroundColor3 = curTheme.out
+            }):Play()
+            tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                BackgroundColor3 = curTheme.out
+            }):Play()
+            tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                Transparency = 0
+            }):Play()
+            t(chkIcn, "TextTransparency", 1, 0.2)
+            t(stateLayer, "BackgroundColor3", curTheme.fg, 0.2)
+        end
+
+        if flag then lib.Flags[flag] = st end
+        if cb then cb(st) end
+    end)
+
+    trk.MouseEnter:Connect(function()
+        t(stateLayer, "BackgroundTransparency", 0.88, 0.2)
+    end)
+    trk.MouseLeave:Connect(function()
+        t(stateLayer, "BackgroundTransparency", 1, 0.2)
+    end)
+
+    trk.InputBegan:Connect(function(input)
+        if input.UserInputType.Name == "MouseButton1" or input.UserInputType.Name == "Touch" then
+            tw:Create(thm, TweenInfo.new(0.2, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 28, 0, 28)
+            }):Play()
+        end
+    end)
+
+    trk.InputEnded:Connect(function(input)
+        if input.UserInputType.Name == "MouseButton1" or input.UserInputType.Name == "Touch" then
+            tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                Size = st and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 16, 0, 16)
+            }):Play()
+        end
+    end)
+
+    lib:RegisterElement(wrapper, txt, "item")
+
+    local returnObj = {
+        SetText = function(self, newTxt) l.Text = newTxt end,
+        SetValue = function(self, newState)
+            if st == newState then return end
+            st = newState
             tData.state = st
             thData.state = st
 
@@ -2123,103 +2250,35 @@ local function CreateNox(data)
 
             if flag then lib.Flags[flag] = st end
             if cb then cb(st) end
-        end)
-
-        trk.MouseEnter:Connect(function()
-            t(stateLayer, "BackgroundTransparency", 0.88, 0.2)
-        end)
-        trk.MouseLeave:Connect(function()
-            t(stateLayer, "BackgroundTransparency", 1, 0.2)
-        end)
-
-        trk.InputBegan:Connect(function(input)
-            if input.UserInputType.Name == "MouseButton1" or input.UserInputType.Name == "Touch" then
-                tw:Create(thm, TweenInfo.new(0.2, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(0, 28, 0, 28)
-                }):Play()
-            end
-        end)
-
-        trk.InputEnded:Connect(function(input)
-            if input.UserInputType.Name == "MouseButton1" or input.UserInputType.Name == "Touch" then
-                tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                    Size = st and UDim2.new(0, 24, 0, 24) or UDim2.new(0, 16, 0, 16)
-                }):Play()
-            end
-        end)
-
-        lib:RegisterElement(r, txt, "item")
-
-        local returnObj = {
-            SetText = function(self, newTxt) l.Text = newTxt end,
-            SetValue = function(self, newState)
-                if st == newState then return end
-                st = newState
-                tData.state = st
-                thData.state = st
-
-                if st then
-                    t(trk, "BackgroundColor3", curTheme.pri, 0.3)
-                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                        Size = UDim2.new(0, 24, 0, 24),
-                        Position = UDim2.new(0, 36, 0.5, 0),
-                    }):Play()
-                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        BackgroundColor3 = curTheme.onpri
-                    }):Play()
-                    tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        Transparency = 1
-                    }):Play()
-                    t(chkIcn, "TextTransparency", 0, 0.2)
-                    t(stateLayer, "BackgroundColor3", curTheme.onpri, 0.2)
-                else
-                    t(trk, "BackgroundColor3", curTheme.inact, 0.3)
-                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                        Size = UDim2.new(0, 16, 0, 16),
-                        Position = UDim2.new(0, 16, 0.5, 0),
-                        BackgroundColor3 = curTheme.out
-                    }):Play()
-                    tw:Create(thm, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        BackgroundColor3 = curTheme.out
-                    }):Play()
-                    tw:Create(crnr, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                        Transparency = 0
-                    }):Play()
-                    t(chkIcn, "TextTransparency", 1, 0.2)
-                    t(stateLayer, "BackgroundColor3", curTheme.fg, 0.2)
+        end,
+        SetIcon = function(self, newIconStr)
+            for _, child in pairs(r:GetChildren()) do
+                if child ~= l and child ~= trk and not child:IsA("UIListLayout") then
+                    child:Destroy()
                 end
-
-                if flag then lib.Flags[flag] = st end
-                if cb then cb(st) end
-            end,
-            SetIcon = function(self, newIconStr)
-                for _, child in pairs(r:GetChildren()) do
-                    if child ~= l and child ~= trk and not child:IsA("UIListLayout") then
-                        child:Destroy()
-                    end
-                end
-                
-                leftOffset = 0
-                if newIconStr and newIconStr ~= "" then
-                    local icn = createIconObj(r, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
-                    if icn then
-                        setIconColor(icn, curTheme.out)
-                        table.insert(objs.icon, icn)
-                        leftOffset = 32
-                    end
-                end
-                
-                l.Size = UDim2.new(1, -(60 + leftOffset), 1, 0)
-                l.Position = UDim2.new(0, leftOffset, 0, 0)
             end
-        }
-        
-        if flag then
-            lib.Setters[flag] = function(val) returnObj:SetValue(val) end
+            
+            leftOffset = 0
+            if newIconStr and newIconStr ~= "" then
+                local icn = createIconObj(r, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
+                if icn then
+                    setIconColor(icn, curTheme.out)
+                    table.insert(objs.icon, icn)
+                    leftOffset = 32
+                end
+            end
+            
+            l.Size = UDim2.new(1, -(60 + leftOffset), 1, 0)
+            l.Position = UDim2.new(0, leftOffset, 0, 0)
         end
-
-        return returnObj
+    }
+    
+    if flag then
+        lib.Setters[flag] = function(val) returnObj:SetValue(val) end
     end
+
+    return returnObj
+end
 
     function lib:AddRadioGroup(data)
         local titleText = data.Title or "Radio Group"
@@ -3015,745 +3074,836 @@ local function CreateNox(data)
         return returnObj
     end
 
-    function lib:AddDropdown(data)
-        local labelTxt = data.Title or "Dropdown"
-        local options = data.Options or {}
-        local defaultIdx = data.Default or 1
-        local iconStr = data.Icon
-        local cb = data.Callback
-        local flag = data.Flag
-        lib.ElementCounter += 1
-        
-        local selectedIdx = defaultIdx or 1
-        local currentOptions = options or {}
-        local isOpen = false
-        
-        if flag and lib.Flags[flag] ~= nil then
-            local loadedVal = lib.Flags[flag]
-            for i, val in ipairs(currentOptions) do
-                if val == loadedVal then selectedIdx = i break end
-            end
+function lib:AddDropdown(data)
+    local labelTxt = data.Title or "Dropdown"
+    local options = data.Options or {}
+    local defaultIdx = data.Default
+    local supportTxt = data.SupportText
+    local iconStr = data.Icon
+    local cb = data.Callback
+    local flag = data.Flag
+    lib.ElementCounter += 1
+    
+    local selectedIdx = defaultIdx
+    local currentOptions = options or {}
+    local isOpen = false
+    
+    if flag and lib.Flags[flag] ~= nil then
+        local loadedVal = lib.Flags[flag]
+        for i, val in ipairs(currentOptions) do
+            if val == loadedVal then selectedIdx = i break end
         end
-        if flag then lib.Flags[flag] = currentOptions[selectedIdx] or "" end
-    
-        local frame = Instance.new("Frame", lib.CurrentBuildContainer)
-        frame.LayoutOrder = lib.ElementCounter
-        frame.Size = UDim2.new(1, 0, 0, 56)
-        frame.AutomaticSize = Enum.AutomaticSize.Y
-        frame.BackgroundColor3 = curTheme.inact
-        frame.BorderSizePixel = 0
-        Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 4)
-        table.insert(objs.inact, frame)
-    
-        local flatBot = Instance.new("Frame", frame)
-        flatBot.Size = UDim2.new(1, 0, 0, 4)
-        flatBot.Position = UDim2.new(0, 0, 1, -4)
-        flatBot.BackgroundColor3 = curTheme.inact
-        flatBot.BorderSizePixel = 0
-        table.insert(objs.inact, flatBot)
+    end
+    if flag and selectedIdx then lib.Flags[flag] = currentOptions[selectedIdx] end
 
-        local leftOffset = 16
-        if iconStr and iconStr ~= "" then
-            local lIcn = createIconObj(frame, iconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
-            if lIcn then
-                setIconColor(lIcn, curTheme.out)
-                table.insert(objs.icon, lIcn)
-                leftOffset = 44
-            end
+    local wrapper = Instance.new("Frame", lib.CurrentBuildContainer)
+    wrapper.LayoutOrder = lib.ElementCounter
+    wrapper.Size = UDim2.new(1, 0, 0, 0)
+    wrapper.AutomaticSize = Enum.AutomaticSize.Y
+    wrapper.BackgroundTransparency = 1
+    
+    local wrapLayout = Instance.new("UIListLayout", wrapper)
+    wrapLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    wrapLayout.Padding = UDim.new(0, 4)
+
+    local frame = Instance.new("Frame", wrapper)
+    frame.LayoutOrder = 1
+    frame.Size = UDim2.new(1, 0, 0, 56)
+    frame.AutomaticSize = Enum.AutomaticSize.Y
+    frame.BackgroundColor3 = curTheme.inact
+    frame.BorderSizePixel = 0
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 4)
+    table.insert(objs.inact, frame)
+
+    local flatBot = Instance.new("Frame", frame)
+    flatBot.Size = UDim2.new(1, 0, 0, 4)
+    flatBot.Position = UDim2.new(0, 0, 1, -4)
+    flatBot.BackgroundColor3 = curTheme.inact
+    flatBot.BorderSizePixel = 0
+    table.insert(objs.inact, flatBot)
+
+    local leftOffset = 16
+    if iconStr and iconStr ~= "" then
+        local lIcn = createIconObj(frame, iconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
+        if lIcn then
+            setIconColor(lIcn, curTheme.out)
+            table.insert(objs.icon, lIcn)
+            leftOffset = 44
         end
-    
-        local lbl = Instance.new("TextLabel", frame)
-        lbl.Size = UDim2.new(1, -(leftOffset + 40), 0, 20)
-        lbl.Position = UDim2.new(0, leftOffset, 0, 6)
-        lbl.BackgroundTransparency = 1
-        lbl.Text = labelTxt
-        lbl.RichText = true
-        lbl.TextColor3 = curTheme.out
-        lbl.FontFace = m3Font
-        lbl.TextSize = 11
-        lbl.TextXAlignment = Enum.TextXAlignment.Left
-    
-        local valLbl = Instance.new("TextLabel", frame)
-        valLbl.Size = UDim2.new(1, -(leftOffset + 36), 0, 24)
-        valLbl.Position = UDim2.new(0, leftOffset, 0, 26)
-        valLbl.BackgroundTransparency = 1
-        valLbl.Text = currentOptions[selectedIdx] or ""
-        valLbl.TextColor3 = curTheme.fg
-        valLbl.FontFace = m3Font
-        valLbl.RichText = true
-        valLbl.TextSize = 15
-        valLbl.TextXAlignment = Enum.TextXAlignment.Left
-        valLbl.TextWrapped = true
-        valLbl.AutomaticSize = Enum.AutomaticSize.Y
-        
-        local valPad = Instance.new("UIPadding", valLbl)
-        valPad.PaddingBottom = UDim.new(0, 8) 
-        
-        table.insert(objs.fg, valLbl)
-    
-        local icn = createIconObj(frame, "chevron-down", UDim2.new(0, 24, 0, 24), UDim2.new(1, -12, 0.5, 0), Vector2.new(1, 0.5), false)
-        setIconColor(icn, curTheme.out)
-        table.insert(objs.icon, icn)
-    
-        local btn = Instance.new("TextButton", frame)
-        btn.Size = UDim2.new(1, 0, 1, 0)
-        btn.BackgroundTransparency = 1
-        btn.Text = ""
-    
-        local botLine = Instance.new("Frame", frame)
-        botLine.Size = UDim2.new(1, 0, 0, 1)
-        botLine.AnchorPoint = Vector2.new(0, 1)
-        botLine.Position = UDim2.new(0, 0, 1, 0)
-        botLine.BackgroundColor3 = curTheme.out
-        botLine.BorderSizePixel = 0
-
-        local function updateState()
-            t(botLine, "BackgroundColor3", isOpen and curTheme.pri or curTheme.out, 0.2)
-            tw:Create(botLine, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, 0, 0, isOpen and 2 or 1)}):Play()
-            t(lbl, "TextColor3", isOpen and curTheme.pri or curTheme.out, 0.2)
-            tw:Create(icn, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Rotation = isOpen and 180 or 0}):Play()
-            setIconColor(icn, isOpen and curTheme.pri or curTheme.out, 0.2)
-        end
-    
-        local menuObj = nil
-        local trackConn = nil
-        local closeOverlay = nil
-        
-        local function closeMenu()
-            if not isOpen then return end
-            isOpen = false
-            updateState()
-            
-            if trackConn then trackConn:Disconnect() end
-            if closeOverlay then closeOverlay:Destroy(); closeOverlay = nil end
-            
-            if menuObj then
-                t(menuObj, "BackgroundTransparency", 1, 0.2)
-                for _, child in pairs(menuObj:GetChildren()) do
-                    if child:IsA("TextButton") then
-                        t(child, "TextTransparency", 1, 0.2)
-                        t(child, "BackgroundTransparency", 1, 0.2)
-                    end
-                end
-                task.delay(0.2, function()
-                    if menuObj then menuObj:Destroy() menuObj = nil end
-                end)
-            end
-        end
-    
-        btn.MouseButton1Click:Connect(function()
-            if isOpen then
-                closeMenu()
-            else
-                isOpen = true
-                updateState()
-                
-                closeOverlay = Instance.new("TextButton", gui)
-                closeOverlay.Size = UDim2.new(1, 0, 1, 0)
-                closeOverlay.BackgroundTransparency = 1
-                closeOverlay.Text = ""
-                closeOverlay.ZIndex = 499
-                closeOverlay.MouseButton1Click:Connect(closeMenu)
-
-                menuObj = Instance.new("ScrollingFrame", gui)
-                menuObj.Size = UDim2.new(0, frame.AbsoluteSize.X, 0, math.min(#currentOptions * 48, 144))
-                menuObj.Position = UDim2.new(0, frame.AbsolutePosition.X, 0, frame.AbsolutePosition.Y + frame.AbsoluteSize.Y)
-                menuObj.BackgroundColor3 = curTheme.bg:Lerp(curTheme.pri, 0.08)
-                menuObj.BorderSizePixel = 0
-                menuObj.ZIndex = 500
-                menuObj.ScrollBarThickness = 2
-                menuObj.ScrollBarImageColor3 = curTheme.out
-                menuObj.BackgroundTransparency = 1
-                menuObj.ClipsDescendants = true
-                menuObj.AutomaticCanvasSize = Enum.AutomaticSize.Y
-                menuObj.CanvasSize = UDim2.new(0, 0, 0, 0)
-                
-                local mCorner = Instance.new("UICorner", menuObj)
-                mCorner.CornerRadius = UDim.new(0, 4) 
-                mCorner.BottomLeftRadius = UDim.new(0, 4)
-                mCorner.BottomRightRadius = UDim.new(0, 4)
-                table.insert(objs.dlg_bg, menuObj) 
-
-                trackConn = rs.RenderStepped:Connect(function()
-                    if not isOpen or not menuObj then trackConn:Disconnect() return end
-                    menuObj.Position = UDim2.new(0, frame.AbsolutePosition.X, 0, frame.AbsolutePosition.Y + frame.AbsoluteSize.Y)
-                end)
-    
-                local mLayout = Instance.new("UIListLayout", menuObj)
-                mLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    
-                for i, opt in ipairs(currentOptions) do
-                    local optBtn = Instance.new("TextButton", menuObj)
-                    optBtn.Size = UDim2.new(1, 0, 0, 48)
-                    
-                    if i == selectedIdx then
-                        optBtn.BackgroundColor3 = curTheme.inact:Lerp(curTheme.pri, 0.15)
-                        optBtn.BackgroundTransparency = 1
-                    else
-                        optBtn.BackgroundColor3 = curTheme.inact:Lerp(curTheme.fg, 0.05)
-                        optBtn.BackgroundTransparency = 1
-                    end
-
-                    optBtn.Text = opt
-                    optBtn.FontFace = m3Font
-                    optBtn.TextSize = 14
-                    optBtn.RichText = true
-                    optBtn.TextColor3 = curTheme.fg
-                    optBtn.TextXAlignment = Enum.TextXAlignment.Left
-                    optBtn.LayoutOrder = i
-                    optBtn.BorderSizePixel = 0
-                    optBtn.ZIndex = 501
-                    optBtn.TextTransparency = 1
-                    optBtn.AutoButtonColor = false
-                    table.insert(objs.dlg_fg, optBtn)
-                    
-                    local p = Instance.new("UIPadding", optBtn)
-                    p.PaddingLeft = UDim.new(0, 16)
-                    p.PaddingRight = UDim.new(0, 16)
-    
-                    optBtn.MouseEnter:Connect(function() 
-                        if i ~= selectedIdx then t(optBtn, "BackgroundTransparency", 0.7, 0.1) end
-                    end)
-                    optBtn.MouseLeave:Connect(function() 
-                        if i ~= selectedIdx then t(optBtn, "BackgroundTransparency", 1, 0.1) end
-                    end)
-                    optBtn.InputBegan:Connect(function(input) RippleEffect(optBtn, input, curTheme.fg) end)
-    
-                    optBtn.MouseButton1Click:Connect(function()
-                        selectedIdx = i; valLbl.Text = opt
-                        if flag then lib.Flags[flag] = opt end
-                        if cb then cb(opt) end
-                        closeMenu()
-                    end)
-                end
-    
-                tw:Create(menuObj, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
-                for i, child in ipairs(menuObj:GetChildren()) do
-                    if child:IsA("TextButton") then
-                        t(child, "TextTransparency", 0, 0.3)
-                        if child.LayoutOrder == selectedIdx then t(child, "BackgroundTransparency", 0, 0.3) end
-                    end
-                end
-            end
-        end)
-
-        frame.MouseEnter:Connect(function()
-            if not isOpen then
-                t(frame, "BackgroundColor3", curTheme.inact:Lerp(curTheme.fg, 0.05), 0.2)
-                t(flatBot, "BackgroundColor3", curTheme.inact:Lerp(curTheme.fg, 0.05), 0.2)
-            end
-        end)
-        frame.MouseLeave:Connect(function()
-            t(frame, "BackgroundColor3", curTheme.inact, 0.2)
-            t(flatBot, "BackgroundColor3", curTheme.inact, 0.2)
-        end)
-
-        lib:RegisterElement(frame, labelTxt, "item")
-
-        local returnObj = {
-            SetText = function(self, newTxt) lbl.Text = newTxt end,
-            SetValue = function(self, newOpt) 
-                local found = false
-                for i, v in ipairs(currentOptions) do
-                    if v == newOpt then selectedIdx = i; found = true; break end
-                end
-                if found then
-                    valLbl.Text = newOpt
-                    if flag then lib.Flags[flag] = newOpt end
-                    if cb then cb(newOpt) end 
-                end
-            end,
-            Refresh = function(self, newOptions, newDefaultIdx)
-                currentOptions = newOptions or {}
-                selectedIdx = newDefaultIdx or 1
-                valLbl.Text = currentOptions[selectedIdx] or ""
-                if isOpen then closeMenu() end
-            end,
-            SetIcon = function(self, newIconStr)
-                for _, child in pairs(frame:GetChildren()) do
-                    if child ~= lbl and child ~= valLbl and child ~= btn and child ~= botLine and child ~= flatBot and child ~= icn then
-                        child:Destroy()
-                    end
-                end
-                
-                leftOffset = 16
-                if newIconStr and newIconStr ~= "" then
-                    local lIcn = createIconObj(frame, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
-                    if lIcn then
-                        setIconColor(lIcn, curTheme.out)
-                        table.insert(objs.icon, lIcn)
-                        leftOffset = 44
-                    end
-                end
-                
-                lbl.Size = UDim2.new(1, -(leftOffset + 40), 0, 20)
-                lbl.Position = UDim2.new(0, leftOffset, 0, 6)
-                valLbl.Size = UDim2.new(1, -(leftOffset + 36), 0, 24)
-                valLbl.Position = UDim2.new(0, leftOffset, 0, 26)
-            end
-        }
-        
-        if flag then
-            lib.Setters[flag] = function(val) returnObj:SetValue(val) end
-        end
-        
-        return returnObj
     end
 
-    function lib:AddColorPicker(data)
-        local titleText = data.Title or "Color Picker"
-        local defColor = data.Default or Color3.new(1, 1, 1)
-        local iconStr = data.Icon
-        local cb = data.Callback
-        local flag = data.Flag
-        lib.ElementCounter += 1
+    local lbl = Instance.new("TextLabel", frame)
+    lbl.Size = UDim2.new(1, -(leftOffset + 40), 0, 20)
+    lbl.AnchorPoint = Vector2.new(0, 0)
+    lbl.Position = UDim2.new(0, leftOffset, 0, 18)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = labelTxt
+    lbl.RichText = true
+    lbl.TextColor3 = curTheme.out
+    lbl.FontFace = m3Font
+    lbl.TextSize = 15
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
 
-        local function formatHex(color)
-            return string.format("#%02X%02X%02X", math.round(color.R * 255), math.round(color.G * 255), math.round(color.B * 255))
-        end
+    local valLbl = Instance.new("TextLabel", frame)
+    valLbl.Size = UDim2.new(1, -(leftOffset + 36), 0, 24)
+    valLbl.Position = UDim2.new(0, leftOffset, 0, 26)
+    valLbl.BackgroundTransparency = 1
+    valLbl.Text = selectedIdx and currentOptions[selectedIdx] or ""
+    valLbl.TextColor3 = curTheme.fg
+    valLbl.FontFace = m3Font
+    valLbl.RichText = true
+    valLbl.TextSize = 15
+    valLbl.TextXAlignment = Enum.TextXAlignment.Left
+    valLbl.TextWrapped = true
+    valLbl.AutomaticSize = Enum.AutomaticSize.Y
+    valLbl.Visible = selectedIdx ~= nil
+    
+    local valPad = Instance.new("UIPadding", valLbl)
+    valPad.PaddingBottom = UDim.new(0, 8) 
+    
+    table.insert(objs.fg, valLbl)
+
+    local icn = createIconObj(frame, "chevron-down", UDim2.new(0, 24, 0, 24), UDim2.new(1, -12, 0.5, 0), Vector2.new(1, 0.5), false)
+    setIconColor(icn, curTheme.out)
+    table.insert(objs.icon, icn)
+
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(1, 0, 1, 0)
+    btn.BackgroundTransparency = 1
+    btn.Text = ""
+
+    local botLine = Instance.new("Frame", frame)
+    botLine.Size = UDim2.new(1, 0, 0, 1)
+    botLine.AnchorPoint = Vector2.new(0, 1)
+    botLine.Position = UDim2.new(0, 0, 1, 0)
+    botLine.BackgroundColor3 = curTheme.out
+    botLine.BorderSizePixel = 0
+
+    if supportTxt and supportTxt ~= "" then
+        local suppLbl = Instance.new("TextLabel", wrapper)
+        suppLbl.LayoutOrder = 2
+        suppLbl.Size = UDim2.new(1, -32, 0, 16)
+        suppLbl.Position = UDim2.new(0, 16, 0, 0) 
+        suppLbl.BackgroundTransparency = 1
+        suppLbl.Text = supportTxt
+        suppLbl.RichText = true
+        suppLbl.TextColor3 = curTheme.out
+        suppLbl.FontFace = m3Font
+        suppLbl.TextSize = 12
+        suppLbl.TextXAlignment = Enum.TextXAlignment.Left
+        suppLbl.TextWrapped = true
+        suppLbl.AutomaticSize = Enum.AutomaticSize.Y
+        table.insert(objs.fg, suppLbl)
+    end
+
+    local ddData = {
+        lbl = lbl, 
+        line = botLine, 
+        getState = function() return isOpen end
+    }
+    table.insert(objs.dropdown, ddData)
+
+    local function updateState()
+        local hasSelected = selectedIdx ~= nil and currentOptions[selectedIdx] ~= nil
         
-        local function parseHex(hexStr)
-            hexStr = hexStr:gsub("#", "")
-            if #hexStr == 6 then
-                local rVal = tonumber(hexStr:sub(1, 2), 16)
-                local gVal = tonumber(hexStr:sub(3, 4), 16)
-                local bVal = tonumber(hexStr:sub(5, 6), 16)
-                if rVal and gVal and bVal then
-                    return Color3.fromRGB(rVal, gVal, bVal)
+        if isOpen or hasSelected then
+            tw:Create(lbl, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {
+                Position = UDim2.new(0, leftOffset, 0, 6), TextSize = 11, TextColor3 = isOpen and curTheme.pri or curTheme.out
+            }):Play()
+            valLbl.Visible = true
+        else
+            tw:Create(lbl, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {
+                Position = UDim2.new(0, leftOffset, 0, 18), TextSize = 15, TextColor3 = curTheme.out
+            }):Play()
+            valLbl.Visible = false
+        end
+
+        t(botLine, "BackgroundColor3", isOpen and curTheme.pri or curTheme.out, 0.2)
+        tw:Create(botLine, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, 0, 0, isOpen and 2 or 1)}):Play()
+        tw:Create(icn, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Rotation = isOpen and 180 or 0}):Play()
+        setIconColor(icn, isOpen and curTheme.pri or curTheme.out, 0.2)
+    end
+
+    task.spawn(updateState)
+
+    local menuObj = nil
+    local trackConn = nil
+    local closeOverlay = nil
+    
+    local function closeMenu()
+        if not isOpen then return end
+        isOpen = false
+        updateState()
+        
+        if trackConn then trackConn:Disconnect() end
+        if closeOverlay then closeOverlay:Destroy(); closeOverlay = nil end
+        
+        if menuObj then
+            t(menuObj, "BackgroundTransparency", 1, 0.2)
+            for _, child in pairs(menuObj:GetChildren()) do
+                if child:IsA("TextButton") then
+                    t(child, "TextTransparency", 1, 0.2)
+                    t(child, "BackgroundTransparency", 1, 0.2)
                 end
             end
-            return nil
+            task.delay(0.2, function()
+                if menuObj then menuObj:Destroy() menuObj = nil end
+            end)
         end
+    end
 
-        local currentColor = defColor
-        local h, s, v = currentColor:ToHSV()
+    btn.MouseButton1Click:Connect(function()
+        if isOpen then
+            closeMenu()
+        else
+            isOpen = true
+            updateState()
+            
+            closeOverlay = Instance.new("TextButton", gui)
+            closeOverlay.Size = UDim2.new(1, 0, 1, 0)
+            closeOverlay.BackgroundTransparency = 1
+            closeOverlay.Text = ""
+            closeOverlay.ZIndex = 499
+            closeOverlay.MouseButton1Click:Connect(closeMenu)
 
-        if flag and lib.Flags[flag] ~= nil then
-            local loadedVal = lib.Flags[flag]
-            if typeof(loadedVal) == "Color3" then
-                currentColor = loadedVal
-            elseif type(loadedVal) == "string" then
-                local parsed = parseHex(loadedVal)
-                if parsed then currentColor = parsed end
+            menuObj = Instance.new("ScrollingFrame", gui)
+            menuObj.Size = UDim2.new(0, frame.AbsoluteSize.X, 0, math.min(#currentOptions * 48, 144))
+            menuObj.Position = UDim2.new(0, frame.AbsolutePosition.X, 0, frame.AbsolutePosition.Y + frame.AbsoluteSize.Y)
+            menuObj.BackgroundColor3 = curTheme.bg:Lerp(curTheme.pri, 0.08)
+            menuObj.BorderSizePixel = 0
+            menuObj.ZIndex = 500
+            menuObj.ScrollBarThickness = 2
+            menuObj.ScrollBarImageColor3 = curTheme.out
+            menuObj.BackgroundTransparency = 1
+            menuObj.ClipsDescendants = true
+            menuObj.AutomaticCanvasSize = Enum.AutomaticSize.Y
+            menuObj.CanvasSize = UDim2.new(0, 0, 0, 0)
+            
+            local mCorner = Instance.new("UICorner", menuObj)
+            mCorner.CornerRadius = UDim.new(0, 4) 
+            mCorner.BottomLeftRadius = UDim.new(0, 4)
+            mCorner.BottomRightRadius = UDim.new(0, 4)
+            table.insert(objs.dlg_bg, menuObj) 
+
+            trackConn = rs.RenderStepped:Connect(function()
+                if not isOpen or not menuObj then trackConn:Disconnect() return end
+                menuObj.Position = UDim2.new(0, frame.AbsolutePosition.X, 0, frame.AbsolutePosition.Y + frame.AbsoluteSize.Y)
+            end)
+
+            local mLayout = Instance.new("UIListLayout", menuObj)
+            mLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+            for i, opt in ipairs(currentOptions) do
+                local optBtn = Instance.new("TextButton", menuObj)
+                optBtn.Size = UDim2.new(1, 0, 0, 48)
+                
+                if i == selectedIdx then
+                    optBtn.BackgroundColor3 = curTheme.inact:Lerp(curTheme.pri, 0.15)
+                    optBtn.BackgroundTransparency = 1
+                else
+                    optBtn.BackgroundColor3 = curTheme.inact:Lerp(curTheme.fg, 0.05)
+                    optBtn.BackgroundTransparency = 1
+                end
+
+                optBtn.Text = opt
+                optBtn.FontFace = m3Font
+                optBtn.TextSize = 14
+                optBtn.RichText = true
+                optBtn.TextColor3 = curTheme.fg
+                optBtn.TextXAlignment = Enum.TextXAlignment.Left
+                optBtn.LayoutOrder = i
+                optBtn.BorderSizePixel = 0
+                optBtn.ZIndex = 501
+                optBtn.TextTransparency = 1
+                optBtn.AutoButtonColor = false
+                table.insert(objs.dlg_fg, optBtn)
+                
+                local p = Instance.new("UIPadding", optBtn)
+                p.PaddingLeft = UDim.new(0, 16)
+                p.PaddingRight = UDim.new(0, 16)
+
+                optBtn.MouseEnter:Connect(function() 
+                    if i ~= selectedIdx then t(optBtn, "BackgroundTransparency", 0.7, 0.1) end
+                end)
+                optBtn.MouseLeave:Connect(function() 
+                    if i ~= selectedIdx then t(optBtn, "BackgroundTransparency", 1, 0.1) end
+                end)
+                optBtn.InputBegan:Connect(function(input) RippleEffect(optBtn, input, curTheme.fg) end)
+
+                optBtn.MouseButton1Click:Connect(function()
+                    selectedIdx = i; valLbl.Text = opt
+                    if flag then lib.Flags[flag] = opt end
+                    if cb then cb(opt) end
+                    closeMenu()
+                end)
             end
-            h, s, v = currentColor:ToHSV()
+
+            tw:Create(menuObj, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
+            for i, child in ipairs(menuObj:GetChildren()) do
+                if child:IsA("TextButton") then
+                    t(child, "TextTransparency", 0, 0.3)
+                    if child.LayoutOrder == selectedIdx then t(child, "BackgroundTransparency", 0, 0.3) end
+                end
+            end
         end
-        if flag then lib.Flags[flag] = formatHex(currentColor) end
+    end)
 
-        local r = Instance.new("Frame", lib.CurrentBuildContainer)
-        r.LayoutOrder = lib.ElementCounter
-        r.Size = UDim2.new(1, 0, 0, 48)
-        r.BackgroundTransparency = 1
+    frame.MouseEnter:Connect(function()
+        if not isOpen then
+            t(frame, "BackgroundColor3", curTheme.inact:Lerp(curTheme.fg, 0.05), 0.2)
+            t(flatBot, "BackgroundColor3", curTheme.inact:Lerp(curTheme.fg, 0.05), 0.2)
+        end
+    end)
+    frame.MouseLeave:Connect(function()
+        t(frame, "BackgroundColor3", curTheme.inact, 0.2)
+        t(flatBot, "BackgroundColor3", curTheme.inact, 0.2)
+    end)
 
-        local leftOffset = 0
+    lib:RegisterElement(wrapper, labelTxt, "item")
+
+    local returnObj = {
+        SetText = function(self, newTxt) lbl.Text = newTxt end,
+        SetValue = function(self, newOpt) 
+            local found = false
+            for i, v in ipairs(currentOptions) do
+                if v == newOpt then selectedIdx = i; found = true; break end
+            end
+            if found then
+                valLbl.Text = newOpt
+                updateState()
+                if flag then lib.Flags[flag] = newOpt end
+                if cb then cb(newOpt) end 
+            end
+        end,
+        Refresh = function(self, newOptions, newDefaultIdx)
+            currentOptions = newOptions or {}
+            selectedIdx = newDefaultIdx
+            valLbl.Text = selectedIdx and currentOptions[selectedIdx] or ""
+            updateState()
+            if isOpen then closeMenu() end
+        end,
+        SetIcon = function(self, newIconStr)
+            for _, child in pairs(frame:GetChildren()) do
+                if child ~= lbl and child ~= valLbl and child ~= btn and child ~= botLine and child ~= flatBot and child ~= icn then
+                    child:Destroy()
+                end
+            end
+            
+            leftOffset = 16
+            if newIconStr and newIconStr ~= "" then
+                local lIcn = createIconObj(frame, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
+                if lIcn then
+                    setIconColor(lIcn, curTheme.out)
+                    table.insert(objs.icon, lIcn)
+                    leftOffset = 44
+                end
+            end
+            
+            lbl.Size = UDim2.new(1, -(leftOffset + 40), 0, 20)
+            valLbl.Size = UDim2.new(1, -(leftOffset + 36), 0, 24)
+            valLbl.Position = UDim2.new(0, leftOffset, 0, 26)
+            updateState()
+        end
+    }
+    
+    if flag then
+        lib.Setters[flag] = function(val) returnObj:SetValue(val) end
+    end
+    
+    return returnObj
+end
+
+function lib:AddColorPicker(data)
+    local titleText = data.Title or "Color Picker"
+    local supportTxt = data.SupportText
+    local defColor = data.Default or Color3.new(1, 1, 1)
+    local iconStr = data.Icon
+    local cb = data.Callback
+    local flag = data.Flag
+    lib.ElementCounter += 1
+
+    local function formatHex(color)
+        return string.format("#%02X%02X%02X", math.round(color.R * 255), math.round(color.G * 255), math.round(color.B * 255))
+    end
+    
+    local function parseHex(hexStr)
+        hexStr = hexStr:gsub("#", "")
+        if #hexStr == 6 then
+            local rVal = tonumber(hexStr:sub(1, 2), 16)
+            local gVal = tonumber(hexStr:sub(3, 4), 16)
+            local bVal = tonumber(hexStr:sub(5, 6), 16)
+            if rVal and gVal and bVal then
+                return Color3.fromRGB(rVal, gVal, bVal)
+            end
+        end
+        return nil
+    end
+
+    local currentColor = defColor
+    local h, s, v = currentColor:ToHSV()
+
+    if flag and lib.Flags[flag] ~= nil then
+        local loadedVal = lib.Flags[flag]
+        if typeof(loadedVal) == "Color3" then
+            currentColor = loadedVal
+        elseif type(loadedVal) == "string" then
+            local parsed = parseHex(loadedVal)
+            if parsed then currentColor = parsed end
+        end
+        h, s, v = currentColor:ToHSV()
+    end
+    if flag then lib.Flags[flag] = formatHex(currentColor) end
+
+    local wrapper = Instance.new("Frame", lib.CurrentBuildContainer)
+    wrapper.LayoutOrder = lib.ElementCounter
+    wrapper.Size = UDim2.new(1, 0, 0, 0)
+    wrapper.AutomaticSize = Enum.AutomaticSize.Y
+    wrapper.BackgroundTransparency = 1
+
+    local wrapLayout = Instance.new("UIListLayout", wrapper)
+    wrapLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    wrapLayout.Padding = UDim.new(0, 0)
+
+    local r = Instance.new("Frame", wrapper)
+    r.LayoutOrder = 1
+    r.Size = UDim2.new(1, 0, 0, 48)
+    r.AutomaticSize = Enum.AutomaticSize.Y
+    r.BackgroundTransparency = 1
+
+    local leftOffset = 0
+    
+    if iconStr and iconStr ~= "" then
+        local icn = createIconObj(r, iconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
+        if icn then
+            setIconColor(icn, curTheme.out)
+            table.insert(objs.icon, icn)
+            leftOffset = 32
+        end
+    end
+
+    local lbl = Instance.new("TextLabel", r)
+    lbl.Size = UDim2.new(1, -(60 + leftOffset), 1, 0)
+    lbl.Position = UDim2.new(0, leftOffset, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = titleText
+    lbl.TextColor3 = curTheme.fg
+    lbl.FontFace = m3Font
+    lbl.RichText = true
+    lbl.TextSize = 16
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.TextYAlignment = Enum.TextYAlignment.Center
+    lbl.TextWrapped = true
+    lbl.AutomaticSize = Enum.AutomaticSize.Y
+    table.insert(objs.fg, lbl)
+
+    local btn = Instance.new("TextButton", r)
+    btn.Size = UDim2.new(0, 40, 0, 24)
+    btn.AnchorPoint = Vector2.new(1, 0.5)
+    btn.Position = UDim2.new(1, 0, 0.5, 0)
+    btn.BackgroundColor3 = currentColor
+    btn.Text = ""
+    btn.AutoButtonColor = false
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+
+    local stroke = Instance.new("UIStroke", btn)
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke.Thickness = 1
+    stroke.Color = curTheme.out
+    table.insert(objs.icon, stroke)
+
+    if supportTxt and supportTxt ~= "" then
+        lbl.TextYAlignment = Enum.TextYAlignment.Top
+        local suppLbl = Instance.new("TextLabel", wrapper)
+        suppLbl.LayoutOrder = 2
+        suppLbl.Size = UDim2.new(1, -(60 + leftOffset), 0, 16)
+        suppLbl.Position = UDim2.new(0, leftOffset, 0, 0)
+        suppLbl.BackgroundTransparency = 1
+        suppLbl.Text = supportTxt
+        suppLbl.RichText = true
+        suppLbl.TextColor3 = curTheme.out
+        suppLbl.FontFace = m3Font
+        suppLbl.TextSize = 12
+        suppLbl.TextXAlignment = Enum.TextXAlignment.Left
+        suppLbl.TextWrapped = true
+        suppLbl.AutomaticSize = Enum.AutomaticSize.Y
         
-        if iconStr and iconStr ~= "" then
-            local icn = createIconObj(r, iconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
-            if icn then
-                setIconColor(icn, curTheme.out)
-                table.insert(objs.icon, icn)
-                leftOffset = 32
+        local sPad = Instance.new("UIPadding", suppLbl)
+        sPad.PaddingLeft = UDim.new(0, leftOffset)
+        
+        table.insert(objs.fg, suppLbl)
+    end
+
+    btn.MouseButton1Click:Connect(function()
+        local d_h, d_s, d_v = h, s, v
+        local d_color = currentColor
+        local activeConns = {}
+        
+        local overlay = Instance.new("TextButton", gui)
+        overlay.Size = UDim2.new(1, 0, 1, 0)
+        overlay.BackgroundColor3 = curTheme.bg
+        overlay.BackgroundTransparency = 1
+        overlay.Text = ""
+        overlay.AutoButtonColor = false
+        overlay.ZIndex = 999
+        
+        local dlgBox = Instance.new("Frame", overlay)
+        dlgBox.Size = UDim2.new(0, 320, 0, 0)
+        dlgBox.AnchorPoint = Vector2.new(0.5, 0.5)
+        dlgBox.Position = UDim2.new(0.5, 0, 0.5, 20)
+        dlgBox.BackgroundColor3 = curTheme.bg:Lerp(curTheme.pri, 0.11)
+        dlgBox.AutomaticSize = Enum.AutomaticSize.Y
+        dlgBox.BackgroundTransparency = 1
+        dlgBox.ZIndex = 1000
+        table.insert(objs.dlg_bg, dlgBox)
+        Instance.new("UICorner", dlgBox).CornerRadius = UDim.new(0, 24)
+        
+        local pad = Instance.new("UIPadding", dlgBox)
+        pad.PaddingLeft = UDim.new(0, 24)
+        pad.PaddingRight = UDim.new(0, 24)
+        pad.PaddingTop = UDim.new(0, 24)
+        pad.PaddingBottom = UDim.new(0, 16)
+        
+        local layout = Instance.new("UIListLayout", dlgBox)
+        layout.SortOrder = Enum.SortOrder.LayoutOrder
+        layout.Padding = UDim.new(0, 16)
+        
+        local dTitle = Instance.new("TextLabel", dlgBox)
+        dTitle.Size = UDim2.new(1, 0, 0, 24)
+        dTitle.BackgroundTransparency = 1
+        dTitle.Text = titleText
+        dTitle.TextColor3 = curTheme.fg
+        dTitle.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+        dTitle.TextSize = 20
+        dTitle.TextXAlignment = Enum.TextXAlignment.Left
+        dTitle.TextTransparency = 1
+        dTitle.LayoutOrder = 1
+        dTitle.ZIndex = 1000
+        table.insert(objs.dlg_fg, dTitle)
+        
+        local mapCont = Instance.new("Frame", dlgBox)
+        mapCont.Size = UDim2.new(1, 0, 0, 160)
+        mapCont.BackgroundColor3 = Color3.fromHSV(d_h, 1, 1)
+        mapCont.LayoutOrder = 2
+        mapCont.ZIndex = 1000
+        Instance.new("UICorner", mapCont).CornerRadius = UDim.new(0, 8)
+        
+        local wGrad = Instance.new("Frame", mapCont)
+        wGrad.Size = UDim2.new(1, 0, 1, 0)
+        wGrad.BackgroundColor3 = Color3.new(1, 1, 1)
+        wGrad.ZIndex = 1001
+        Instance.new("UICorner", wGrad).CornerRadius = UDim.new(0, 8)
+        local uigW = Instance.new("UIGradient", wGrad)
+        uigW.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
+        
+        local bGrad = Instance.new("Frame", mapCont)
+        bGrad.Size = UDim2.new(1, 0, 1, 0)
+        bGrad.BackgroundColor3 = Color3.new(0, 0, 0)
+        bGrad.ZIndex = 1002
+        Instance.new("UICorner", bGrad).CornerRadius = UDim.new(0, 8)
+        local uigB = Instance.new("UIGradient", bGrad)
+        uigB.Rotation = 90
+        uigB.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(1, 0)})
+        
+        local mapBtn = Instance.new("TextButton", bGrad)
+        mapBtn.Size = UDim2.new(1, 0, 1, 0)
+        mapBtn.BackgroundTransparency = 1
+        mapBtn.Text = ""
+        mapBtn.ZIndex = 1003
+        
+        local mapCursor = Instance.new("Frame", mapBtn)
+        mapCursor.Size = UDim2.new(0, 12, 0, 12)
+        mapCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+        mapCursor.BackgroundColor3 = Color3.new(1, 1, 1)
+        mapCursor.ZIndex = 1004
+        Instance.new("UICorner", mapCursor).CornerRadius = UDim.new(1, 0)
+        local mStr = Instance.new("UIStroke", mapCursor)
+        mStr.Color = Color3.new(0, 0, 0)
+        mStr.Thickness = 1
+        
+        local hueCont = Instance.new("Frame", dlgBox)
+        hueCont.Size = UDim2.new(1, 0, 0, 20)
+        hueCont.BackgroundColor3 = Color3.new(1,1,1)
+        hueCont.LayoutOrder = 3
+        hueCont.ZIndex = 1000
+        Instance.new("UICorner", hueCont).CornerRadius = UDim.new(0, 10)
+        
+        local hueGrad = Instance.new("UIGradient", hueCont)
+        hueGrad.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+            ColorSequenceKeypoint.new(0.167, Color3.fromRGB(255, 255, 0)),
+            ColorSequenceKeypoint.new(0.333, Color3.fromRGB(0, 255, 0)),
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+            ColorSequenceKeypoint.new(0.667, Color3.fromRGB(0, 0, 255)),
+            ColorSequenceKeypoint.new(0.833, Color3.fromRGB(255, 0, 255)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+        })
+        
+        local hueBtn = Instance.new("TextButton", hueCont)
+        hueBtn.Size = UDim2.new(1, 0, 1, 0)
+        hueBtn.BackgroundTransparency = 1
+        hueBtn.Text = ""
+        hueBtn.ZIndex = 1001
+        
+        local hueCursor = Instance.new("Frame", hueBtn)
+        hueCursor.Size = UDim2.new(0, 16, 0, 24)
+        hueCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+        hueCursor.BackgroundColor3 = Color3.new(1, 1, 1)
+        hueCursor.ZIndex = 1002
+        Instance.new("UICorner", hueCursor).CornerRadius = UDim.new(0, 4)
+        local hStr = Instance.new("UIStroke", hueCursor)
+        hStr.Color = Color3.new(0, 0, 0)
+        hStr.Thickness = 1
+
+        local dataCont = Instance.new("Frame", dlgBox)
+        dataCont.Size = UDim2.new(1, 0, 0, 36)
+        dataCont.BackgroundTransparency = 1
+        dataCont.LayoutOrder = 4
+        dataCont.ZIndex = 1000
+        
+        local dataLayout = Instance.new("UIListLayout", dataCont)
+        dataLayout.FillDirection = Enum.FillDirection.Horizontal
+        dataLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        dataLayout.Padding = UDim.new(0, 8)
+        dataLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        
+        local previewBox = Instance.new("Frame", dataCont)
+        previewBox.Size = UDim2.new(0, 36, 0, 36)
+        previewBox.BackgroundColor3 = d_color
+        previewBox.LayoutOrder = 1
+        previewBox.ZIndex = 1000
+        Instance.new("UICorner", previewBox).CornerRadius = UDim.new(0, 8)
+        local pStr = Instance.new("UIStroke", previewBox)
+        pStr.Color = curTheme.out
+        pStr.Thickness = 1
+        table.insert(objs.icon, pStr)
+        
+        local hexBg = Instance.new("Frame", dataCont)
+        hexBg.Size = UDim2.new(1, -44, 0, 36)
+        hexBg.BackgroundColor3 = curTheme.inact
+        hexBg.LayoutOrder = 2
+        hexBg.ZIndex = 1000
+        Instance.new("UICorner", hexBg).CornerRadius = UDim.new(0, 8)
+        table.insert(objs.inact, hexBg)
+        
+        local hexPrefix = Instance.new("TextLabel", hexBg)
+        hexPrefix.Size = UDim2.new(0, 30, 1, 0)
+        hexPrefix.BackgroundTransparency = 1
+        hexPrefix.Text = "HEX"
+        hexPrefix.TextColor3 = curTheme.out
+        hexPrefix.FontFace = m3Font
+        hexPrefix.TextSize = 12
+        hexPrefix.ZIndex = 1000
+        table.insert(objs.icon, hexPrefix)
+        
+        local hexBox = Instance.new("TextBox", hexBg)
+        hexBox.Size = UDim2.new(1, -38, 1, 0)
+        hexBox.Position = UDim2.new(0, 30, 0, 0)
+        hexBox.BackgroundTransparency = 1
+        hexBox.Text = formatHex(d_color)
+        hexBox.TextColor3 = curTheme.fg
+        hexBox.FontFace = m3Font
+        hexBox.TextSize = 14
+        hexBox.TextXAlignment = Enum.TextXAlignment.Left
+        hexBox.ZIndex = 1000
+        hexBox.ClearTextOnFocus = false
+        table.insert(objs.fg, hexBox)
+
+        local actCont = Instance.new("Frame", dlgBox)
+        actCont.Size = UDim2.new(1, 0, 0, 40)
+        actCont.BackgroundTransparency = 1
+        actCont.LayoutOrder = 5
+        actCont.ZIndex = 1000
+        
+        local actLayout = Instance.new("UIListLayout", actCont)
+        actLayout.FillDirection = Enum.FillDirection.Horizontal
+        actLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+        actLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        actLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        actLayout.Padding = UDim.new(0, 8)
+
+        local function closeDialog()
+            for _, c in ipairs(activeConns) do c:Disconnect() end
+            
+            t(overlay, "BackgroundTransparency", 1, 0.3)
+            tw:Create(dlgBox, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                Position = UDim2.new(0.5, 0, 0.5, 20), BackgroundTransparency = 1
+            }):Play()
+            
+            for _, v in pairs(dlgBox:GetDescendants()) do
+                if v:IsA("TextLabel") or v:IsA("TextBox") or v:IsA("TextButton") then
+                    t(v, "TextTransparency", 1, 0.2)
+                    if v.Name ~= "mapBtn" and v.Name ~= "hueBtn" then t(v, "BackgroundTransparency", 1, 0.2) end
+                elseif v:IsA("UIStroke") then
+                    t(v, "Transparency", 1, 0.2)
+                elseif v:IsA("Frame") and v.Name ~= "mapCursor" and v.Name ~= "hueCursor" and v.Name ~= "wGrad" and v.Name ~= "bGrad" then
+                    t(v, "BackgroundTransparency", 1, 0.2)
+                end
             end
+            
+            task.delay(0.3, function() overlay:Destroy() end)
         end
-
-        local lbl = Instance.new("TextLabel", r)
-        lbl.Size = UDim2.new(1, -(60 + leftOffset), 1, 0)
-        lbl.Position = UDim2.new(0, leftOffset, 0, 0)
-        lbl.BackgroundTransparency = 1
-        lbl.Text = titleText
-        lbl.TextColor3 = curTheme.fg
-        lbl.FontFace = m3Font
-        lbl.RichText = true
-        lbl.TextSize = 16
-        lbl.TextXAlignment = Enum.TextXAlignment.Left
-        table.insert(objs.fg, lbl)
-
-        local btn = Instance.new("TextButton", r)
-        btn.Size = UDim2.new(0, 40, 0, 24)
-        btn.AnchorPoint = Vector2.new(1, 0.5)
-        btn.Position = UDim2.new(1, 0, 0.5, 0)
-        btn.BackgroundColor3 = currentColor
-        btn.Text = ""
-        btn.AutoButtonColor = false
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-
-        local stroke = Instance.new("UIStroke", btn)
-        stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-        stroke.Thickness = 1
-        stroke.Color = curTheme.out
-        table.insert(objs.icon, stroke)
-
-        btn.MouseButton1Click:Connect(function()
-            local d_h, d_s, d_v = h, s, v
-            local d_color = currentColor
-            local activeConns = {}
+        
+        local function makeBtn(txt, isFilled, clb)
+            local b = Instance.new("TextButton", actCont)
+            b.BackgroundTransparency = isFilled and 0 or 1
+            b.BackgroundColor3 = isFilled and curTheme.pri or curTheme.bg
+            b.Text = txt
+            b.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+            b.TextSize = 14
+            b.TextColor3 = isFilled and curTheme.onpri or curTheme.pri
+            b.Size = UDim2.new(0, 0, 0, 40)
+            b.AutomaticSize = Enum.AutomaticSize.X
+            b.TextTransparency = 1
+            b.ZIndex = 1000
+            Instance.new("UICorner", b).CornerRadius = UDim.new(1, 0)
             
-            local overlay = Instance.new("TextButton", gui)
-            overlay.Size = UDim2.new(1, 0, 1, 0)
-            overlay.BackgroundColor3 = curTheme.bg
-            overlay.BackgroundTransparency = 1
-            overlay.Text = ""
-            overlay.AutoButtonColor = false
-            overlay.ZIndex = 999
+            local padding = Instance.new("UIPadding", b)
+            padding.PaddingLeft = UDim.new(0, 16)
+            padding.PaddingRight = UDim.new(0, 16)
             
-            local dlgBox = Instance.new("Frame", overlay)
-            dlgBox.Size = UDim2.new(0, 320, 0, 0)
-            dlgBox.AnchorPoint = Vector2.new(0.5, 0.5)
-            dlgBox.Position = UDim2.new(0.5, 0, 0.5, 20)
-            dlgBox.BackgroundColor3 = curTheme.bg:Lerp(curTheme.pri, 0.11)
-            dlgBox.AutomaticSize = Enum.AutomaticSize.Y
-            dlgBox.BackgroundTransparency = 1
-            dlgBox.ZIndex = 1000
-            table.insert(objs.dlg_bg, dlgBox)
-            Instance.new("UICorner", dlgBox).CornerRadius = UDim.new(0, 24)
+            table.insert(objs.dlg_btn, {btn = b, isFilled = isFilled})
             
-            local pad = Instance.new("UIPadding", dlgBox)
-            pad.PaddingLeft = UDim.new(0, 24)
-            pad.PaddingRight = UDim.new(0, 24)
-            pad.PaddingTop = UDim.new(0, 24)
-            pad.PaddingBottom = UDim.new(0, 16)
+            b.MouseEnter:Connect(function()
+                local hBg = isFilled and curTheme.fg or curTheme.pri
+                local hTr = isFilled and 0 or 0.92
+                t(b, "BackgroundTransparency", hTr, 0.2)
+                t(b, "BackgroundColor3", hBg, 0.2)
+            end)
+            b.MouseLeave:Connect(function()
+                local iBg = isFilled and curTheme.pri or curTheme.bg
+                local iTr = isFilled and 0 or 1
+                t(b, "BackgroundTransparency", iTr, 0.2)
+                t(b, "BackgroundColor3", iBg, 0.2)
+            end)
             
-            local layout = Instance.new("UIListLayout", dlgBox)
-            layout.SortOrder = Enum.SortOrder.LayoutOrder
-            layout.Padding = UDim.new(0, 16)
-            
-            local dTitle = Instance.new("TextLabel", dlgBox)
-            dTitle.Size = UDim2.new(1, 0, 0, 24)
-            dTitle.BackgroundTransparency = 1
-            dTitle.Text = titleText
-            dTitle.TextColor3 = curTheme.fg
-            dTitle.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
-            dTitle.TextSize = 20
-            dTitle.TextXAlignment = Enum.TextXAlignment.Left
-            dTitle.TextTransparency = 1
-            dTitle.LayoutOrder = 1
-            dTitle.ZIndex = 1000
-            table.insert(objs.dlg_fg, dTitle)
-            
-            local mapCont = Instance.new("Frame", dlgBox)
-            mapCont.Size = UDim2.new(1, 0, 0, 160)
+            b.MouseButton1Click:Connect(function()
+                closeDialog()
+                if clb then clb() end
+            end)
+        end
+        
+        makeBtn("Cancel", false, nil)
+        makeBtn("Apply", true, function()
+            h, s, v = d_h, d_s, d_v
+            currentColor = d_color
+            t(btn, "BackgroundColor3", currentColor, 0.3)
+            if flag then lib.Flags[flag] = formatHex(currentColor) end
+            if cb then cb(currentColor) end
+        end)
+        
+        local function updateCursors()
+            mapCursor.Position = UDim2.new(d_s, 0, 1 - d_v, 0)
+            hueCursor.Position = UDim2.new(d_h, 0, 0.5, 0)
+        end
+        
+        local function updateValues()
+            d_color = Color3.fromHSV(d_h, d_s, d_v)
             mapCont.BackgroundColor3 = Color3.fromHSV(d_h, 1, 1)
-            mapCont.LayoutOrder = 2
-            mapCont.ZIndex = 1000
-            Instance.new("UICorner", mapCont).CornerRadius = UDim.new(0, 8)
-            
-            local wGrad = Instance.new("Frame", mapCont)
-            wGrad.Size = UDim2.new(1, 0, 1, 0)
-            wGrad.BackgroundColor3 = Color3.new(1, 1, 1)
-            wGrad.ZIndex = 1001
-            Instance.new("UICorner", wGrad).CornerRadius = UDim.new(0, 8)
-            local uigW = Instance.new("UIGradient", wGrad)
-            uigW.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
-            
-            local bGrad = Instance.new("Frame", mapCont)
-            bGrad.Size = UDim2.new(1, 0, 1, 0)
-            bGrad.BackgroundColor3 = Color3.new(0, 0, 0)
-            bGrad.ZIndex = 1002
-            Instance.new("UICorner", bGrad).CornerRadius = UDim.new(0, 8)
-            local uigB = Instance.new("UIGradient", bGrad)
-            uigB.Rotation = 90
-            uigB.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(1, 0)})
-            
-            local mapBtn = Instance.new("TextButton", bGrad)
-            mapBtn.Size = UDim2.new(1, 0, 1, 0)
-            mapBtn.BackgroundTransparency = 1
-            mapBtn.Text = ""
-            mapBtn.ZIndex = 1003
-            
-            local mapCursor = Instance.new("Frame", mapBtn)
-            mapCursor.Size = UDim2.new(0, 12, 0, 12)
-            mapCursor.AnchorPoint = Vector2.new(0.5, 0.5)
-            mapCursor.BackgroundColor3 = Color3.new(1, 1, 1)
-            mapCursor.ZIndex = 1004
-            Instance.new("UICorner", mapCursor).CornerRadius = UDim.new(1, 0)
-            local mStr = Instance.new("UIStroke", mapCursor)
-            mStr.Color = Color3.new(0, 0, 0)
-            mStr.Thickness = 1
-            
-            local hueCont = Instance.new("Frame", dlgBox)
-            hueCont.Size = UDim2.new(1, 0, 0, 20)
-            hueCont.BackgroundColor3 = Color3.new(1,1,1)
-            hueCont.LayoutOrder = 3
-            hueCont.ZIndex = 1000
-            Instance.new("UICorner", hueCont).CornerRadius = UDim.new(0, 10)
-            
-            local hueGrad = Instance.new("UIGradient", hueCont)
-            hueGrad.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-                ColorSequenceKeypoint.new(0.167, Color3.fromRGB(255, 255, 0)),
-                ColorSequenceKeypoint.new(0.333, Color3.fromRGB(0, 255, 0)),
-                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
-                ColorSequenceKeypoint.new(0.667, Color3.fromRGB(0, 0, 255)),
-                ColorSequenceKeypoint.new(0.833, Color3.fromRGB(255, 0, 255)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
-            })
-            
-            local hueBtn = Instance.new("TextButton", hueCont)
-            hueBtn.Size = UDim2.new(1, 0, 1, 0)
-            hueBtn.BackgroundTransparency = 1
-            hueBtn.Text = ""
-            hueBtn.ZIndex = 1001
-            
-            local hueCursor = Instance.new("Frame", hueBtn)
-            hueCursor.Size = UDim2.new(0, 16, 0, 24)
-            hueCursor.AnchorPoint = Vector2.new(0.5, 0.5)
-            hueCursor.BackgroundColor3 = Color3.new(1, 1, 1)
-            hueCursor.ZIndex = 1002
-            Instance.new("UICorner", hueCursor).CornerRadius = UDim.new(0, 4)
-            local hStr = Instance.new("UIStroke", hueCursor)
-            hStr.Color = Color3.new(0, 0, 0)
-            hStr.Thickness = 1
-    
-            local dataCont = Instance.new("Frame", dlgBox)
-            dataCont.Size = UDim2.new(1, 0, 0, 36)
-            dataCont.BackgroundTransparency = 1
-            dataCont.LayoutOrder = 4
-            dataCont.ZIndex = 1000
-            
-            local dataLayout = Instance.new("UIListLayout", dataCont)
-            dataLayout.FillDirection = Enum.FillDirection.Horizontal
-            dataLayout.SortOrder = Enum.SortOrder.LayoutOrder
-            dataLayout.Padding = UDim.new(0, 8)
-            dataLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-            
-            local previewBox = Instance.new("Frame", dataCont)
-            previewBox.Size = UDim2.new(0, 36, 0, 36)
             previewBox.BackgroundColor3 = d_color
-            previewBox.LayoutOrder = 1
-            previewBox.ZIndex = 1000
-            Instance.new("UICorner", previewBox).CornerRadius = UDim.new(0, 8)
-            local pStr = Instance.new("UIStroke", previewBox)
-            pStr.Color = curTheme.out
-            pStr.Thickness = 1
-            table.insert(objs.icon, pStr)
-            
-            local hexBg = Instance.new("Frame", dataCont)
-            hexBg.Size = UDim2.new(1, -44, 0, 36)
-            hexBg.BackgroundColor3 = curTheme.inact
-            hexBg.LayoutOrder = 2
-            hexBg.ZIndex = 1000
-            Instance.new("UICorner", hexBg).CornerRadius = UDim.new(0, 8)
-            table.insert(objs.inact, hexBg)
-            
-            local hexPrefix = Instance.new("TextLabel", hexBg)
-            hexPrefix.Size = UDim2.new(0, 30, 1, 0)
-            hexPrefix.BackgroundTransparency = 1
-            hexPrefix.Text = "HEX"
-            hexPrefix.TextColor3 = curTheme.out
-            hexPrefix.FontFace = m3Font
-            hexPrefix.TextSize = 12
-            hexPrefix.ZIndex = 1000
-            table.insert(objs.icon, hexPrefix)
-            
-            local hexBox = Instance.new("TextBox", hexBg)
-            hexBox.Size = UDim2.new(1, -38, 1, 0)
-            hexBox.Position = UDim2.new(0, 30, 0, 0)
-            hexBox.BackgroundTransparency = 1
-            hexBox.Text = formatHex(d_color)
-            hexBox.TextColor3 = curTheme.fg
-            hexBox.FontFace = m3Font
-            hexBox.TextSize = 14
-            hexBox.TextXAlignment = Enum.TextXAlignment.Left
-            hexBox.ZIndex = 1000
-            hexBox.ClearTextOnFocus = false
-            table.insert(objs.fg, hexBox)
-    
-            local actCont = Instance.new("Frame", dlgBox)
-            actCont.Size = UDim2.new(1, 0, 0, 40)
-            actCont.BackgroundTransparency = 1
-            actCont.LayoutOrder = 5
-            actCont.ZIndex = 1000
-            
-            local actLayout = Instance.new("UIListLayout", actCont)
-            actLayout.FillDirection = Enum.FillDirection.Horizontal
-            actLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
-            actLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-            actLayout.SortOrder = Enum.SortOrder.LayoutOrder
-            actLayout.Padding = UDim.new(0, 8)
-    
-            local function closeDialog()
-                for _, c in ipairs(activeConns) do c:Disconnect() end
-                
-                t(overlay, "BackgroundTransparency", 1, 0.3)
-                tw:Create(dlgBox, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                    Position = UDim2.new(0.5, 0, 0.5, 20), BackgroundTransparency = 1
-                }):Play()
-                
-                for _, v in pairs(dlgBox:GetDescendants()) do
-                    if v:IsA("TextLabel") or v:IsA("TextBox") or v:IsA("TextButton") then
-                        t(v, "TextTransparency", 1, 0.2)
-                        if v.Name ~= "mapBtn" and v.Name ~= "hueBtn" then t(v, "BackgroundTransparency", 1, 0.2) end
-                    elseif v:IsA("UIStroke") then
-                        t(v, "Transparency", 1, 0.2)
-                    elseif v:IsA("Frame") and v.Name ~= "mapCursor" and v.Name ~= "hueCursor" and v.Name ~= "wGrad" and v.Name ~= "bGrad" then
-                        t(v, "BackgroundTransparency", 1, 0.2)
-                    end
+            if not hexBox:IsFocused() then hexBox.Text = formatHex(d_color) end
+        end
+        
+        local mapDrag = false
+        local hueDrag = false
+        
+        table.insert(activeConns, mapBtn.InputBegan:Connect(function(i)
+            if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then mapDrag = true end
+        end))
+        table.insert(activeConns, hueBtn.InputBegan:Connect(function(i)
+            if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then hueDrag = true end
+        end))
+        
+        table.insert(activeConns, uis.InputEnded:Connect(function(i)
+            if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then
+                mapDrag = false
+                hueDrag = false
+            end
+        end))
+        
+        table.insert(activeConns, uis.InputChanged:Connect(function(i)
+            if i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch") then
+                if mapDrag then
+                    local ms = mapBtn.AbsoluteSize
+                    local mp = mapBtn.AbsolutePosition
+                    local x = math.clamp((i.Position.X - mp.X) / ms.X, 0, 1)
+                    local y = math.clamp((i.Position.Y - mp.Y) / ms.Y, 0, 1)
+                    d_s = x
+                    d_v = 1 - y
+                    updateCursors()
+                    updateValues()
+                elseif hueDrag then
+                    local hs = hueBtn.AbsoluteSize
+                    local hp = hueBtn.AbsolutePosition
+                    local x = math.clamp((i.Position.X - hp.X) / hs.X, 0, 1)
+                    d_h = x
+                    updateCursors()
+                    updateValues()
                 end
-                
-                task.delay(0.3, function() overlay:Destroy() end)
             end
-            
-            local function makeBtn(txt, isFilled, clb)
-                local b = Instance.new("TextButton", actCont)
-                b.BackgroundTransparency = isFilled and 0 or 1
-                b.BackgroundColor3 = isFilled and curTheme.pri or curTheme.bg
-                b.Text = txt
-                b.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
-                b.TextSize = 14
-                b.TextColor3 = isFilled and curTheme.onpri or curTheme.pri
-                b.Size = UDim2.new(0, 0, 0, 40)
-                b.AutomaticSize = Enum.AutomaticSize.X
-                b.TextTransparency = 1
-                b.ZIndex = 1000
-                Instance.new("UICorner", b).CornerRadius = UDim.new(1, 0)
-                
-                local padding = Instance.new("UIPadding", b)
-                padding.PaddingLeft = UDim.new(0, 16)
-                padding.PaddingRight = UDim.new(0, 16)
-                
-                table.insert(objs.dlg_btn, {btn = b, isFilled = isFilled})
-                
-                b.MouseEnter:Connect(function()
-                    local hBg = isFilled and curTheme.fg or curTheme.pri
-                    local hTr = isFilled and 0 or 0.92
-                    t(b, "BackgroundTransparency", hTr, 0.2)
-                    t(b, "BackgroundColor3", hBg, 0.2)
-                end)
-                b.MouseLeave:Connect(function()
-                    local iBg = isFilled and curTheme.pri or curTheme.bg
-                    local iTr = isFilled and 0 or 1
-                    t(b, "BackgroundTransparency", iTr, 0.2)
-                    t(b, "BackgroundColor3", iBg, 0.2)
-                end)
-                
-                b.MouseButton1Click:Connect(function()
-                    closeDialog()
-                    if clb then clb() end
-                end)
+        end))
+        
+        table.insert(activeConns, hexBox.FocusLost:Connect(function()
+            local c = parseHex(hexBox.Text)
+            if c then
+                d_color = c
+                d_h, d_s, d_v = c:ToHSV()
+                updateCursors()
+                updateValues()
+            else
+                hexBox.Text = formatHex(d_color)
             end
-            
-            makeBtn("Cancel", false, nil)
-            makeBtn("Apply", true, function()
-                h, s, v = d_h, d_s, d_v
-                currentColor = d_color
+        end))
+        
+        updateCursors()
+        
+        t(overlay, "BackgroundTransparency", 0.6, 0.4)
+        tw:Create(dlgBox, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+            Position = UDim2.new(0.5, 0, 0.5, 0), BackgroundTransparency = 0
+        }):Play()
+        t(dTitle, "TextTransparency", 0, 0.4)
+        for _, bData in ipairs(objs.dlg_btn) do t(bData.btn, "TextTransparency", 0, 0.4) end
+    end)
+
+    lib:RegisterElement(wrapper, titleText, "item")
+
+    local returnObj = {
+        SetValue = function(self, newColor)
+            if typeof(newColor) == "Color3" then
+                currentColor = newColor
+                h, s, v = newColor:ToHSV()
                 t(btn, "BackgroundColor3", currentColor, 0.3)
                 if flag then lib.Flags[flag] = formatHex(currentColor) end
                 if cb then cb(currentColor) end
-            end)
-            
-            local function updateCursors()
-                mapCursor.Position = UDim2.new(d_s, 0, 1 - d_v, 0)
-                hueCursor.Position = UDim2.new(1 - d_h, 0, 0.5, 0)
+            end
+        end,
+        GetValue = function(self) return currentColor end,
+        SetText = function(self, newTxt) lbl.Text = newTxt end,
+        SetIcon = function(self, newIconStr)
+            for _, child in pairs(r:GetChildren()) do
+                if child ~= lbl and child ~= btn and not child:IsA("UIListLayout") then
+                    child:Destroy()
+                end
             end
             
-            local function updateValues()
-                d_color = Color3.fromHSV(d_h, d_s, d_v)
-                mapCont.BackgroundColor3 = Color3.fromHSV(d_h, 1, 1)
-                previewBox.BackgroundColor3 = d_color
-                if not hexBox:IsFocused() then hexBox.Text = formatHex(d_color) end
+            leftOffset = 0
+            if newIconStr and newIconStr ~= "" then
+                local icn = createIconObj(r, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
+                if icn then
+                    setIconColor(icn, curTheme.out)
+                    table.insert(objs.icon, icn)
+                    leftOffset = 32
+                end
             end
             
-            local mapDrag = false
-            local hueDrag = false
-            
-            table.insert(activeConns, mapBtn.InputBegan:Connect(function(i)
-                if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then mapDrag = true end
-            end))
-            table.insert(activeConns, hueBtn.InputBegan:Connect(function(i)
-                if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then hueDrag = true end
-            end))
-            
-            table.insert(activeConns, uis.InputEnded:Connect(function(i)
-                if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then
-                    mapDrag = false
-                    hueDrag = false
-                end
-            end))
-            
-            table.insert(activeConns, uis.InputChanged:Connect(function(i)
-                if i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch") then
-                    if mapDrag then
-                        local ms = mapBtn.AbsoluteSize
-                        local mp = mapBtn.AbsolutePosition
-                        local x = math.clamp((i.Position.X - mp.X) / ms.X, 0, 1)
-                        local y = math.clamp((i.Position.Y - mp.Y) / ms.Y, 0, 1)
-                        d_s = x
-                        d_v = 1 - y
-                        updateCursors()
-                        updateValues()
-                    elseif hueDrag then
-                        local hs = hueBtn.AbsoluteSize
-                        local hp = hueBtn.AbsolutePosition
-                        local x = math.clamp((i.Position.X - hp.X) / hs.X, 0, 1)
-                        d_h = 1 - x
-                        updateCursors()
-                        updateValues()
-                    end
-                end
-            end))
-            
-            table.insert(activeConns, hexBox.FocusLost:Connect(function()
-                local c = parseHex(hexBox.Text)
-                if c then
-                    d_color = c
-                    d_h, d_s, d_v = c:ToHSV()
-                    updateCursors()
-                    updateValues()
-                else
-                    hexBox.Text = formatHex(d_color)
-                end
-            end))
-            
-            updateCursors()
-            
-            t(overlay, "BackgroundTransparency", 0.6, 0.4)
-            tw:Create(dlgBox, TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                Position = UDim2.new(0.5, 0, 0.5, 0), BackgroundTransparency = 0
-            }):Play()
-            t(dTitle, "TextTransparency", 0, 0.4)
-            for _, bData in ipairs(objs.dlg_btn) do t(bData.btn, "TextTransparency", 0, 0.4) end
-        end)
-
-        lib:RegisterElement(r, titleText, "item")
-
-        local returnObj = {
-            SetValue = function(self, newColor)
-                if typeof(newColor) == "Color3" then
-                    currentColor = newColor
-                    h, s, v = newColor:ToHSV()
-                    t(btn, "BackgroundColor3", currentColor, 0.3)
-                    if flag then lib.Flags[flag] = formatHex(currentColor) end
-                    if cb then cb(currentColor) end
-                end
-            end,
-            GetValue = function(self) return currentColor end,
-            SetText = function(self, newTxt) lbl.Text = newTxt end,
-            SetIcon = function(self, newIconStr)
-                for _, child in pairs(r:GetChildren()) do
-                    if child ~= lbl and child ~= btn and not child:IsA("UIListLayout") then
-                        child:Destroy()
-                    end
-                end
-                
-                leftOffset = 0
-                if newIconStr and newIconStr ~= "" then
-                    local icn = createIconObj(r, newIconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
-                    if icn then
-                        setIconColor(icn, curTheme.out)
-                        table.insert(objs.icon, icn)
-                        leftOffset = 32
-                    end
-                end
-                
-                lbl.Size = UDim2.new(1, -(60 + leftOffset), 1, 0)
-                lbl.Position = UDim2.new(0, leftOffset, 0, 0)
-            end
-        }
-        
-        if flag then lib.Setters[flag] = function(val) returnObj:SetValue(val) end end
-        
-        return returnObj
-    end
+            lbl.Size = UDim2.new(1, -(60 + leftOffset), 1, 0)
+            lbl.Position = UDim2.new(0, leftOffset, 0, 0)
+        end
+    }
+    
+    if flag then lib.Setters[flag] = function(val) returnObj:SetValue(val) end end
+    
+    return returnObj
+end
 
     resizeHandle = Instance.new("TextButton", win)
     resizeHandle.Size = UDim2.new(0, 30, 0, 30)
