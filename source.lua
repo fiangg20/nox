@@ -2782,297 +2782,342 @@ end
         return returnObj
     end
 
-    function lib:AddSlider(data)
-        local txt = data.Title or "Slider"
-        local m = data.Min or 0
-        local mx = data.Max or 100
-        local df = data.Default or m
-        local lblval = data.ShowValue
-        if lblval == nil then lblval = true end
-        local sizeStr = data.Size or "xs"
-        local iconStr = data.Icon
-        local cb = data.Callback
-        local flag = data.Flag
-        lib.ElementCounter += 1
+function lib:AddSlider(data)
+    local txt = data.Title or "Slider"
+    local supportTxt = data.SupportText
+    local m = data.Min or 0
+    local mx = data.Max or 100
+    local df = data.Default or m
+    local lblval = data.ShowValue
+    if lblval == nil then lblval = true end
+    local sizeStr = data.Size or "xs"
+    local iconStr = data.Icon
+    local cb = data.Callback
+    local flag = data.Flag
+    lib.ElementCounter += 1
+    
+    local v = math.clamp(df or m, m, mx)
+    if flag and lib.Flags[flag] ~= nil then 
+        v = math.clamp(tonumber(lib.Flags[flag]) or v, m, mx) 
+    end
+    if flag then lib.Flags[flag] = v end
+    local drag = false
+    local titleIconObj = nil
+    local trackIconObj = nil
+
+    local sType = string.lower(sizeStr or "xs")
+    local configs = {
+        xs = {h = 16, cr = 8,  th = 44, icn = 0},
+        s  = {h = 24, cr = 8,  th = 44, icn = 0},
+        m  = {h = 40, cr = 12, th = 52, icn = 24},
+        l  = {h = 56, cr = 16, th = 68, icn = 24},
+        xl = {h = 96, cr = 28, th = 108, icn = 32}
+    }
+    local cfg = configs[sType] or configs.xs
+
+    local wrapper = Instance.new("Frame", lib.CurrentBuildContainer)
+    wrapper.LayoutOrder = lib.ElementCounter
+    wrapper.Size = UDim2.new(1, 0, 0, 0)
+    wrapper.AutomaticSize = Enum.AutomaticSize.Y
+    wrapper.BackgroundTransparency = 1
+
+    local wrapLayout = Instance.new("UIListLayout", wrapper)
+    wrapLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    wrapLayout.Padding = UDim.new(0, 0)
+
+    local r = Instance.new("Frame", wrapper)
+    r.LayoutOrder = 1
+    r.Size = UDim2.new(1, 0, 0, 35 + cfg.th) 
+    r.AutomaticSize = Enum.AutomaticSize.Y
+    r.BackgroundTransparency = 1
+
+    local rLayout = Instance.new("UIListLayout", r)
+    rLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    rLayout.Padding = UDim.new(0, 8)
+
+    local topCont = Instance.new("Frame", r)
+    topCont.LayoutOrder = 1
+    topCont.Size = UDim2.new(1, 0, 0, 0)
+    topCont.AutomaticSize = Enum.AutomaticSize.Y
+    topCont.BackgroundTransparency = 1
+
+    local leftOffset = 0
+    if iconStr and iconStr ~= "" and (sType == "xs" or sType == "s") then
+        titleIconObj = createIconObj(topCont, iconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0, 0), Vector2.new(0, 0), false)
+        if titleIconObj then
+            setIconColor(titleIconObj, curTheme.out)
+            table.insert(objs.icon, titleIconObj)
+            leftOffset = 32
+        end
+    end
+
+    local vl = Instance.new("TextLabel", topCont)
+    vl.Size = UDim2.new(1, -leftOffset, 0, 20) 
+    vl.Position = UDim2.new(0, leftOffset, 0, 0)
+    vl.BackgroundTransparency = 1
+    vl.Text = txt
+    vl.TextColor3 = curTheme.fg
+    vl.FontFace = m3Font
+    vl.RichText = true
+    vl.TextSize = 14
+    vl.TextXAlignment = Enum.TextXAlignment.Left
+    vl.TextWrapped = true
+    vl.AutomaticSize = Enum.AutomaticSize.Y
+    table.insert(objs.fg, vl)
+
+    if supportTxt and supportTxt ~= "" then
+        local suppLbl = Instance.new("TextLabel", wrapper)
+        suppLbl.LayoutOrder = 2
+        suppLbl.Size = UDim2.new(1, -leftOffset, 0, 16)
+        suppLbl.Position = UDim2.new(0, leftOffset, 0, 0)
+        suppLbl.BackgroundTransparency = 1
+        suppLbl.Text = supportTxt
+        suppLbl.RichText = true
+        suppLbl.TextColor3 = curTheme.out
+        suppLbl.FontFace = m3Font
+        suppLbl.TextSize = 12
+        suppLbl.TextXAlignment = Enum.TextXAlignment.Left
+        suppLbl.TextWrapped = true
+        suppLbl.AutomaticSize = Enum.AutomaticSize.Y
         
-        local v = math.clamp(df or m, m, mx)
-        if flag and lib.Flags[flag] ~= nil then 
-            v = math.clamp(tonumber(lib.Flags[flag]) or v, m, mx) 
+        local sPad = Instance.new("UIPadding", suppLbl)
+        sPad.PaddingLeft = UDim.new(0, leftOffset)
+        
+        table.insert(objs.fg, suppLbl)
+    end
+
+    local hb = Instance.new("TextButton", r)
+    hb.LayoutOrder = 3
+    hb.Size = UDim2.new(1, 0, 0, cfg.th)
+    hb.BackgroundTransparency = 1
+    hb.Text = ""
+
+    local act = Instance.new("CanvasGroup", hb)
+    act.AnchorPoint = Vector2.new(0, 0.5)
+    act.Position = UDim2.new(0, 0, 0.5, 0)
+    act.BackgroundColor3 = curTheme.pri
+    act.BorderSizePixel = 0
+    local actuic = Instance.new("UICorner", act)
+    actuic.CornerRadius = UDim.new(0, cfg.cr)
+    actuic.TopRightRadius = UDim.new(0, 2)
+    actuic.BottomRightRadius = UDim.new(0, 2)
+    table.insert(objs.pri, act)
+
+    if iconStr and iconStr ~= "" and cfg.icn > 0 and (sType ~= "xs" and sType ~= "s") then
+        trackIconObj = createIconObj(hb, iconStr, UDim2.new(0, cfg.icn, 0, cfg.icn), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
+        if trackIconObj then
+            trackIconObj.ZIndex = 2
         end
-        if flag then lib.Flags[flag] = v end
-        local drag = false
-        local titleIconObj = nil
-        local trackIconObj = nil
+    end
 
-        local sType = string.lower(sizeStr or "xs")
-        local configs = {
-            xs = {h = 16, cr = 8,  th = 44, icn = 0},
-            s  = {h = 24, cr = 8,  th = 44, icn = 0},
-            m  = {h = 40, cr = 12, th = 52, icn = 24},
-            l  = {h = 56, cr = 16, th = 68, icn = 24},
-            xl = {h = 96, cr = 28, th = 108, icn = 32}
-        }
-        local cfg = configs[sType] or configs.xs
+    local inact = Instance.new("CanvasGroup", hb)
+    inact.AnchorPoint = Vector2.new(1, 0.5)
+    inact.Position = UDim2.new(1, 0, 0.5, 0)
+    inact.BackgroundColor3 = curTheme.inact
+    inact.BorderSizePixel = 0
+    local inactuic = Instance.new("UICorner", inact)
+    inactuic.CornerRadius = UDim.new(0, cfg.cr)
+    inactuic.TopLeftRadius = UDim.new(0, 2)
+    inactuic.BottomLeftRadius = UDim.new(0, 2)
+    table.insert(objs.inact, inact)
 
-        local r = Instance.new("Frame", lib.CurrentBuildContainer)
-        r.LayoutOrder = lib.ElementCounter
-        r.Size = UDim2.new(1, 0, 0, 35 + cfg.th) 
-        r.BackgroundTransparency = 1
+    local dot = Instance.new("Frame", inact)
+    dot.Size = UDim2.new(0, 4, 0, 4)
+    dot.AnchorPoint = Vector2.new(1, 0.5)
+    dot.Position = UDim2.new(1, -8, 0.5, 0)
+    dot.BackgroundColor3 = curTheme.pri
+    Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
+    table.insert(objs.pri, dot)
 
-        local leftOffset = 0
-        if iconStr and iconStr ~= "" and (sType == "xs" or sType == "s") then
-            titleIconObj = createIconObj(r, iconStr, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0, 10), Vector2.new(0, 0.5), false)
-            if titleIconObj then
-                setIconColor(titleIconObj, curTheme.out)
-                table.insert(objs.icon, titleIconObj)
-                leftOffset = 32
-            end
+    local thm = Instance.new("Frame", hb)
+    thm.Size = UDim2.new(0, 4, 0, cfg.th)
+    thm.AnchorPoint = Vector2.new(0.5, 0.5)
+    thm.BackgroundColor3 = curTheme.pri
+    Instance.new("UICorner", thm).CornerRadius = UDim.new(0, 2)
+    table.insert(objs.pri, thm)
+
+    local valTooltip = Instance.new("Frame", thm)
+    valTooltip.AnchorPoint = Vector2.new(0.5, 1)
+    valTooltip.Position = UDim2.new(0.5, 0, 0, -5) 
+    valTooltip.Size = UDim2.new(0, 0, 0, 0)
+    valTooltip.BackgroundColor3 = curTheme.pri
+    valTooltip.ClipsDescendants = true
+    Instance.new("UICorner", valTooltip).CornerRadius = UDim.new(0.5, 0) 
+    table.insert(objs.pri, valTooltip)
+
+    local valTooltipTxt = Instance.new("TextLabel", valTooltip)
+    valTooltipTxt.Size = UDim2.new(1, 0, 1, 0)
+    valTooltipTxt.BackgroundTransparency = 1
+    valTooltipTxt.Text = string.format("%.2f", v)
+    valTooltipTxt.TextColor3 = curTheme.onpri
+    valTooltipTxt.TextWrapped = false
+    valTooltipTxt.ClipsDescendants = false
+    valTooltipTxt.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+    valTooltipTxt.TextSize = 13
+    valTooltipTxt.TextTransparency = 1
+    table.insert(objs.onpri, valTooltipTxt)
+
+    local totalGap = 12
+    local halfGap = totalGap / 2 
+
+    local function updateTrackIcon(thumbX, animTime)
+        if not trackIconObj then return end
+        
+        local iconStart = 12
+        local iconEnd = 12 + cfg.icn
+        local thumbLeft = thumbX - 2
+        local thumbRight = thumbX + 2
+        
+        if thumbRight >= iconStart and thumbLeft <= iconEnd then
+            setIconTrans(trackIconObj, 1, animTime)
+        elseif thumbLeft > iconEnd then
+            setIconTrans(trackIconObj, 0, animTime)
+            setIconColor(trackIconObj, curTheme.onpri, animTime)
+        elseif thumbRight < iconStart then
+            setIconTrans(trackIconObj, 0, animTime)
+            setIconColor(trackIconObj, curTheme.pri, animTime)
         end
+    end
 
-        local vl = Instance.new("TextLabel", r)
-        vl.Size = UDim2.new(1, -leftOffset, 0, 20) 
-        vl.Position = UDim2.new(0, leftOffset, 0, 0)
-        vl.BackgroundTransparency = 1
-        vl.Text = txt
-        vl.TextColor3 = curTheme.fg
-        vl.FontFace = m3Font
-        vl.RichText = true
-        vl.TextSize = 14
-        vl.TextXAlignment = Enum.TextXAlignment.Left
-        table.insert(objs.fg, vl)
-
-        local hb = Instance.new("TextButton", r)
-        hb.Size = UDim2.new(1, 0, 0, cfg.th)
-        hb.Position = UDim2.new(0, 0, 0, 25)
-        hb.BackgroundTransparency = 1
-        hb.Text = ""
-
-        local act = Instance.new("CanvasGroup", hb)
-        act.AnchorPoint = Vector2.new(0, 0.5)
-        act.Position = UDim2.new(0, 0, 0.5, 0)
-        act.BackgroundColor3 = curTheme.pri
-        act.BorderSizePixel = 0
-        local actuic = Instance.new("UICorner", act)
-        actuic.CornerRadius = UDim.new(0, cfg.cr)
-        actuic.TopRightRadius = UDim.new(0, 2)
-        actuic.BottomRightRadius = UDim.new(0, 2)
-        table.insert(objs.pri, act)
-
-        if iconStr and iconStr ~= "" and cfg.icn > 0 and (sType ~= "xs" and sType ~= "s") then
-            trackIconObj = createIconObj(hb, iconStr, UDim2.new(0, cfg.icn, 0, cfg.icn), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
-            if trackIconObj then
-                trackIconObj.ZIndex = 2
-            end
-        end
-
-        local inact = Instance.new("CanvasGroup", hb)
-        inact.AnchorPoint = Vector2.new(1, 0.5)
-        inact.Position = UDim2.new(1, 0, 0.5, 0)
-        inact.BackgroundColor3 = curTheme.inact
-        inact.BorderSizePixel = 0
-        local inactuic = Instance.new("UICorner", inact)
-        inactuic.CornerRadius = UDim.new(0, cfg.cr)
-        inactuic.TopLeftRadius = UDim.new(0, 2)
-        inactuic.BottomLeftRadius = UDim.new(0, 2)
-        table.insert(objs.inact, inact)
-
-        local dot = Instance.new("Frame", inact)
-        dot.Size = UDim2.new(0, 4, 0, 4)
-        dot.AnchorPoint = Vector2.new(1, 0.5)
-        dot.Position = UDim2.new(1, -8, 0.5, 0)
-        dot.BackgroundColor3 = curTheme.pri
-        Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
-        table.insert(objs.pri, dot)
-
-        local thm = Instance.new("Frame", hb)
-        thm.Size = UDim2.new(0, 4, 0, cfg.th)
-        thm.AnchorPoint = Vector2.new(0.5, 0.5)
-        thm.BackgroundColor3 = curTheme.pri
-        Instance.new("UICorner", thm).CornerRadius = UDim.new(0, 2)
-        table.insert(objs.pri, thm)
-
-        local valTooltip = Instance.new("Frame", thm)
-        valTooltip.AnchorPoint = Vector2.new(0.5, 1)
-        valTooltip.Position = UDim2.new(0.5, 0, 0, -5) 
-        valTooltip.Size = UDim2.new(0, 0, 0, 0)
-        valTooltip.BackgroundColor3 = curTheme.pri
-        valTooltip.ClipsDescendants = true
-        Instance.new("UICorner", valTooltip).CornerRadius = UDim.new(0.5, 0) 
-        table.insert(objs.pri, valTooltip)
-
-        local valTooltipTxt = Instance.new("TextLabel", valTooltip)
-        valTooltipTxt.Size = UDim2.new(1, 0, 1, 0)
-        valTooltipTxt.BackgroundTransparency = 1
+    local function upd(inp, isClick)
+        local pc = math.clamp((inp.Position.X - hb.AbsolutePosition.X) / hb.AbsoluteSize.X, 0, 1)
+        v = m + ((mx - m) * pc)
         valTooltipTxt.Text = string.format("%.2f", v)
-        valTooltipTxt.TextColor3 = curTheme.onpri
-        valTooltipTxt.TextWrapped = false
-        valTooltipTxt.ClipsDescendants = false
-        valTooltipTxt.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
-        valTooltipTxt.TextSize = 13
-        valTooltipTxt.TextTransparency = 1
-        table.insert(objs.onpri, valTooltipTxt)
+        
+        local tx = hb.AbsoluteSize.X * pc
+        local newActSize = UDim2.new(0, math.max(0, tx - halfGap), 0, cfg.h)
+        local newInactSize = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tx - halfGap), 0, cfg.h)
+        local newThmPos = UDim2.new(0, tx, 0.5, 0)
 
-        local totalGap = 12
-        local halfGap = totalGap / 2 
+        local animTime = isClick and 0.3 or 0.05
+        local tweenInfo = TweenInfo.new(animTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
-        local function updateTrackIcon(thumbX, animTime)
-            if not trackIconObj then return end
+        tw:Create(act, tweenInfo, {Size = newActSize}):Play()
+        tw:Create(inact, tweenInfo, {Size = newInactSize}):Play()
+        tw:Create(thm, tweenInfo, {Position = newThmPos}):Play()
+        
+        updateTrackIcon(tx, animTime)
+
+        if drag and lblval then
+            local txtWidth = math.max(32, valTooltipTxt.TextBounds.X + 16)
+            tw:Create(valTooltip, TweenInfo.new(0.1, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, txtWidth, 0, 32)
+            }):Play()
+        end
+    end
+
+    task.defer(function()
+        local p = (v - m) / (mx - m)
+        local tX = hb.AbsoluteSize.X * p
+        act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
+        inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
+        thm.Position = UDim2.new(0, tX, 0.5, 0)
+        updateTrackIcon(tX, 0)
+    end)
+
+    hb:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+        local p = (v - m) / (mx - m)
+        local tX = hb.AbsoluteSize.X * p
+        act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
+        inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
+        thm.Position = UDim2.new(0, tX, 0.5, 0)
+        updateTrackIcon(tX, 0)
+    end)
+
+    hb.InputBegan:Connect(function(i) 
+        if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then 
+            drag = true
+            upd(i, true)
             
-            local iconStart = 12
-            local iconEnd = 12 + cfg.icn
-            local thumbLeft = thumbX - 2
-            local thumbRight = thumbX + 2
-            
-            if thumbRight >= iconStart and thumbLeft <= iconEnd then
-                setIconTrans(trackIconObj, 1, animTime)
-            elseif thumbLeft > iconEnd then
-                setIconTrans(trackIconObj, 0, animTime)
-                setIconColor(trackIconObj, curTheme.onpri, animTime)
-            elseif thumbRight < iconStart then
-                setIconTrans(trackIconObj, 0, animTime)
-                setIconColor(trackIconObj, curTheme.pri, animTime)
+            if lblval then
+                local txtWidth = math.max(32, valTooltipTxt.TextBounds.X + 16) 
+                
+                tw:Create(valTooltip, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                    Size = UDim2.new(0, txtWidth, 0, 32),
+                    Position = UDim2.new(0.5, 0, 0, -12)
+                }):Play()
+                tw:Create(valTooltipTxt, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
+            end
+        end 
+    end)
+
+    uis.InputChanged:Connect(function(i) 
+        if drag and (i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch")) then 
+            upd(i, false) 
+        end
+    end)
+
+    uis.InputEnded:Connect(function(i) 
+        if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then 
+            if drag then 
+                drag = false
+                if lblval then
+                    tw:Create(valTooltip, TweenInfo.new(0.25, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        Size = UDim2.new(0, 0, 0, 0),
+                        Position = UDim2.new(0.5, 0, 0, -5)
+                    }):Play()
+                    tw:Create(valTooltipTxt, TweenInfo.new(0.15), {TextTransparency = 1}):Play()
+                end
+
+                if flag then lib.Flags[flag] = v end
+                if cb then cb(v) end 
             end
         end
+    end)
 
-        local function upd(inp, isClick)
-            local pc = math.clamp((inp.Position.X - hb.AbsolutePosition.X) / hb.AbsoluteSize.X, 0, 1)
-            v = m + ((mx - m) * pc)
+    lib:RegisterElement(wrapper, txt, "item")
+
+    local returnObj = {
+        SetText = function(self, newTxt) vl.Text = newTxt end,
+        SetValue = function(self, newVal)
+            v = math.clamp(newVal, m, mx)
             valTooltipTxt.Text = string.format("%.2f", v)
             
-            local tx = hb.AbsoluteSize.X * pc
-            local newActSize = UDim2.new(0, math.max(0, tx - halfGap), 0, cfg.h)
-            local newInactSize = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tx - halfGap), 0, cfg.h)
-            local newThmPos = UDim2.new(0, tx, 0.5, 0)
-
-            local animTime = isClick and 0.3 or 0.05
-            local tweenInfo = TweenInfo.new(animTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
-
-            tw:Create(act, tweenInfo, {Size = newActSize}):Play()
-            tw:Create(inact, tweenInfo, {Size = newInactSize}):Play()
-            tw:Create(thm, tweenInfo, {Position = newThmPos}):Play()
+            local p = (v - m) / (mx - m)
+            local tX = hb.AbsoluteSize.X * p
+            act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
+            inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
+            thm.Position = UDim2.new(0, tX, 0.5, 0)
             
-            updateTrackIcon(tx, animTime)
-
-            if drag and lblval then
-                local txtWidth = math.max(32, valTooltipTxt.TextBounds.X + 16)
-                tw:Create(valTooltip, TweenInfo.new(0.1, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                    Size = UDim2.new(0, txtWidth, 0, 32)
-                }):Play()
+            updateTrackIcon(tX, 0.2)
+            
+            if flag then lib.Flags[flag] = v end
+            if cb then cb(v) end
+        end,
+        SetIcon = function(self, newIcon)
+            if not newIcon or newIcon == "" then return end
+            if sType == "xs" or sType == "s" then
+                if titleIconObj then titleIconObj:Destroy() end
+                titleIconObj = createIconObj(topCont, newIcon, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0, 0), Vector2.new(0, 0), false)
+                if titleIconObj then
+                    setIconColor(titleIconObj, curTheme.out)
+                    table.insert(objs.icon, titleIconObj)
+                    vl.Position = UDim2.new(0, 32, 0, 0)
+                    vl.Size = UDim2.new(1, -32, 0, 20)
+                end
+            elseif cfg.icn > 0 then
+                if trackIconObj then trackIconObj:Destroy() end
+                trackIconObj = createIconObj(hb, newIcon, UDim2.new(0, cfg.icn, 0, cfg.icn), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
+                if trackIconObj then
+                    trackIconObj.ZIndex = 2
+                    local p = (v - m) / (mx - m)
+                    updateTrackIcon(hb.AbsoluteSize.X * p, 0)
+                end
             end
         end
-
-        task.defer(function()
-            local p = (v - m) / (mx - m)
-            local tX = hb.AbsoluteSize.X * p
-            act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
-            inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
-            thm.Position = UDim2.new(0, tX, 0.5, 0)
-            updateTrackIcon(tX, 0)
-        end)
-
-        hb:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-            local p = (v - m) / (mx - m)
-            local tX = hb.AbsoluteSize.X * p
-            act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
-            inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
-            thm.Position = UDim2.new(0, tX, 0.5, 0)
-            updateTrackIcon(tX, 0)
-        end)
-
-        hb.InputBegan:Connect(function(i) 
-            if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then 
-                drag = true
-                upd(i, true)
-                
-                if lblval then
-                    local txtWidth = math.max(32, valTooltipTxt.TextBounds.X + 16) 
-                    
-                    tw:Create(valTooltip, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                        Size = UDim2.new(0, txtWidth, 0, 32),
-                        Position = UDim2.new(0.5, 0, 0, -12)
-                    }):Play()
-                    tw:Create(valTooltipTxt, TweenInfo.new(0.2), {TextTransparency = 0}):Play()
-                end
-            end 
-        end)
-
-        uis.InputChanged:Connect(function(i) 
-            if drag and (i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch")) then 
-                upd(i, false) 
-            end
-        end)
-
-        uis.InputEnded:Connect(function(i) 
-            if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then 
-                if drag then 
-                    drag = false
-                    if lblval then
-                        tw:Create(valTooltip, TweenInfo.new(0.25, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                            Size = UDim2.new(0, 0, 0, 0),
-                            Position = UDim2.new(0.5, 0, 0, -5)
-                        }):Play()
-                        tw:Create(valTooltipTxt, TweenInfo.new(0.15), {TextTransparency = 1}):Play()
-                    end
-
-                    if flag then lib.Flags[flag] = v end
-                    if cb then cb(v) end 
-                end
-            end
-        end)
-
-        lib:RegisterElement(r, txt, "item")
-
-        local returnObj = {
-            SetText = function(self, newTxt) vl.Text = newTxt end,
-            SetValue = function(self, newVal)
-                v = math.clamp(newVal, m, mx)
-                valTooltipTxt.Text = string.format("%.2f", v)
-                
-                local p = (v - m) / (mx - m)
-                local tX = hb.AbsoluteSize.X * p
-                act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
-                inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
-                thm.Position = UDim2.new(0, tX, 0.5, 0)
-                
-                updateTrackIcon(tX, 0.2)
-                
-                if flag then lib.Flags[flag] = v end
-                if cb then cb(v) end
-            end,
-            SetIcon = function(self, newIcon)
-                if not newIcon or newIcon == "" then return end
-                if sType == "xs" or sType == "s" then
-                    if titleIconObj then titleIconObj:Destroy() end
-                    titleIconObj = createIconObj(r, newIcon, UDim2.new(0, 20, 0, 20), UDim2.new(0, 0, 0, 10), Vector2.new(0, 0.5), false)
-                    if titleIconObj then
-                        setIconColor(titleIconObj, curTheme.out)
-                        table.insert(objs.icon, titleIconObj)
-                        vl.Position = UDim2.new(0, 32, 0, 0)
-                        vl.Size = UDim2.new(1, -32, 0, 20)
-                    end
-                elseif cfg.icn > 0 then
-                    if trackIconObj then trackIconObj:Destroy() end
-                    trackIconObj = createIconObj(hb, newIcon, UDim2.new(0, cfg.icn, 0, cfg.icn), UDim2.new(0, 12, 0.5, 0), Vector2.new(0, 0.5), false)
-                    if trackIconObj then
-                        trackIconObj.ZIndex = 2
-                        local p = (v - m) / (mx - m)
-                        updateTrackIcon(hb.AbsoluteSize.X * p, 0)
-                    end
-                end
-            end
-        }
-        
-        if flag then
-            lib.Setters[flag] = function(val) returnObj:SetValue(val) end
-        end
-        
-        table.insert(objs.slider, function(animDuration) 
-            local p = (v - m) / (mx - m)
-            updateTrackIcon(hb.AbsoluteSize.X * p, animDuration or 0.5) 
-        end)
-        
-        return returnObj
+    }
+    
+    if flag then
+        lib.Setters[flag] = function(val) returnObj:SetValue(val) end
     end
+    
+    table.insert(objs.slider, function(animDuration) 
+        local p = (v - m) / (mx - m)
+        updateTrackIcon(hb.AbsoluteSize.X * p, animDuration or 0.5) 
+    end)
+    
+    return returnObj
+end
 
 function lib:AddDropdown(data)
     local labelTxt = data.Title or "Dropdown"
