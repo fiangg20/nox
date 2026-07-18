@@ -86,6 +86,14 @@
             z-index: 10;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
+        .header-main-group, .header-action-group {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .header-action-group {
+            order: 2;
+        }
         .menu-toggle {
             display: none;
             background: none;
@@ -112,6 +120,162 @@
         header h1 .material-symbols-outlined {
             font-size: 2rem;
         }
+        .join-discord-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 28px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            gap: 10px;
+        }
+        .join-discord-btn:hover {
+            background-color: #beacff;
+        }
+        .join-discord-btn:active {
+            transform: translateY(1px);
+        }
+        .discord-icon-svg {
+            height: 1.2rem;
+            width: 1.2rem;
+            fill: currentColor;
+        }
+        .code-block-container {
+            position: relative;
+            margin: 1em 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: var(--code-bg);
+        }
+        pre[class*="language-"] {
+            margin: 0;
+            background-color: transparent !important;
+            padding: 1.5rem;
+            padding-top: 3.5rem;
+            overflow-x: auto;
+        }
+        pre[class*="language-"] code,
+        pre[class*="language-"] code span {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+        .code-block-container .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 8px;
+            color: var(--md-sys-color-outline);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .code-block-container .copy-btn:hover {
+            background: rgba(208, 188, 255, 0.15);
+            color: var(--md-sys-color-primary);
+        }
+        .code-block-container .copy-btn span.material-symbols-outlined {
+            font-family: 'Material Symbols Outlined' !important;
+            font-size: 18px;
+        }
+        @media (max-width: 768px) {
+            header {
+                flex-wrap: wrap;
+                padding: 1rem;
+            }
+            .header-main-group, .header-action-group {
+                width: 100%;
+                justify-content: flex-start;
+                gap: 0.8rem;
+                flex-direction: row;
+                margin: 0;
+            }
+            .header-main-group {
+                order: 1;
+                width: auto;
+                flex: 1;
+            }
+            .header-action-group {
+                order: 2;
+                width: 100%;
+                margin-top: 0.5rem;
+                justify-content: center;
+            }
+            header h1 {
+                margin: 0 auto 0 0;
+                font-size: 1.5rem;
+            }
+            header h1 .material-symbols-outlined {
+                font-size: 1.6rem;
+            }
+            header h1 span[style] {
+                font-size: 1rem !important;
+                margin-left: 4px !important;
+            }
+            .join-discord-btn {
+                width: 100%;
+                white-space: nowrap;
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+            .discord-icon-svg {
+                height: 1rem;
+                width: 1rem;
+            }
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: 0;
+                margin-right: 10px;
+                order: -1;
+            }
+            .layout-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 115px;
+                width: 100%;
+                height: calc(100vh - 115px);
+                max-height: none;
+                background-color: var(--md-sys-color-surface);
+                z-index: 9;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                overflow-y: auto;
+                border-right: 1px solid var(--md-sys-color-surface-variant);
+                border-bottom: none;
+                visibility: hidden;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                visibility: visible;
+            }
+            .main-content {
+                padding: 2rem 1.5rem;
+                flex: 1;
+            }
+            .hero-container {
+                flex-direction: column-reverse;
+            }
+            .hero-text {
+                padding: 2rem;
+            }
+        }
         .layout-container {
             display: flex;
             flex: 1;
@@ -125,6 +289,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
+            flex-shrink: 0;
         }
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
@@ -163,7 +328,7 @@
             color: var(--md-sys-color-primary);
         }
         .nav-item.active {
-            background-color: rgba(208, 188, 255, 0.12); 
+            background-color: rgba(208, 188, 255, 0.12);
             color: var(--md-sys-color-primary);
         }
         .nav-item.active .material-symbols-outlined {
@@ -223,59 +388,6 @@
             white-space: nowrap;
         }
         .arg-table th { background: rgba(208, 188, 255, 0.1); color: var(--md-sys-color-primary); font-weight: 600; }
-        pre[class*="language-"] {
-            position: relative;
-            background-color: var(--code-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            padding-top: 2.5rem;
-            margin: 0;
-            overflow-x: auto;
-        }
-        pre[class*="language-"]::-webkit-scrollbar {
-            height: 8px;
-        }
-        pre[class*="language-"]::-webkit-scrollbar-track {
-            background: var(--code-bg);
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-        }
-        pre[class*="language-"]::-webkit-scrollbar-thumb {
-            background-color: var(--md-sys-color-surface-variant);
-            border-radius: 10px;
-        }
-        pre[class*="language-"], 
-        code[class*="language-"], 
-        code[class*="language-"] span, 
-        pre[class*="language-"] span,
-        pre[class*="language-"] *, 
-        code[class*="language-"] * {
-            font-family: 'JetBrains Mono', monospace !important;
-        }
-        .copy-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: none;
-            border-radius: 8px;
-            color: var(--md-sys-color-outline);
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            z-index: 5;
-        }
-        .copy-btn:hover {
-            background: rgba(208, 188, 255, 0.15);
-            color: var(--md-sys-color-primary);
-        }
-        .copy-btn .material-symbols-outlined {
-            font-size: 18px;
-        }
         .type-chip {
             display: inline-block;
             background: rgba(208, 188, 255, 0.15);
@@ -361,61 +473,34 @@
             font-weight: 500;
             margin-top: 2px;
         }
-        @media (max-width: 768px) {
-            .menu-toggle {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .layout-container {
-                flex-direction: column;
-            }
-            .sidebar {
-                position: fixed;
-                left: 0;
-                top: 65px;
-                width: 100%;
-                height: calc(100vh - 65px);
-                max-height: 300px;
-                background-color: var(--md-sys-color-surface);
-                z-index: 9;
-                transform: translateY(-100%);
-                transition: transform 0.3s ease;
-                overflow-y: auto;
-                border-bottom: 1px solid var(--md-sys-color-surface-variant);
-            }
-            .sidebar.active {
-                transform: translateY(0);
-            }
-            .main-content {
-                padding: 2rem 1.5rem;
-                flex: 1;
-                transition: margin-top 0.3s ease;
-            }
-            .hero-container {
-                flex-direction: column-reverse;
-            }
-            .hero-text {
-                padding: 2rem;
-            }
-        }
     </style>
 </head>
 <body>
     <header>
-        <h1 class="md-typescale-headline-medium">
-            <span class="material-symbols-outlined icon-filled">auto_awesome</span> Nox 
-            <span style="color: var(--md-sys-color-outline); font-size: 1.3rem; font-weight: 400; margin-left: 8px;">Documentation</span>
-        </h1>
-        <button class="menu-toggle" id="menuToggle" title="Toggle menu">
-            <span class="material-symbols-outlined">menu</span>
-        </button>
+        <div class="header-main-group">
+            <h1 class="md-typescale-headline-medium">
+                <span class="material-symbols-outlined icon-filled">auto_awesome</span> Nox 
+                <span style="color: var(--md-sys-color-outline); font-size: 1.3rem; font-weight: 400; margin-left: 8px;">Documentation</span>
+            </h1>
+            <button class="menu-toggle" id="menuToggle" title="Toggle menu">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+        
+        <div class="header-action-group">
+            <a href="https://discord.gg/d5KcVbspv" target="_blank" class="join-discord-btn" title="Join our community on Discord">
+                <svg class="discord-icon-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.16 12.16 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025 13.227 13.227 0 0 0-3.257 1.011.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032.068 12.053.082 12.072.1 12.086c2.107 1.543 4.148 2.483 6.155 3.109a.053.053 0 0 0 .056-.019c.472-.645.89-1.335 1.251-2.062a.053.053 0 0 0-.029-.073c-.683-.26-1.334-.582-1.956-.96a.054.054 0 0 1-.005-.09c.137-.101.273-.205.404-.311a.054.054 0 0 1 .058-.008c4.01 1.838 8.35 1.838 12.32 0a.054.054 0 0 1 .058.008c.13.106.267.21.404.311a.054.054 0 0 1-.005.09 11.232 11.232 0 0 1-1.956.96.054.054 0 0 0-.029.073c.361.727.779 1.417 1.251 2.062a.053.053 0 0 0 .056.019c2.007-.626 4.048-1.566 6.155-3.109a.054.054 0 0 0 .034-.054c.346-3.411-.531-6.425-2.285-9.107a.041.041 0 0 0-.021-.018Z"/>
+                    <path d="M5.14 8.707c-.908 0-1.661.82-1.661 1.832s.73 1.832 1.661 1.832c.93 0 1.66-.82 1.66-1.832S6.049 8.707 5.14 8.707Zm5.72 0c-.908 0-1.66.82-1.66 1.832s.73 1.832 1.66 1.832c.93 0 1.66-.82 1.66-1.832s-.753-1.832-1.66-1.832Z"/>
+                </svg>
+                <span>Join Discord Server</span>
+            </a>
+        </div>
     </header>
     <div class="layout-container">
         <nav class="sidebar">
             <div class="nav-label">Overview</div>
             <a href="#home" class="nav-item"><span class="material-symbols-outlined">home</span> Home</a>
-            <a href="#credits" class="nav-item"><span class="material-symbols-outlined">group</span> Credits</a>
             <div class="nav-label">Introduction</div>
             <a href="#init" class="nav-item"><span class="material-symbols-outlined">rocket_launch</span> Initialization</a>
             <div class="nav-label">Core System</div>
@@ -440,6 +525,8 @@
             <div class="nav-label">Popups & Overlays</div>
             <a href="#notify" class="nav-item"><span class="material-symbols-outlined">notifications</span> Notification</a>
             <a href="#dialog" class="nav-item"><span class="material-symbols-outlined">chat_bubble</span> Dialog</a>
+            <div class="nav-label">Credits</div>
+            <a href="#credits" class="nav-item"><span class="material-symbols-outlined">group</span> Credits</a>
         </nav>
         <main class="main-content">
             <section id="home" class="content-section">
@@ -796,7 +883,6 @@ infoLabel:SetIcon("info_i")</code></pre>
                 <h2><span class="material-symbols-outlined">group</span> Credits</h2>
                 <div class="credits-grid">
                     <div class="credit-card">
-                        <div class="credit-avatar">U</div>
                         <div class="credit-info">
                             <span class="credit-name">UltraSirius Inc.</span>
                             <span class="credit-role">Lead Developer & Design</span>
@@ -828,10 +914,17 @@ infoLabel:SetIcon("info_i")</code></pre>
 
             const codeBlocks = document.querySelectorAll('pre[class*="language-"]');
             codeBlocks.forEach((pre) => {
+                const container = document.createElement('div');
+                container.className = 'code-block-container';
+                pre.parentNode.insertBefore(container, pre);
+                container.appendChild(pre);
+
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'copy-btn';
                 copyBtn.title = 'Copy code';
                 copyBtn.innerHTML = '<span class="material-symbols-outlined">content_copy</span>';
+                container.appendChild(copyBtn);
+
                 copyBtn.addEventListener('click', () => {
                     const codeElement = pre.querySelector('code');
                     if (!codeElement) return;
@@ -856,7 +949,6 @@ infoLabel:SetIcon("info_i")</code></pre>
                         document.body.removeChild(textarea);
                     }
                 });
-                pre.appendChild(copyBtn);
             });
 
             const sections = document.querySelectorAll('.content-section');
