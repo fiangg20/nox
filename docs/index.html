@@ -144,6 +144,7 @@
         header h1 .material-symbols-outlined {
             font-size: 2rem;
         }
+        
         .join-discord-btn {
             display: flex;
             align-items: center;
@@ -166,92 +167,19 @@
         .join-discord-btn:active {
             transform: translateY(1px);
         }
-        .discord-icon-svg {
+        .discord-icon {
             height: 1.2rem;
             width: 1.2rem;
-            fill: currentColor;
-        }
-        
-        .dropdown-container {
-            position: relative;
-        }
-        .dropdown-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: var(--md-sys-color-surface-variant);
-            color: var(--md-sys-color-on-surface);
-            border: none;
-            padding: 0.6rem 1rem;
-            border-radius: 28px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 500;
-            font-family: 'Google Sans', sans-serif;
-            transition: background-color 0.2s ease;
-        }
-        .dropdown-btn:hover {
-            background-color: rgba(228, 228, 228, 0.08);
-        }
-        .dropdown-menu {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            background-color: var(--md-sys-color-surface);
-            border-radius: 16px;
-            padding: 8px;
-            width: 320px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            display: none;
-            flex-direction: column;
-            gap: 2px;
-            z-index: 100;
-        }
-        .dropdown-menu.show {
-            display: flex;
-        }
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            text-decoration: none;
-            color: var(--md-sys-color-on-surface);
-            border-radius: 8px;
-            transition: background-color 0.2s ease;
-        }
-        .dropdown-item:hover {
-            background-color: rgba(228, 228, 228, 0.08);
-        }
-        .dropdown-item-icon {
-            width: 34px;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--md-sys-color-on-surface);
-            flex-shrink: 0;
-            background: transparent;
-        }
-        .item-text {
-            display: flex;
-            flex-direction: column;
-        }
-        .item-title {
-            font-weight: 500;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .item-subtitle {
-            color: var(--md-sys-color-outline);
-            font-size: 0.8rem;
-            margin-top: 2px;
-        }
-        .small-icon {
-            font-size: 14px !important;
-            color: var(--md-sys-color-outline);
+            display: inline-block;
+            background-color: currentColor;
+            -webkit-mask-image: url('https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/docs/discord.png');
+            -webkit-mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-image: url('https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/docs/discord.png');
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
         }
 
         .search-wrapper {
@@ -571,10 +499,10 @@
             .join-discord-btn {
                 width: 100%;
                 white-space: nowrap;
-                padding: 0.6rem 1rem;
+                padding: 0.8rem 1rem;
                 font-size: 0.9rem;
             }
-            .discord-icon-svg {
+            .discord-icon {
                 height: 1rem;
                 width: 1rem;
             }
@@ -634,89 +562,13 @@
         </div>
         
         <div class="header-action-group">
-            <div class="dropdown-container">
-                <button class="dropdown-btn" id="copyPageBtn">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
-                    Copy page
-                    <span class="material-symbols-outlined" style="font-size: 20px;">keyboard_arrow_up</span>
-                </button>
-                <div class="dropdown-menu" id="copyPageMenu">
-                    <a href="#" class="dropdown-item" id="btnCopyMarkdown">
-                        <div class="dropdown-item-icon"><span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span></div>
-                        <div class="item-text">
-                            <div class="item-title">Copy page</div>
-                            <div class="item-subtitle">Copy page as Markdown for LLMs</div>
-                        </div>
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <div class="dropdown-item-icon"><span class="material-symbols-outlined" style="font-size: 18px;">markdown</span></div>
-                        <div class="item-text">
-                            <div class="item-title">View as Markdown <span class="material-symbols-outlined small-icon">arrow_outward</span></div>
-                            <div class="item-subtitle">View this page as plain text</div>
-                        </div>
-                    </a>
-                    <a href="https://chatgpt.com/?q=Read+from+https%3A%2F%2Ffiangg20.github.io%2Fnox%2Findex.html+so+I+can+ask+questions+about+it." target="_blank" class="dropdown-item">
-                        <div class="dropdown-item-icon"><span class="material-symbols-outlined" style="font-size: 18px;">chat</span></div>
-                        <div class="item-text">
-                            <div class="item-title">Open in ChatGPT <span class="material-symbols-outlined small-icon">arrow_outward</span></div>
-                            <div class="item-subtitle">Ask questions about this page</div>
-                        </div>
-                    </a>
-                    <a href="https://claude.ai/new?q=Read+from+https%3A%2F%2Ffiangg20.github.io%2Fnox%2Findex.html+so+I+can+ask+questions+about+it." target="_blank" class="dropdown-item">
-                        <div class="dropdown-item-icon"><span class="material-symbols-outlined" style="font-size: 18px;">psychology</span></div>
-                        <div class="item-text">
-                            <div class="item-title">Open in Claude <span class="material-symbols-outlined small-icon">arrow_outward</span></div>
-                            <div class="item-subtitle">Ask questions about this page</div>
-                        </div>
-                    </a>
-                    <a href="https://www.perplexity.ai/?q=Read+from+https%3A%2F%2Ffiangg20.github.io%2Fnox%2Findex.html+so+I+can+ask+questions+about+it." target="_blank" class="dropdown-item">
-                        <div class="dropdown-item-icon"><span class="material-symbols-outlined" style="font-size: 18px;">travel_explore</span></div>
-                        <div class="item-text">
-                            <div class="item-title">Open in Perplexity <span class="material-symbols-outlined small-icon">arrow_outward</span></div>
-                            <div class="item-subtitle">Ask questions about this page</div>
-                        </div>
-                    </a>
-                    <a href="https://gemini.google.com/app?q=Read+from+https%3A%2F%2Ffiangg20.github.io%2Fnox%2Findex.html+so+I+can+ask+questions+about+it." target="_blank" class="dropdown-item">
-                        <div class="dropdown-item-icon"><span class="material-symbols-outlined" style="font-size: 18px;">auto_awesome</span></div>
-                        <div class="item-text">
-                            <div class="item-title">Open in Gemini <span class="material-symbols-outlined small-icon">arrow_outward</span></div>
-                            <div class="item-subtitle">Ask questions about this page</div>
-                        </div>
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <div class="dropdown-item-icon"><span class="material-symbols-outlined" style="font-size: 18px;">data_object</span></div>
-                        <div class="item-text">
-                            <div class="item-title">Copy MCP Server</div>
-                            <div class="item-subtitle">Copy MCP Server URL to clipboard</div>
-                        </div>
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <div class="dropdown-item-icon"><span class="material-symbols-outlined" style="font-size: 18px;">terminal</span></div>
-                        <div class="item-text">
-                            <div class="item-title">Connect to Cursor <span class="material-symbols-outlined small-icon">arrow_outward</span></div>
-                            <div class="item-subtitle">Install MCP Server on Cursor</div>
-                        </div>
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <div class="dropdown-item-icon"><span class="material-symbols-outlined" style="font-size: 18px;">code</span></div>
-                        <div class="item-text">
-                            <div class="item-title">Connect to VS Code <span class="material-symbols-outlined small-icon">arrow_outward</span></div>
-                            <div class="item-subtitle">Install MCP Server on VS Code</div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
             <a href="https://discord.gg/d5KcVbspv" target="_blank" class="join-discord-btn" title="Join our community on Discord">
-                <svg class="discord-icon-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.16 12.16 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025 13.227 13.227 0 0 0-3.257 1.011.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032.068 12.053.082 12.072.1 12.086c2.107 1.543 4.148 2.483 6.155 3.109a.053.053 0 0 0 .056-.019c.472-.645.89-1.335 1.251-2.062a.053.053 0 0 0-.029-.073c-.683-.26-1.334-.582-1.956-.96a.054.054 0 0 1-.005-.09c.137-.101.273-.205.404-.311a.054.054 0 0 1 .058-.008c4.01 1.838 8.35 1.838 12.32 0a.054.054 0 0 1 .058.008c.13.106.267.21.404.311a.054.054 0 0 1-.005.09 11.232 11.232 0 0 1-1.956.96.054.054 0 0 0-.029.073c.361.727.779 1.417 1.251 2.062a.053.053 0 0 0 .056.019c2.007-.626 4.048-1.566 6.155-3.109a.054.054 0 0 0 .034-.054c.346-3.411-.531-6.425-2.285-9.107a.041.041 0 0 0-.021-.018Z"/>
-                    <path d="M5.14 8.707c-.908 0-1.661.82-1.661 1.832s.73 1.832 1.661 1.832c.93 0 1.66-.82 1.66-1.832S6.049 8.707 5.14 8.707Zm5.72 0c-.908 0-1.66.82-1.66 1.832s.73 1.832 1.66 1.832c.93 0 1.66-.82 1.66-1.832s-.753-1.832-1.66-1.832Z"/>
-                </svg>
+                <span class="discord-icon"></span>
                 <span>Discord</span>
             </a>
         </div>
     </header>
-
+    
     <div class="layout-container">
         <nav class="sidebar">
             <div class="search-wrapper">
@@ -766,7 +618,9 @@
             <section id="home" class="content-section">
                 <div class="hero-container">
                     <div class="hero-text">
-                        <h1 class="md-typescale-display-small" style="margin-top: 0; font-weight: 500;">Baselined</h1>
+                        <h1 class="md-typescale-display-small" style="margin-top: 0; font-weight: 500; display: flex; align-items: center; gap: 12px; color: var(--md-sys-color-primary);">
+                            <span class="material-symbols-outlined icon-filled" style="font-size: 1.2em;">auto_awesome</span> Baselined
+                        </h1>
                         <p class="md-typescale-body-large" style="color: var(--md-sys-color-outline); max-width: 800px; line-height: 1.6;">
                             Baselined is a premium UI framework for Roblox that fully adapts <b>Material Design 3 (M3)</b> guidelines. It comes equipped with <i>Ripple</i> animations, a dynamic color system, auto-saving configurations, and a highly responsive built-in search feature.
                         </p>
@@ -1296,28 +1150,6 @@ infoLabel:SetIcon("info_i")</code></pre>
                 searchInput.dispatchEvent(new Event('input'));
                 searchInput.focus();
             });
-
-            const copyPageBtn = document.getElementById('copyPageBtn');
-            const copyPageMenu = document.getElementById('copyPageMenu');
-
-            copyPageBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                copyPageMenu.classList.toggle('show');
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!copyPageMenu.contains(e.target) && e.target !== copyPageBtn) {
-                    copyPageMenu.classList.remove('show');
-                }
-            });
-            
-            const btnCopyMarkdown = document.getElementById('btnCopyMarkdown');
-            if(btnCopyMarkdown) {
-                btnCopyMarkdown.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    console.log('Copy to markdown logic here');
-                });
-            }
         });
     </script>
 </body>
