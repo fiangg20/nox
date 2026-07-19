@@ -69,6 +69,30 @@
             --md-sys-typescale-body-small-font: 'Google Sans', sans-serif;
             font-family: 'Google Sans', sans-serif;
         }
+
+        /* Universal Transparent Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.15); /* Transparent code-block style */
+            border-radius: 10px;
+            border: 2px solid transparent; 
+            background-clip: padding-box;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            border: 2px solid transparent; 
+            background-clip: padding-box;
+        }
+        ::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+
         .material-symbols-outlined {
             font-family: 'Material Symbols Outlined' !important;
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -147,6 +171,48 @@
             width: 1.2rem;
             fill: currentColor;
         }
+
+        .search-wrapper {
+            position: sticky;
+            top: 0;
+            background-color: var(--md-sys-color-surface);
+            padding: 1.5rem 1.5rem 1rem 1.5rem;
+            z-index: 10;
+        }
+        .m3-search-bar {
+            display: flex;
+            align-items: center;
+            background-color: var(--md-sys-color-surface-variant);
+            border-radius: 28px;
+            padding: 0 16px;
+            height: 48px;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .m3-search-bar:focus-within {
+            background-color: var(--md-sys-color-background);
+            box-shadow: 0 0 0 2px var(--md-sys-color-primary);
+        }
+        .m3-search-bar .search-icon {
+            color: var(--md-sys-color-on-surface);
+            margin-right: 12px;
+        }
+        .m3-search-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--md-sys-color-on-surface);
+            font-size: 0.95rem;
+            font-family: 'Google Sans', sans-serif;
+            outline: none;
+            width: 100%;
+        }
+        .m3-search-bar input::placeholder {
+            color: var(--md-sys-color-outline);
+        }
+        .m3-search-bar .clear-icon:hover {
+            color: var(--md-sys-color-primary) !important;
+        }
+
         .code-block-container {
             position: relative;
             margin: 1em 0;
@@ -190,92 +256,7 @@
             font-family: 'Material Symbols Outlined' !important;
             font-size: 18px;
         }
-        @media (max-width: 768px) {
-            header {
-                flex-wrap: wrap;
-                padding: 1rem;
-            }
-            .header-main-group, .header-action-group {
-                width: 100%;
-                justify-content: flex-start;
-                gap: 0.8rem;
-                flex-direction: row;
-                margin: 0;
-            }
-            .header-main-group {
-                order: 1;
-                width: auto;
-                flex: 1;
-            }
-            .header-action-group {
-                order: 2;
-                width: 100%;
-                margin-top: 0.5rem;
-                justify-content: center;
-            }
-            header h1 {
-                margin: 0 auto 0 0;
-                font-size: 1.5rem;
-            }
-            header h1 .material-symbols-outlined {
-                font-size: 1.6rem;
-            }
-            header h1 span[style] {
-                font-size: 1rem !important;
-                margin-left: 4px !important;
-            }
-            .join-discord-btn {
-                width: 100%;
-                white-space: nowrap;
-                padding: 0.6rem 1rem;
-                font-size: 0.9rem;
-            }
-            .discord-icon-svg {
-                height: 1rem;
-                width: 1rem;
-            }
-            .menu-toggle {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-left: 0;
-                margin-right: 10px;
-                order: -1;
-            }
-            .layout-container {
-                flex-direction: column;
-            }
-            .sidebar {
-                position: fixed;
-                left: 0;
-                top: 115px;
-                width: 100%;
-                height: calc(100vh - 115px);
-                max-height: none;
-                background-color: var(--md-sys-color-surface);
-                z-index: 9;
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                overflow-y: auto;
-                border-right: 1px solid var(--md-sys-color-surface-variant);
-                border-bottom: none;
-                visibility: hidden;
-            }
-            .sidebar.active {
-                transform: translateX(0);
-                visibility: visible;
-            }
-            .main-content {
-                padding: 2rem 1.5rem;
-                flex: 1;
-            }
-            .hero-container {
-                flex-direction: column-reverse;
-            }
-            .hero-text {
-                padding: 2rem;
-            }
-        }
+        
         .layout-container {
             display: flex;
             flex: 1;
@@ -285,23 +266,22 @@
             width: 280px;
             background-color: var(--md-sys-color-surface);
             overflow-y: auto;
-            padding: 1.5rem 0;
+            border-radius: 0 0px 24px 0;
+            padding: 0 0 1.5rem 0;
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
             flex-shrink: 0;
         }
-        .sidebar::-webkit-scrollbar { width: 6px; }
-        .sidebar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb { background-color: var(--md-sys-color-surface-variant); border-radius: 10px; }
+        
         .nav-label {
             padding: 0.5rem 2rem;
             color: var(--md-sys-color-outline);
             font-size: 0.9rem;
             font-weight: 600;
-            margin-top: 1.5rem;
+            margin-top: 1rem;
         }
-        .nav-label:first-child { margin-top: 0; }
+        .nav-label:first-of-type { margin-top: 0; }
         .nav-item {
             text-decoration: none;
             color: var(--md-sys-color-on-surface);
@@ -335,23 +315,21 @@
             color: var(--md-sys-color-primary);
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+
         .main-content {
             flex: 1;
             overflow-y: auto;
             padding: 0.6rem 0.6rem;
             scroll-behavior: smooth;
         }
-        .main-content::-webkit-scrollbar { width: 8px; }
-        .main-content::-webkit-scrollbar-track { background: var(--md-sys-color-background); }
-        .main-content::-webkit-scrollbar-thumb { background-color: var(--md-sys-color-surface-variant); border-radius: 10px; }
         .content-section {
             margin-bottom: 0.6rem;
             scroll-margin-top: 2rem;
         }
         .content-section h2 {
             color: var(--md-sys-color-primary);
-            padding-bottom: 0.5rem;
             margin-bottom: 1.5rem;
+            padding-left: 1rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -473,6 +451,92 @@
             font-weight: 500;
             margin-top: 2px;
         }
+
+        @media (max-width: 768px) {
+            header {
+                flex-wrap: wrap;
+                padding: 1rem;
+            }
+            .header-main-group, .header-action-group {
+                width: 100%;
+                justify-content: flex-start;
+                gap: 0.8rem;
+                flex-direction: row;
+                margin: 0;
+            }
+            .header-main-group {
+                order: 1;
+                width: auto;
+                flex: 1;
+            }
+            .header-action-group {
+                order: 2;
+                width: 100%;
+                margin-top: 0.5rem;
+                justify-content: center;
+            }
+            header h1 {
+                margin: 0 auto 0 0;
+                font-size: 1.5rem;
+            }
+            header h1 .material-symbols-outlined {
+                font-size: 1.6rem;
+            }
+            header h1 span[style] {
+                font-size: 1rem !important;
+                margin-left: 4px !important;
+            }
+            .join-discord-btn {
+                width: 100%;
+                white-space: nowrap;
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+            .discord-icon-svg {
+                height: 1rem;
+                width: 1rem;
+            }
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: 0;
+                margin-right: 10px;
+                order: -1;
+            }
+            .layout-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 115px;
+                width: 100%;
+                height: calc(100vh - 115px);
+                max-height: none;
+                background-color: var(--md-sys-color-surface);
+                z-index: 9;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                border-right: 1px solid var(--md-sys-color-surface-variant);
+                border-bottom: none;
+                visibility: hidden;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+                visibility: visible;
+            }
+            .main-content {
+                padding: 2rem 1.5rem;
+                flex: 1;
+            }
+            .hero-container {
+                flex-direction: column-reverse;
+            }
+            .hero-text {
+                padding: 2rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -493,12 +557,25 @@
                     <path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.16 12.16 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025 13.227 13.227 0 0 0-3.257 1.011.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032.068 12.053.082 12.072.1 12.086c2.107 1.543 4.148 2.483 6.155 3.109a.053.053 0 0 0 .056-.019c.472-.645.89-1.335 1.251-2.062a.053.053 0 0 0-.029-.073c-.683-.26-1.334-.582-1.956-.96a.054.054 0 0 1-.005-.09c.137-.101.273-.205.404-.311a.054.054 0 0 1 .058-.008c4.01 1.838 8.35 1.838 12.32 0a.054.054 0 0 1 .058.008c.13.106.267.21.404.311a.054.054 0 0 1-.005.09 11.232 11.232 0 0 1-1.956.96.054.054 0 0 0-.029.073c.361.727.779 1.417 1.251 2.062a.053.053 0 0 0 .056.019c2.007-.626 4.048-1.566 6.155-3.109a.054.054 0 0 0 .034-.054c.346-3.411-.531-6.425-2.285-9.107a.041.041 0 0 0-.021-.018Z"/>
                     <path d="M5.14 8.707c-.908 0-1.661.82-1.661 1.832s.73 1.832 1.661 1.832c.93 0 1.66-.82 1.66-1.832S6.049 8.707 5.14 8.707Zm5.72 0c-.908 0-1.66.82-1.66 1.832s.73 1.832 1.66 1.832c.93 0 1.66-.82 1.66-1.832s-.753-1.832-1.66-1.832Z"/>
                 </svg>
-                <span>Join Discord Server</span>
+                <span>Discord</span>
             </a>
         </div>
     </header>
+
     <div class="layout-container">
         <nav class="sidebar">
+            <div class="search-wrapper">
+                <div class="m3-search-bar">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="text" id="sidebarSearch" placeholder="Search docs..." autocomplete="off">
+                    <span class="material-symbols-outlined clear-icon" id="searchClearBtn" style="display: none; cursor: pointer; color: var(--md-sys-color-outline);">close</span>
+                </div>
+            </div>
+            
+            <div id="noSearchResults" style="display: none; padding: 1rem 2rem; color: var(--md-sys-color-outline); font-size: 0.9rem; text-align: center;">
+                No matching topics found.
+            </div>
+
             <div class="nav-label">Overview</div>
             <a href="#home" class="nav-item"><span class="material-symbols-outlined">home</span> Home</a>
             <div class="nav-label">Introduction</div>
@@ -514,6 +591,7 @@
             <a href="#switch" class="nav-item"><span class="material-symbols-outlined">toggle_on</span> Switch / Toggle</a>
             <a href="#slider" class="nav-item"><span class="material-symbols-outlined">linear_scale</span> Slider</a>
             <a href="#textbox" class="nav-item"><span class="material-symbols-outlined">text_fields</span> Text Box</a>
+            <a href="#colorpicker" class="nav-item"><span class="material-symbols-outlined">colors</span> Color Picker</a>
             <a href="#dropdown" class="nav-item"><span class="material-symbols-outlined">arrow_drop_down_circle</span> Dropdown</a>
             <a href="#radiogroup" class="nav-item"><span class="material-symbols-outlined">radio_button_checked</span> Radio Group</a>
             <a href="#checkbox" class="nav-item"><span class="material-symbols-outlined">check_box</span> Checkbox</a>
@@ -528,6 +606,7 @@
             <div class="nav-label">Credits</div>
             <a href="#credits" class="nav-item"><span class="material-symbols-outlined">group</span> Credits</a>
         </nav>
+
         <main class="main-content">
             <section id="home" class="content-section">
                 <div class="hero-container">
@@ -542,6 +621,7 @@
                     </div>
                 </div>
             </section>
+            
             <section id="init" class="content-section">
                 <h2><span class="material-symbols-outlined">rocket_launch</span> Initialization</h2>
                 <div class="doc-card">
@@ -549,6 +629,7 @@
                     <pre><code class="language-lua">local Baselined = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua"))()</code></pre>
                 </div>
             </section>
+            
             <section id="window" class="content-section">
                 <h2><span class="material-symbols-outlined">web_asset</span> Window <span class="type-chip">Base</span></h2>
                 <div class="doc-card">
@@ -587,6 +668,7 @@
 Window:SetTitle("Baselined Hub V2")</code></pre>
                 </div>
             </section>
+            
             <section id="config" class="content-section">
                 <h2><span class="material-symbols-outlined">save</span> Config System <span class="type-chip">System</span></h2>
                 <div class="doc-card">
@@ -599,6 +681,7 @@ for i, name in ipairs(savedConfigs) do
 end</code></pre>
                 </div>
             </section>
+            
             <section id="theme" class="content-section">
                 <h2><span class="material-symbols-outlined">palette</span> Theme System <span class="type-chip">System</span></h2>
                 <div class="doc-card">
@@ -615,6 +698,7 @@ Window:AddTheme("MyCustomDark", {
 Window:ChangePalette("MyCustomDark")</code></pre>
                 </div>
             </section>
+            
             <section id="tabs" class="content-section">
                 <h2><span class="material-symbols-outlined">tab</span> Tabs <span class="type-chip">Layout</span></h2>
                 <div class="doc-card">
@@ -632,6 +716,7 @@ MainTab:SetIcon("settings_account_box")
 Window:SelectTab("Settings")</code></pre>
                 </div>
             </section>
+
             <section id="icons" class="content-section">
                 <h2><span class="material-symbols-outlined">emoji_symbols</span> Icons System <span class="type-chip">System</span></h2>
                 <div class="doc-card">
@@ -653,6 +738,7 @@ MainTab:AddButton({
 })</code></pre>
                 </div>
             </section>
+
             <section id="button" class="content-section">
                 <h2><span class="material-symbols-outlined">smart_button</span> Button <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
@@ -677,6 +763,7 @@ Btn:SetText("New Button Name")
 Btn:SetIcon("terminal_2")</code></pre>
                 </div>
             </section>
+
             <section id="switch" class="content-section">
                 <h2><span class="material-symbols-outlined">toggle_on</span> Switch <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
@@ -696,6 +783,7 @@ AutoFarmToggle:SetText("Auto Farm [UPDATED]")
 AutoFarmToggle:SetIcon("bolt_boost")</code></pre>
                 </div>
             </section>
+
             <section id="slider" class="content-section">
                 <h2><span class="material-symbols-outlined">linear_scale</span> Slider <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
@@ -726,6 +814,7 @@ SpeedSlider:SetText("Run Speed")
 SpeedSlider:SetIcon("directions_run")</code></pre>
                 </div>
             </section>
+
             <section id="textbox" class="content-section">
                 <h2><span class="material-symbols-outlined">text_fields</span> Text Box <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
@@ -743,6 +832,25 @@ SpeedSlider:SetIcon("directions_run")</code></pre>
 TargetBox:SetValue("RobloxPlayer123")
 TargetBox:SetText("Target (Username)")
 TargetBox:SetIcon("person_check")</code></pre>
+                </div>
+            </section>
+            <section id="colorpicker" class="content-section">
+                <h2><span class="material-symbols-outlined">colors</span> Color Picker <span class="type-chip">Element</span></h2>
+                <div class="doc-card">
+                    <p class="doc-desc">Color picker. Built using Material Design 3 guidelines (although there is no color picker in Material Design 3).</p>
+                    <pre><code class="language-lua">local PickColor = MainTab:AddColorPicker({
+    Title = "Pick Some Color",
+    Default = Color3.fromRGB(255, 255, 255),
+    Icon = "format_color_fill",
+    Flag = "Color_Picker",
+    Callback = function(color)
+        print("Color picked:", color)
+    end
+})
+PickColor:SetValue(Color3.fromRGB(255, 255, 255))
+PickColor:GetValue()
+PickColor:SetText()
+PickColor:SetIcon()</code></pre>
                 </div>
             </section>
             <section id="dropdown" class="content-section">
@@ -765,6 +873,7 @@ LocationDrop:SetText("Select Location")
 LocatuonDrop:SetIcon("map_pin_heart")</code></pre>
                 </div>
             </section>
+
             <section id="radiogroup" class="content-section">
                 <h2><span class="material-symbols-outlined">radio_button_checked</span> Radio Group <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
@@ -782,6 +891,7 @@ local currentString, currentIndex = ModeRadio:GetValue()
 ModeRadio:SetValue(2)</code></pre>
                 </div>
             </section>
+
             <section id="checkbox" class="content-section">
                 <h2><span class="material-symbols-outlined">check_box</span> Checkbox <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
@@ -799,6 +909,7 @@ NoclipCheck:SetValue(true)
 NoclipCheck:SetText("Noclip (Walk through walls)")</code></pre>
                 </div>
             </section>
+
             <section id="chipgroup" class="content-section">
                 <h2><span class="material-symbols-outlined">smart_button</span> Chip Group <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
@@ -825,6 +936,7 @@ FilterChips:SetValue({
 })</code></pre>
                 </div>
             </section>
+
             <section id="label" class="content-section">
                 <h2><span class="material-symbols-outlined">label</span> Label & Layout <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
@@ -839,6 +951,7 @@ InfoLabel:SetText("Status: Active")
 infoLabel:SetIcon("info_i")</code></pre>
                 </div>
             </section>
+
             <section id="notify" class="content-section">
                 <h2><span class="material-symbols-outlined">notifications</span> Notification (Snackbar) <span class="type-chip">Overlay</span></h2>
                 <div class="doc-card">
@@ -857,6 +970,7 @@ infoLabel:SetIcon("info_i")</code></pre>
 })</code></pre>
                 </div>
             </section>
+
             <section id="dialog" class="content-section">
                 <h2><span class="material-symbols-outlined">chat_bubble</span> Dialog <span class="type-chip">Overlay</span></h2>
                 <div class="doc-card">
@@ -879,10 +993,12 @@ infoLabel:SetIcon("info_i")</code></pre>
 })</code></pre>
                 </div>
             </section>
+
             <section id="credits" class="content-section">
                 <h2><span class="material-symbols-outlined">group</span> Credits</h2>
                 <div class="credits-grid">
                     <div class="credit-card">
+                        <div class="credit-avatar">B</div>
                         <div class="credit-info">
                             <span class="credit-name">Bases</span>
                             <span class="credit-role">Lead Developer & Design</span>
@@ -892,6 +1008,7 @@ infoLabel:SetIcon("info_i")</code></pre>
             </section>
         </main>
     </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
     <script>
@@ -972,6 +1089,57 @@ infoLabel:SetIcon("info_i")</code></pre>
             }, observerOptions);
             sections.forEach(section => {
                 observer.observe(section);
+            });
+
+            const searchInput = document.getElementById('sidebarSearch');
+            const searchClearBtn = document.getElementById('searchClearBtn');
+            const navLabels = document.querySelectorAll('.sidebar .nav-label');
+            const noResultsMsg = document.getElementById('noSearchResults');
+
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                let visibleCount = 0;
+                
+                if (query.length > 0) {
+                    searchClearBtn.style.display = 'block';
+                } else {
+                    searchClearBtn.style.display = 'none';
+                }
+
+                navItems.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if (text.includes(query)) {
+                        item.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                navLabels.forEach(label => {
+                    let next = label.nextElementSibling;
+                    let hasVisibleChild = false;
+                    while(next && next.classList.contains('nav-item')) {
+                        if (next.style.display !== 'none') {
+                            hasVisibleChild = true;
+                            break;
+                        }
+                        next = next.nextElementSibling;
+                    }
+                    label.style.display = hasVisibleChild ? 'block' : 'none';
+                });
+
+                if (visibleCount === 0) {
+                    noResultsMsg.style.display = 'block';
+                } else {
+                    noResultsMsg.style.display = 'none';
+                }
+            });
+
+            searchClearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+                searchInput.focus();
             });
         });
     </script>
