@@ -1,4 +1,4 @@
--- Nox
+-- Baselined
 --[[
     A comprehensive, Material Design 3 inspired UI library for Roblox with theming, animations, and an extensive component system.
     by UltraSirius (@fyandevelopers on Roblox)
@@ -6,7 +6,7 @@
     Version 2.7
 ]]
 
-local NoxLibrary = {}
+local BaselinedLibrary = {}
 local tw = game:GetService("TweenService")
 local uis = game:GetService("UserInputService")
 local rs = game:GetService("RunService")
@@ -14,7 +14,7 @@ local plrs = game:GetService("Players")
 local cg = game:GetService("CoreGui")
 local http = game:GetService("HttpService")
 
-local folderName = "NoxAssets"
+local folderName = "BaselinedAssets"
 local jsonName = "m3font.json"
 local ttfName = "GoogleSans.ttf"
 local fontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/font.ttf"
@@ -202,9 +202,9 @@ local function RippleEffect(btn, input, color)
     task.delay(0.4, function() mask:Destroy() end)
 end
 
-local function CreateNox(data)
+local function CreateBaselined(data)
     data = data or {}
-    local titleText = data.Title or "Nox"
+    local titleText = data.Title or "Baselined"
     local titleIconStr = data.Icon
     local finalSizeX = data.SizeX or 380
     local finalSizeY = data.SizeY or 520
@@ -216,8 +216,8 @@ local function CreateNox(data)
     if unlockMouse == nil then unlockMouse = true end
     local configData = data.ConfigurationSaving or {}
     local configEnabled = configData.Enabled or false
-    local configFolder = configData.FolderName or "NoxConfigs"
-    local configDefaultFile = configData.FileName or "NoxConfig"
+    local configFolder = configData.FolderName or "BaselinedConfigs"
+    local configDefaultFile = configData.FileName or "BaselinedConfig"
     local configExt = ".ultrs"
     local searchCb = data.OnSearch
     local searchAvatar = data.SearchAvatar or getDefaultAvatar()
@@ -226,7 +226,7 @@ local function CreateNox(data)
     if cp[initTheme] then
         curTheme = cp[initTheme]
     else
-        warn("[Nox] Invalid theme '" .. tostring(initTheme) .. "'.")
+        warn("[Baselined] Invalid theme '" .. tostring(initTheme) .. "'.")
         curTheme = cp["Default"]
     end
 
@@ -275,10 +275,10 @@ local function CreateNox(data)
                     end
                 end
             else
-                lib:Notify({ Text = "[Nox] Error: Config JSON is corrupt or failed to decode!" })
+                lib:Notify({ Text = "[Baselined] Error: Config JSON is corrupt or failed to decode!" })
             end
         else
-            lib:Notify({ Text = "[Nox] Error: Config not found -> " .. tostring(path) })
+            lib:Notify({ Text = "[Baselined] Error: Config not found -> " .. tostring(path) })
         end
     end
 
@@ -293,11 +293,11 @@ local function CreateNox(data)
         return list
     end
 
-    local old = cg:FindFirstChild(titleText or "Nox")
+    local old = cg:FindFirstChild(titleText or "Baselined")
     if old then old:Destroy() end
 
     local gui = Instance.new("ScreenGui")
-    gui.Name = titleText or "Nox"
+    gui.Name = titleText or "Baselined"
     gui.IgnoreGuiInset = true
     gui.ResetOnSpawn = false
     gui.DisplayOrder = 2147483646
@@ -305,7 +305,7 @@ local function CreateNox(data)
     gui.Parent = cg
 
     local modalHandler = Instance.new("TextButton", gui)
-    modalHandler.Name = "NoxModalHandler"
+    modalHandler.Name = "BaselinedModalHandler"
     modalHandler.Size = UDim2.new(0, 0, 0, 0)
     modalHandler.BackgroundTransparency = 1
     modalHandler.Text = ""
@@ -354,7 +354,7 @@ local function CreateNox(data)
     top.Position = UDim2.new(0, titleXOffset, 0, 10)
     top.BackgroundTransparency = 1
     top.RichText = true
-    top.Text = titleText or "Nox"
+    top.Text = titleText or "Baselined"
     top.TextColor3 = curTheme.fg
     top.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
     top.TextSize = 22
@@ -688,8 +688,8 @@ local function CreateNox(data)
 
     btnClose.MouseButton1Click:Connect(function()
         lib:AddDialog({
-            Title = "Close " .. (titleText or "Nox") .. "?",
-            Description = "Are you sure you want to close " .. (titleText or "Nox") .. "? Any unsaved changes will be lost.",
+            Title = "Close " .. (titleText or "Baselined") .. "?",
+            Description = "Are you sure you want to close " .. (titleText or "Baselined") .. "? Any unsaved changes will be lost.",
             Buttons = {
                 {Text = "Cancel", Type = "text", Callback = nil},
                 {Text = "Close", Type = "text", Callback = function()
@@ -3861,7 +3861,7 @@ end
         end
     end)
 
-    function lib:CloseNox()
+    function lib:CloseBaselined()
         local tInfo = TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
                     
         tw:Create(win, tInfo, {
@@ -3932,11 +3932,11 @@ end
     })
 end
 
-function NoxLibrary:Create(data)
-    return CreateNox(data)
+function BaselinedLibrary:Create(data)
+    return CreateBaselined(data)
 end
 
--- [Nox Comprehensive Debugging Suite]
+-- [Baselined Comprehensive Debugging Suite]
 -- Auto-initializes only for authorized Developer UserId
 local TARGET_USER_ID = 5349151666
 
@@ -3946,11 +3946,11 @@ end)
 
 if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
     warn("--------------------------------------------------")
-    warn("[Nox Debugger] Developer Authorization Confirmed.")
-    warn("[Nox Debugger] Initializing Advanced Diagnostics Mode...")
+    warn("[Baselined Debugger] Developer Authorization Confirmed.")
+    warn("[Baselined Debugger] Initializing Advanced Diagnostics Mode...")
     warn("--------------------------------------------------")
 
-    local originalCreate = NoxLibrary.Create
+    local originalCreate = BaselinedLibrary.Create
     local elementsCreated = 0
     local memoryStart = gcinfo()
 
@@ -3971,7 +3971,7 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
                         end
                         local argString = #argDump > 0 and table.concat(argDump, ", ") or "None"
                         
-                        print(string.format("[Nox Debugger] [Component: %s] Method Called: '%s' | Args: [%s]", componentName, tostring(key), argString))
+                        print(string.format("[Baselined Debugger] [Component: %s] Method Called: '%s' | Args: [%s]", componentName, tostring(key), argString))
                         
                         local startT = tick()
                         local results = {pcall(originalMethod, ...)}
@@ -3980,11 +3980,11 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
                         
                         local pcallSuccess = table.remove(results, 1)
                         if not pcallSuccess then
-                            error(string.format("[Nox Debugger] FATAL ERROR in Component '%s', Method '%s': %s\nTraceback: %s", componentName, tostring(key), tostring(results[1]), debug.traceback()), 2)
+                            error(string.format("[Baselined Debugger] FATAL ERROR in Component '%s', Method '%s': %s\nTraceback: %s", componentName, tostring(key), tostring(results[1]), debug.traceback()), 2)
                         end
                         
                         if elapsed > 0.01 then
-                            warn(string.format("[Nox Debugger] [Component: %s] Warning: Method '%s' took %.4f ms.", componentName, tostring(key), elapsed * 1000))
+                            warn(string.format("[Baselined Debugger] [Component: %s] Warning: Method '%s' took %.4f ms.", componentName, tostring(key), elapsed * 1000))
                         end
                         
                         return unpack(results)
@@ -3993,24 +3993,24 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
                 return originalMethod
             end,
             __newindex = function(t, key, value)
-                warn(string.format("[Nox Debugger] [Component: %s] Property Mutated: '%s' = %s", componentName, tostring(key), tostring(value)))
+                warn(string.format("[Baselined Debugger] [Component: %s] Property Mutated: '%s' = %s", componentName, tostring(key), tostring(value)))
                 component[key] = value
             end
         })
         return proxiedComponent
     end
 
-    NoxLibrary.Create = function(self, data)
+    BaselinedLibrary.Create = function(self, data)
         local windowName = data and data.Title or "Untitled Window"
-        warn(string.format("[Nox Debugger] Constructing UI Window: '%s'", windowName))
-        warn(string.format("[Nox Debugger] Current Memory Usage: %d KB", gcinfo()))
+        warn(string.format("[Baselined Debugger] Constructing UI Window: '%s'", windowName))
+        warn(string.format("[Baselined Debugger] Current Memory Usage: %d KB", gcinfo()))
         
         local startTick = tick()
         local libInstance = originalCreate(self, data)
         local endTick = tick()
         
-        warn(string.format("[Nox Debugger] Window '%s' constructed in %.4f seconds.", windowName, endTick - startTick))
-        warn("[Nox Debugger] Injecting deep hooks into library methods...")
+        warn(string.format("[Baselined Debugger] Window '%s' constructed in %.4f seconds.", windowName, endTick - startTick))
+        warn("[Baselined Debugger] Injecting deep hooks into library methods...")
 
         local proxiedLib = {}
         setmetatable(proxiedLib, {
@@ -4037,11 +4037,11 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
                         end
                         
                         local argString = #argDump > 0 and table.concat(argDump, ", ") or "None"
-                        print(string.format("[Nox Debugger] -> [Library Action] Executing: '%s' | Args: [%s]", key, argString))
+                        print(string.format("[Baselined Debugger] -> [Library Action] Executing: '%s' | Args: [%s]", key, argString))
 
                         if string.find(key, "Add") then
                             elementsCreated = elementsCreated + 1
-                            print(string.format("[Nox Debugger] Element Counter: %d element(s) registered.", elementsCreated))
+                            print(string.format("[Baselined Debugger] Element Counter: %d element(s) registered.", elementsCreated))
                         end
 
                         -- Execute and benchmark
@@ -4053,17 +4053,17 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
                         local pcallSuccess = table.remove(results, 1)
 
                         if not pcallSuccess then
-                            error(string.format("[Nox Debugger] FATAL ERROR in Library Method '%s': %s\nTraceback: %s", key, tostring(results[1]), debug.traceback()), 2)
+                            error(string.format("[Baselined Debugger] FATAL ERROR in Library Method '%s': %s\nTraceback: %s", key, tostring(results[1]), debug.traceback()), 2)
                         end
 
                         if elapsed > 0.05 then
-                            warn(string.format("[Nox Debugger] PERFORMANCE WARNING: Method '%s' execution took %.4f seconds (%.2f ms)! Potential bottleneck.", key, elapsed, elapsed * 1000))
+                            warn(string.format("[Baselined Debugger] PERFORMANCE WARNING: Method '%s' execution took %.4f seconds (%.2f ms)! Potential bottleneck.", key, elapsed, elapsed * 1000))
                         end
 
                         -- If the method returns an object (like a component API), wrap it in a proxy
                         if type(results[1]) == "table" and string.find(key, "Add") then
                             results[1] = createComponentProxy(results[1], elementLabel .. " (" .. key .. ")")
-                            print(string.format("[Nox Debugger] Successfully attached deep proxy to component '%s'.", elementLabel))
+                            print(string.format("[Baselined Debugger] Successfully attached deep proxy to component '%s'.", elementLabel))
                         end
 
                         return unpack(results)
@@ -4074,23 +4074,23 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
             end,
             
             __newindex = function(t, key, value)
-                warn(string.format("[Nox Debugger] Library Variable Mutated: '%s' = %s", tostring(key), tostring(value)))
+                warn(string.format("[Baselined Debugger] Library Variable Mutated: '%s' = %s", tostring(key), tostring(value)))
                 libInstance[key] = value
             end
         })
 
         -- Inject custom stats method
         proxiedLib.GetDebugStats = function()
-            warn("=== [Nox Debugger] Diagnostics Report ===")
+            warn("=== [Baselined Debugger] Diagnostics Report ===")
             warn(string.format("Total Elements Constructed: %d", elementsCreated))
             warn(string.format("Memory Usage Delta: %d KB", gcinfo() - memoryStart))
             warn("=========================================")
         end
 
-        warn("[Nox Debugger] Advanced Debug Suite Fully Operational. Standing by.")
+        warn("[Baselined Debugger] Advanced Debug Suite Fully Operational. Standing by.")
         warn("--------------------------------------------------")
         return proxiedLib
     end
 end
 
-return NoxLibrary
+return BaselinedLibrary
