@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nox - Documentation</title>
+    <title>Baselined - Documentation</title>
     <style>
         @font-face {
             font-family: 'Google Sans';
-            src: url('https://cdn.jsdelivr.net/gh/fiangg20/nox@main/font.ttf') format('truetype');
+            src: url('https://cdn.jsdelivr.net/gh/fiangg20/Baselined@main/font.ttf') format('truetype');
             font-weight: 400;
             font-style: normal;
         }
@@ -479,7 +479,7 @@
     <header>
         <div class="header-main-group">
             <h1 class="md-typescale-headline-medium">
-                <span class="material-symbols-outlined icon-filled">auto_awesome</span> Nox 
+                <span class="material-symbols-outlined icon-filled">auto_awesome</span> Baselined 
                 <span style="color: var(--md-sys-color-outline); font-size: 1.3rem; font-weight: 400; margin-left: 8px;">Documentation</span>
             </h1>
             <button class="menu-toggle" id="menuToggle" title="Toggle menu">
@@ -532,13 +532,13 @@
             <section id="home" class="content-section">
                 <div class="hero-container">
                     <div class="hero-text">
-                        <h1 class="md-typescale-display-small" style="margin-top: 0; font-weight: 700;">Nox</h1>
+                        <h1 class="md-typescale-display-small" style="margin-top: 0; font-weight: 700;">Baselined</h1>
                         <p class="md-typescale-body-large" style="color: var(--md-sys-color-outline); max-width: 800px; line-height: 1.6;">
-                            Nox is a premium UI framework for Roblox that fully adapts <b>Material Design 3 (M3)</b> guidelines. It comes equipped with <i>Ripple</i> animations, a dynamic color system, auto-saving configurations, and a highly responsive built-in search feature.
+                            Baselined is a premium UI framework for Roblox that fully adapts <b>Material Design 3 (M3)</b> guidelines. It comes equipped with <i>Ripple</i> animations, a dynamic color system, auto-saving configurations, and a highly responsive built-in search feature.
                         </p>
                     </div>
                     <div class="hero-banner">
-                        <img src="https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/banner.png" alt="Nox Framework Banner" onerror="this.src='https://placehold.co/1280x720/2B2930/D0BCFF?text=Nox+Banner+(16:9)'">
+                        <img src="https://raw.githubusercontent.com/fiangg20/Baselined/refs/heads/main/banner.png" alt="Baselined Framework Banner" onerror="this.src='https://placehold.co/1280x720/2B2930/D0BCFF?text=Baselined+Banner+(16:9)'">
                     </div>
                 </div>
             </section>
@@ -546,7 +546,7 @@
                 <h2><span class="material-symbols-outlined">rocket_launch</span> Initialization</h2>
                 <div class="doc-card">
                     <p class="doc-desc">Load the library into your script. This library will automatically download <code>Google Sans</code> and <code>Material Icons</code> assets into your workspace folder if they don't already exist.</p>
-                    <pre><code class="language-lua">local Nox = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/source.lua"))()</code></pre>
+                    <pre><code class="language-lua">local Baselined = loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/Baselined/refs/heads/main/source.lua"))()</code></pre>
                 </div>
             </section>
             <section id="window" class="content-section">
@@ -562,10 +562,10 @@
                         <tr><td>Theme</td><td>string</td><td>Initial color theme. Options: Purple, Blue, Red, Green, Orange, Default.</td></tr>
                         <tr><td>Search</td><td>boolean</td><td>Displays a Search Bar at the top of the UI (Default: false).</td></tr>
                         <tr><td>UnlockMouse</td><td>boolean</td><td>Unlock mouse while in FPS (Default: true).</td></tr>
-                        <tr><td>ConfigurationSaving</td><td>table</td><td>Save and load configuration for Nox (Default: true).</td></tr>
+                        <tr><td>ConfigurationSaving</td><td>table</td><td>Save and load configuration for Baselined (Default: true).</td></tr>
                     </table>
-                    <pre><code class="language-lua">local Window = Nox:Create({
-    Title = "Nox Hub",
+                    <pre><code class="language-lua">local Window = Baselined:Create({
+    Title = "Baselined Hub",
     SizeX = 380,
     SizeY = 520,
     ToggleKey = Enum.KeyCode.K,
@@ -574,7 +574,7 @@
     UnlockMouse = true,
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = "NoxDocs",
+        FolderName = "BaselinedDocs",
         FileName = "Default"
     },
     SearchPlaceholder = "Search features...",
@@ -584,13 +584,13 @@
         print("UI Closed!")
     end
 })
-Window:SetTitle("Nox Hub V2")</code></pre>
+Window:SetTitle("Baselined Hub V2")</code></pre>
                 </div>
             </section>
             <section id="config" class="content-section">
                 <h2><span class="material-symbols-outlined">save</span> Config System <span class="type-chip">System</span></h2>
                 <div class="doc-card">
-                    <p class="doc-desc">Nox features a built-in JSON configuration management system (ConfigurationSaving). Any UI element initialized with a <code>Flag = "FlagName"</code> parameter will have its value automatically saved/loaded to this system.</p>
+                    <p class="doc-desc">Baselined features a built-in JSON configuration management system (ConfigurationSaving). Any UI element initialized with a <code>Flag = "FlagName"</code> parameter will have its value automatically saved/loaded to this system.</p>
                     <pre><code class="language-lua">Window:SaveConfig("MyConfig")
 Window:LoadConfig("MyConfig")
 local savedConfigs = Window:GetConfigs() 
@@ -635,7 +635,7 @@ Window:SelectTab("Settings")</code></pre>
             <section id="icons" class="content-section">
                 <h2><span class="material-symbols-outlined">emoji_symbols</span> Icons System <span class="type-chip">System</span></h2>
                 <div class="doc-card">
-                    <p class="doc-desc">Nox fully integrates <b>Google Material Icons</b>. Any element that accepts an <code>Icon</code> parameter can use official Material Symbol names directly without needing an image ID. It also supports custom Roblox Image IDs!</p>
+                    <p class="doc-desc">Baselined fully integrates <b>Google Material Icons</b>. Any element that accepts an <code>Icon</code> parameter can use official Material Symbol names directly without needing an image ID. It also supports custom Roblox Image IDs!</p>
                     <p class="doc-desc" style="font-size: 0.95rem; margin-top: -0.5rem; background: rgba(208, 188, 255, 0.1); padding: 12px; border-radius: 8px; display: inline-block;">
                         <span class="material-symbols-outlined icon-filled" style="font-size: 18px; vertical-align: text-bottom; color: var(--md-sys-color-primary);">search</span> 
                         Browse all available icons here: 
@@ -699,7 +699,7 @@ AutoFarmToggle:SetIcon("bolt_boost")</code></pre>
             <section id="slider" class="content-section">
                 <h2><span class="material-symbols-outlined">linear_scale</span> Slider <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
-                    <p class="doc-desc">Select number/float values. Uniquely, Nox supports various slider sizes ranging from XS to XL.</p>
+                    <p class="doc-desc">Select number/float values. Uniquely, Baselined supports various slider sizes ranging from XS to XL.</p>
                     <table class="arg-table">
                         <tr><th>Size (String)</th><th>Handle Height</th><th>Contains Icon?</th></tr>
                         <tr><td><code>"xs"</code></td><td>Small (16px)</td><td>Yes</td></td></tr>
@@ -884,7 +884,7 @@ infoLabel:SetIcon("info_i")</code></pre>
                 <div class="credits-grid">
                     <div class="credit-card">
                         <div class="credit-info">
-                            <span class="credit-name">UltraSirius Inc.</span>
+                            <span class="credit-name">Bases</span>
                             <span class="credit-role">Lead Developer & Design</span>
                         </div>
                     </div>
