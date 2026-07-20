@@ -253,6 +253,7 @@ local function CreateBaselined(data)
     local configEnabled = configData.Enabled or false
     local configFolder = configData.FolderName or "BaselinedConfigs"
     local configDefaultFile = configData.FileName or "BaselinedConfig"
+    local configUseConfig = configData.UseIntegratedConfigurationSystem or false
     local configExt = ".ultrs"
     local searchCb = data.OnSearch
     local searchAvatar = data.SearchAvatar or getDefaultAvatar()
@@ -278,92 +279,6 @@ local function CreateBaselined(data)
 
     if configEnabled then
         if not isfolder(configFolder) then makefolder(configFolder) end
-    end
-
-    function lib:SaveConfig(name)
-        if not configEnabled then return end
-        local finalName = name or configDefaultFile
-        if finalName == "" then return end
-        
-        lib.Flags["_WinX"] = isMin and preSize.X.Offset or win.Size.X.Offset
-        lib.Flags["_WinY"] = isMin and preSize.Y.Offset or win.Size.Y.Offset
-        lib.Flags["_PosXS"] = win.Position.X.Scale
-        lib.Flags["_PosXO"] = win.Position.X.Offset
-        lib.Flags["_PosYS"] = win.Position.Y.Scale
-        lib.Flags["_PosYO"] = win.Position.Y.Offset
-        
-        if lib.ActiveTabIndex > 0 and lib.Tabs[lib.ActiveTabIndex] then
-            lib.Flags["_ActiveTab"] = lib.Tabs[lib.ActiveTabIndex].btn.Text
-        end
-    
-        local success, json = pcall(function()
-            return http:JSONEncode(lib.Flags)
-        end)
-        
-        if success then
-            writefile(configFolder .. "/" .. finalName .. configExt, json)
-        end
-    end
-    
-    function lib:LoadConfig(name)
-        if not configEnabled then return end
-        
-        local finalName = name or configDefaultFile
-        local path = configFolder .. "/" .. finalName .. configExt
-        
-        if isfile(path) then
-            local success, decoded = pcall(function()
-                return http:JSONDecode(readfile(path))
-            end)
-            
-            if success and type(decoded) == "table" then
-                if decoded["_WinX"] and decoded["_WinY"] then
-                    local nw = UDim2.new(0, decoded["_WinX"], 0, decoded["_WinY"])
-                    if not isMin then
-                        win.Size = nw
-                    end
-                    preSize = nw
-                end
-                
-                if decoded["_PosXS"] and decoded["_PosXO"] and decoded["_PosYS"] and decoded["_PosYO"] then
-                    local np = UDim2.new(decoded["_PosXS"], decoded["_PosXO"], decoded["_PosYS"], decoded["_PosYO"])
-                    win.Position = np
-                    prePos = np
-                end
-                
-                if decoded["_ActiveTab"] then
-                    task.spawn(function()
-                        lib:SelectTab(decoded["_ActiveTab"])
-                    end)
-                end
-    
-                for flag, val in pairs(decoded) do
-                    if not string.match(flag, "^_") then
-                        lib.Flags[flag] = val
-                        if lib.Setters[flag] then
-                            task.spawn(function()
-                                pcall(function() lib.Setters[flag](val) end)
-                            end)
-                        end
-                    end
-                end
-            else
-                lib:Notify({ Text = "[Baselined] Error: Config JSON is corrupt or failed to decode!" })
-            end
-        else
-            lib:Notify({ Text = "[Baselined] Error: Config not found -> " .. tostring(path) })
-        end
-    end
-
-    function lib:GetConfigs()
-        local list = {}
-        if configEnabled and isfolder(configFolder) then
-            for _, file in ipairs(listfiles(configFolder)) do
-                local fileName = file:match("([^/\\]+)%" .. configExt .. "$")
-                if fileName then table.insert(list, fileName) end
-            end
-        end
-        return list
     end
 
     local old = cg:FindFirstChild(titleText or "Baselined")
@@ -795,6 +710,9 @@ local function CreateBaselined(data)
                     setIconTrans(icnClose, 1, 0.4)
                     
                     task.wait(0.4)
+                    if lib.Flags["AutoSaveOnExit"] then
+                        lib:SaveConfig("AutoSave")
+                    end
                     if closeCb then closeCb() end
                     gui:Destroy()
                 end}
@@ -931,12 +849,14 @@ local function CreateBaselined(data)
     end
 
     function lib:ChangeTheme(name)
-        if not cp[name] then
+        if cp[name] then
             if not string.match(name, "Dark$") and not string.match(name, "Light$") then
                 local randomSuffix = (math.random() > 0.5) and "Dark" or "Light"
                 name = name .. randomSuffix
             end
-        else return end
+        else
+            warn("[Baselined] Invalid theme '" .. tostring(name) .. "'.")
+        end
 
         curTheme = cp[name]
         
@@ -1862,6 +1782,7 @@ local function CreateBaselined(data)
         lib:RegisterElement(wrapper, labelTxt, "item")
 
         local returnObj = {
+            GetValue = function(self) return tbox.Text end,
             SetText = function(self, newTxt) lbl.Text = newTxt end,
             SetValue = function(self, newVal)
                 tbox.Text = tostring(newVal)
@@ -2774,10 +2695,11 @@ local function CreateBaselined(data)
             SetValue = function(self, stateTable)
                 if type(stateTable) == "table" then
                     for k, v in pairs(stateTable) do
-                        selected[k] = v
-                        if chipBtns[k] then
-                            chipBtns[k].selected = v
-                            updateState(k)
+                        local key = tonumber(k) or k
+                        selected[key] = v
+                        if chipBtns[key] then
+                            chipBtns[key].selected = v
+                            updateState(key)
                         end
                     end
                     if flag then
@@ -3387,6 +3309,7 @@ function lib:AddDropdown(data)
     lib:RegisterElement(wrapper, labelTxt, "item")
 
     local returnObj = {
+        GetValue = function(self) return currentOptions[selectedIdx] end,
         SetText = function(self, newTxt) lbl.Text = newTxt end,
         SetValue = function(self, newOpt) 
             local found = false
@@ -3870,6 +3793,10 @@ function lib:AddColorPicker(data)
 
     local returnObj = {
         SetValue = function(self, newColor)
+            if type(newColor) == "string" then
+                local parsed = parseHex(newColor)
+                if parsed then newColor = parsed else return end
+            end
             if typeof(newColor) == "Color3" then
                 currentColor = newColor
                 h, s, v = newColor:ToHSV()
@@ -3945,6 +3872,92 @@ end
         end
     end)
 
+    function lib:SaveConfig(name)
+        if not configEnabled then return end
+        local finalName = name or configDefaultFile
+        if finalName == "" then return end
+        
+        lib.Flags["_WinX"] = isMin and preSize.X.Offset or win.Size.X.Offset
+        lib.Flags["_WinY"] = isMin and preSize.Y.Offset or win.Size.Y.Offset
+        lib.Flags["_PosXS"] = win.Position.X.Scale
+        lib.Flags["_PosXO"] = win.Position.X.Offset
+        lib.Flags["_PosYS"] = win.Position.Y.Scale
+        lib.Flags["_PosYO"] = win.Position.Y.Offset
+        
+        if lib.ActiveTabIndex > 0 and lib.Tabs[lib.ActiveTabIndex] then
+            lib.Flags["_ActiveTab"] = lib.Tabs[lib.ActiveTabIndex].btn.Text
+        end
+    
+        local success, json = pcall(function()
+            return http:JSONEncode(lib.Flags)
+        end)
+        
+        if success then
+            writefile(configFolder .. "/" .. finalName .. configExt, json)
+        end
+    end
+    
+    function lib:LoadConfig(name)
+        if not configEnabled then return end
+        
+        local finalName = name or configDefaultFile
+        local path = configFolder .. "/" .. finalName .. configExt
+        
+        if isfile(path) then
+            local success, decoded = pcall(function()
+                return http:JSONDecode(readfile(path))
+            end)
+            
+            if success and type(decoded) == "table" then
+                if decoded["_WinX"] and decoded["_WinY"] then
+                    local nw = UDim2.new(0, decoded["_WinX"], 0, decoded["_WinY"])
+                    if not isMin then
+                        win.Size = nw
+                    end
+                    preSize = nw
+                end
+                
+                if decoded["_PosXS"] and decoded["_PosXO"] and decoded["_PosYS"] and decoded["_PosYO"] then
+                    local np = UDim2.new(decoded["_PosXS"], decoded["_PosXO"], decoded["_PosYS"], decoded["_PosYO"])
+                    win.Position = np
+                    prePos = np
+                end
+                
+                if decoded["_ActiveTab"] then
+                    task.spawn(function()
+                        lib:SelectTab(decoded["_ActiveTab"])
+                    end)
+                end
+    
+                for flag, val in pairs(decoded) do
+                    if not string.match(flag, "^_") then
+                        lib.Flags[flag] = val
+                        if lib.Setters[flag] then
+                            task.spawn(function()
+                                pcall(function() lib.Setters[flag](val) end)
+                            end)
+                        end
+                    end
+                end
+            else
+                lib:Notify({ Text = "[Baselined] Error: Config JSON is corrupt or failed to decode!" })
+            end
+        else
+            lib:Notify({ Text = "[Baselined] Error: Config not found -> " .. tostring(path) })
+        end
+    end
+
+    function lib:GetConfigs()
+        local list = {}
+        if configEnabled and isfolder(configFolder) then
+            for _, file in ipairs(listfiles(configFolder)) do
+                local fileName = file:match("([^/\\]+)%" .. configExt .. "$")
+                if fileName then table.insert(list, fileName) end
+            end
+        end
+        return list
+    end
+
     function lib:CloseBaselined()
         local tInfo = TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
                     
@@ -3992,9 +4005,182 @@ end
         end 
     end)
 
+    --[[tw:Create(win, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, finalSizeX, 0, finalSizeY), Transparency = 0
+    }):Play()]]
+
+    local splashFrame = Instance.new("Frame", win)
+    splashFrame.Size = UDim2.new(1, 0, 1, 0)
+    splashFrame.BackgroundColor3 = curTheme.bg
+    splashFrame.BorderSizePixel = 0
+    splashFrame.ZIndex = 9999
+    Instance.new("UICorner", splashFrame).CornerRadius = UDim.new(0, 16)
+    
+    local splashIconStr = (data.Icon and data.Icon ~= "") and data.Icon or "auto_awesome"
+    local splashIcon = createIconObj(splashFrame, splashIconStr, UDim2.new(0, 72, 0, 72), UDim2.new(0.5, 0, 0.5, 0), Vector2.new(0.5, 0.5), false)
+    setIconColor(splashIcon, curTheme.fg)
+    setIconTrans(splashIcon, 1)
+    
+    local elementsToFade = {}
+    for _, obj in ipairs(win:GetDescendants()) do
+        if obj ~= splashFrame and not splashFrame:IsAncestorOf(obj) then
+            if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+                if obj.TextTransparency < 1 then
+                    table.insert(elementsToFade, {obj = obj, prop = "TextTransparency", val = obj.TextTransparency})
+                    obj.TextTransparency = 1
+                end
+            end
+            if obj:IsA("ImageLabel") or obj:IsA("ImageButton") then
+                if obj.ImageTransparency < 1 then
+                    table.insert(elementsToFade, {obj = obj, prop = "ImageTransparency", val = obj.ImageTransparency})
+                    obj.ImageTransparency = 1
+                end
+            end
+            if obj:IsA("Frame") or obj:IsA("ScrollingFrame") then
+                if obj.BackgroundTransparency < 1 then
+                    table.insert(elementsToFade, {obj = obj, prop = "BackgroundTransparency", val = obj.BackgroundTransparency})
+                    obj.BackgroundTransparency = 1
+                end
+            end
+            if obj:IsA("UIStroke") then
+                if obj.Transparency < 1 then
+                    table.insert(elementsToFade, {obj = obj, prop = "Transparency", val = obj.Transparency})
+                    obj.Transparency = 1
+                end
+            end
+        end
+    end
+    
     tw:Create(win, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, finalSizeX, 0, finalSizeY), Transparency = 0
     }):Play()
+    
+    setIconTrans(splashIcon, 0, 0.5)
+    
+    task.wait(1.5)
+    
+    setIconTrans(splashIcon, 1, 0.4)
+    
+    task.wait(0.4)
+    splashFrame:Destroy()
+    
+    for _, animData in ipairs(elementsToFade) do
+        t(animData.obj, animData.prop, animData.val, 0.4)
+        task.wait(0.012)
+    end
+
+    if configEnabled and configUseConfig then
+        task.defer(function()
+            local cfgTab = lib:AddTab({Title = "Configuration", Icon = "settings"})
+            
+            cfgTab:AddSection({Text = "Configuration Management"})
+            
+            local cfgDropdown = cfgTab:AddDropdown({
+                Title = "Select Configuration",
+                Options = lib:GetConfigs(),
+                Icon = "folder"
+            })
+            
+            local cfgName = cfgTab:AddTextBox({
+                Title = "Configuration Name",
+                Icon = "edit",
+                ClearTextOnFocus = false
+            })
+            
+            cfgDropdown.Callback = function(val)
+                cfgName:SetValue(val)
+            end
+            
+            cfgTab:AddButton({
+                Text = "Save Configuration",
+                Icon = "save",
+                Type = "filled",
+                Callback = function()
+                    local n = cfgName:GetValue()
+                    if n and n ~= "" then
+                        lib:SaveConfig(n)
+                        lib:Notify({Text = "Saved configuration: " .. n})
+                        cfgDropdown:Refresh(lib:GetConfigs())
+                    else
+                        lib:Notify({Text = "Configuration name cannot be empty."})
+                    end
+                end
+            })
+            
+            cfgTab:AddButton({
+                Text = "Load Configuration",
+                Icon = "download",
+                Type = "tonal",
+                Callback = function()
+                    local n = cfgDropdown:GetValue()
+                    if n and n ~= "" then
+                        lib:LoadConfig(n)
+                        lib:Notify({Text = "Loaded configuration: " .. n})
+                        cfgName:SetValue(n)
+                    end
+                end
+            })
+            
+            cfgTab:AddButton({
+                Text = "Refresh List",
+                Icon = "refresh",
+                Type = "outlined",
+                Callback = function()
+                    cfgDropdown:Refresh(lib:GetConfigs())
+                    lib:Notify({Text = "Refreshed configurations."})
+                end
+            })
+            
+            cfgTab:AddButton({
+                Text = "Delete Configuration",
+                Icon = "delete",
+                Type = "text",
+                Callback = function()
+                    local n = cfgDropdown:GetValue()
+                    if n and n ~= "" then
+                        lib:AddDialog({
+                            Title = "Confirm Deletion",
+                            Description = "Delete configuration '" .. n .. "'?",
+                            Buttons = {
+                                {Text = "Cancel", Type = "text"},
+                                {Text = "Delete", Type = "filled", Callback = function()
+                                    local p = configFolder .. "/" .. n .. configExt
+                                    if isfile(p) then
+                                        delfile(p)
+                                        cfgDropdown:Refresh(lib:GetConfigs())
+                                        cfgName:SetValue("")
+                                        lib:Notify({Text = "Deleted configuration: " .. n})
+                                    end
+                                end}
+                            }
+                        })
+                    end
+                end
+            })
+            
+            cfgTab:AddDivider()
+            cfgTab:AddSection({Text = "Interface Settings"})
+            
+            local tOpts = {}
+            for k, _ in pairs(cp) do table.insert(tOpts, k) end
+            
+            cfgTab:AddDropdown({
+                Title = "Library Theme",
+                Options = tOpts,
+                Icon = "palette",
+                Callback = function(v)
+                    lib:ChangeTheme(v)
+                end
+            })
+            
+            cfgTab:AddSwitch({
+                Title = "Auto-Save Upon Exit",
+                Icon = "autorenew",
+                Flag = "AutoSaveOnExit",
+                Default = false
+            })
+        end)
+    end
 
     if unlockMouse and uis.MouseEnabled then
         modalHandler.Modal = true
