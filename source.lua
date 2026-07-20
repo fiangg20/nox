@@ -359,7 +359,7 @@ local function CreateBaselined(data)
         local list = {}
         if configEnabled and isfolder(configFolder) then
             for _, file in ipairs(listfiles(configFolder)) do
-                local fileName = file:match("([^/\]+)%" .. configExt .. "$")
+                local fileName = file:match("([^/\\]+)%" .. configExt .. "$")
                 if fileName then table.insert(list, fileName) end
             end
         end
@@ -367,7 +367,24 @@ local function CreateBaselined(data)
     end
 
     local old = cg:FindFirstChild(titleText or "Baselined")
-    if old then old:Destroy() end
+    if old then  
+        lib:AddDialog({
+            Title = "Another script session",
+            Description = "There is another session that wants to overwrite the current Baselined session; do you want to overwrite it?",
+            Buttons = {
+                {
+                    Text = "Cancel", 
+                    Type = "text", 
+                    Callback = function() return end
+                },
+                {
+                    Text = "I Understand, Proceed", 
+                    Type = "text", 
+                    Callback = function() old:Destroy() end
+                }
+            }
+        }) 
+    end
 
     local gui = Instance.new("ScreenGui")
     gui.Name = titleText or "Baselined"
@@ -931,10 +948,16 @@ local function CreateBaselined(data)
     end
 
     function lib:ChangeTheme(name)
-        if not cp[name] then return end
+        if not cp[name] then
+            if not string.match(name, "Dark$") and not string.match(name, "Light$") then
+                local randomSuffix = (math.random() > 0.5) and "Dark" or "Light"
+                name = name .. randomSuffix
+            end
+        else return end
+
         curTheme = cp[name]
         
-        local d = 0.5
+        local d = 0.8
         for _,v in pairs(objs.bg) do t(v, "BackgroundColor3", curTheme.bg, d) end
         for _,v in pairs(objs.fg) do             
             if v:IsA("ImageLabel") or v:IsA("ImageButton") then
