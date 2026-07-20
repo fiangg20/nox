@@ -366,26 +366,6 @@ local function CreateBaselined(data)
         return list
     end
 
-    local old = cg:FindFirstChild(titleText or "Baselined")
-    if old then  
-        lib:AddDialog({
-            Title = "Another script session",
-            Description = "There is another session that wants to overwrite the current Baselined session; do you want to overwrite it?",
-            Buttons = {
-                {
-                    Text = "Cancel", 
-                    Type = "text", 
-                    Callback = function() return end
-                },
-                {
-                    Text = "I Understand, Proceed", 
-                    Type = "text", 
-                    Callback = function() old:Destroy() end
-                }
-            }
-        }) 
-    end
-
     local gui = Instance.new("ScreenGui")
     gui.Name = titleText or "Baselined"
     gui.IgnoreGuiInset = true
@@ -406,8 +386,9 @@ local function CreateBaselined(data)
     notifCont.Size = UDim2.new(1, 0, 1, 0)
     notifCont.BackgroundTransparency = 1
     notifCont.ZIndex = 1000
-
-    local notifPad = Instance.new("UIPadding", notifCont)
+ 
+    
+end
     notifPad.PaddingBottom = UDim.new(0, 32)
 
     local notifLayout = Instance.new("UIListLayout", notifCont)
@@ -1701,6 +1682,43 @@ local function CreateBaselined(data)
         for _, b in pairs(actCont:GetChildren()) do
             if b:IsA("TextButton") then t(b, "TextTransparency", 0, 0.4) end
         end
+    end
+
+    local function findOldGui()
+        for _, child in ipairs(cg:GetChildren()) do
+            if child.Name == (titleText or "Baselined") and child ~= gui then
+                return child
+            end
+        end
+        return nil
+    end
+
+    local old = findOldGui()
+    if old then
+        lib:AddDialog({
+            Title = "Another script session",
+            Description = "There is another session that wants to overwrite the current Baselined session; do you want to overwrite the current Baselined session?",
+            Buttons = {
+                {
+                    Text = "Cancel",
+                    Type = "text",
+                    Callback = function()
+                        if gui and gui.Parent then
+                            gui:Destroy()
+                        end
+                    end
+                },
+                {
+                    Text = "I Understand, Proceed",
+                    Type = "text",
+                    Callback = function()
+                        if old and old.Parent then
+                            old:Destroy()
+                        end
+                    end
+                }
+            }
+        })
     end
 
     function lib:AddTextBox(data)
