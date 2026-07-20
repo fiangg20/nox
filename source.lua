@@ -139,12 +139,47 @@ end
 
 
 local cp = {
-    ["Purple"] = {bg=Color3.fromRGB(28,27,31), fg=Color3.fromRGB(230,225,229), pri=Color3.fromRGB(208,188,255), onpri=Color3.fromRGB(56,30,114), inact=Color3.fromRGB(43,41,48), out=Color3.fromRGB(147,143,153)},
-    ["Blue"] = {bg=Color3.fromRGB(26,28,30), fg=Color3.fromRGB(226,226,230), pri=Color3.fromRGB(162,201,255), onpri=Color3.fromRGB(0,50,90), inact=Color3.fromRGB(40,42,46), out=Color3.fromRGB(141,145,153)},
-    ["Red"] = {bg=Color3.fromRGB(32,26,25), fg=Color3.fromRGB(237,224,222), pri=Color3.fromRGB(255,180,168), onpri=Color3.fromRGB(105,0,5), inact=Color3.fromRGB(50,40,38), out=Color3.fromRGB(160,140,137)},
-    ["Green"] = {bg=Color3.fromRGB(26,28,25), fg=Color3.fromRGB(225,227,223), pri=Color3.fromRGB(143,215,135), onpri=Color3.fromRGB(0,57,10), inact=Color3.fromRGB(40,43,40), out=Color3.fromRGB(142,145,143)},
-    ["Orange"] = {bg=Color3.fromRGB(32,27,24), fg=Color3.fromRGB(236,224,219), pri=Color3.fromRGB(255,183,123), onpri=Color3.fromRGB(76,38,0), inact=Color3.fromRGB(50,42,38), out=Color3.fromRGB(159,141,132)},
-    ["Default"] = {bg=Color3.fromRGB(0,0,0), fg=Color3.fromRGB(230,225,229), pri=Color3.fromRGB(208,188,255), onpri=Color3.fromRGB(56,30,114), inact=Color3.fromRGB(28,28,30), out=Color3.fromRGB(147,143,153)}
+    ["DefaultDark"] = {bg=Color3.fromRGB(0,0,0), fg=Color3.fromRGB(230,225,229), pri=Color3.fromRGB(208,188,255), onpri=Color3.fromRGB(56,30,114), inact=Color3.fromRGB(28,28,30), out=Color3.fromRGB(147,143,153)},
+    ["DefaultLight"] = {bg=Color3.fromRGB(255,255,255), fg=Color3.fromRGB(28,27,31), pri=Color3.fromRGB(103,80,164), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(244,239,244), out=Color3.fromRGB(121,116,126)},
+    
+    ["MonochromeDark"] = {bg=Color3.fromRGB(14,14,14), fg=Color3.fromRGB(227,227,227), pri=Color3.fromRGB(200,200,200), onpri=Color3.fromRGB(24,24,24), inact=Color3.fromRGB(32,32,32), out=Color3.fromRGB(130,130,130)},
+    ["MonochromeLight"] = {bg=Color3.fromRGB(255,255,255), fg=Color3.fromRGB(24,24,24), pri=Color3.fromRGB(90,90,90), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(235,235,235), out=Color3.fromRGB(115,115,115)},
+
+    ["PurpleDark"] = {bg=Color3.fromRGB(28,27,31), fg=Color3.fromRGB(230,225,229), pri=Color3.fromRGB(208,188,255), onpri=Color3.fromRGB(56,30,114), inact=Color3.fromRGB(43,41,48), out=Color3.fromRGB(147,143,153)},
+    ["PurpleLight"] = {bg=Color3.fromRGB(255,251,254), fg=Color3.fromRGB(28,27,31), pri=Color3.fromRGB(103,80,164), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(231,224,236), out=Color3.fromRGB(121,116,126)},
+
+    ["BlueDark"] = {bg=Color3.fromRGB(26,28,30), fg=Color3.fromRGB(226,226,230), pri=Color3.fromRGB(162,201,255), onpri=Color3.fromRGB(0,50,90), inact=Color3.fromRGB(40,42,46), out=Color3.fromRGB(141,145,153)},
+    ["BlueLight"] = {bg=Color3.fromRGB(253,252,255), fg=Color3.fromRGB(26,28,30), pri=Color3.fromRGB(0,98,162), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(223,226,235), out=Color3.fromRGB(115,119,127)},
+
+    ["RedDark"] = {bg=Color3.fromRGB(32,26,25), fg=Color3.fromRGB(237,224,222), pri=Color3.fromRGB(255,180,168), onpri=Color3.fromRGB(105,0,5), inact=Color3.fromRGB(50,40,38), out=Color3.fromRGB(160,140,137)},
+    ["RedLight"] = {bg=Color3.fromRGB(255,251,255), fg=Color3.fromRGB(32,26,25), pri=Color3.fromRGB(192,1,21), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(244,221,218), out=Color3.fromRGB(133,115,112)},
+
+    ["GreenDark"] = {bg=Color3.fromRGB(26,28,25), fg=Color3.fromRGB(225,227,223), pri=Color3.fromRGB(143,215,135), onpri=Color3.fromRGB(0,57,10), inact=Color3.fromRGB(40,43,40), out=Color3.fromRGB(142,145,143)},
+    ["GreenLight"] = {bg=Color3.fromRGB(252,253,246), fg=Color3.fromRGB(26,28,25), pri=Color3.fromRGB(42,106,37), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(222,229,216), out=Color3.fromRGB(114,121,113)},
+
+    ["OrangeDark"] = {bg=Color3.fromRGB(32,27,24), fg=Color3.fromRGB(236,224,219), pri=Color3.fromRGB(255,183,123), onpri=Color3.fromRGB(76,38,0), inact=Color3.fromRGB(50,42,38), out=Color3.fromRGB(159,141,132)},
+    ["OrangeLight"] = {bg=Color3.fromRGB(255,251,248), fg=Color3.fromRGB(32,27,24), pri=Color3.fromRGB(138,81,0), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(245,224,211), out=Color3.fromRGB(133,116,107)},
+
+    ["PinkDark"] = {bg=Color3.fromRGB(31,26,29), fg=Color3.fromRGB(234,224,228), pri=Color3.fromRGB(255,176,201), onpri=Color3.fromRGB(94,17,51), inact=Color3.fromRGB(49,40,45), out=Color3.fromRGB(149,141,144)},
+    ["PinkLight"] = {bg=Color3.fromRGB(255,251,253), fg=Color3.fromRGB(31,26,29), pri=Color3.fromRGB(143,74,103), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(244,221,228), out=Color3.fromRGB(133,114,119)},
+
+    ["CyanDark"] = {bg=Color3.fromRGB(25,28,29), fg=Color3.fromRGB(225,227,227), pri=Color3.fromRGB(94,212,224), onpri=Color3.fromRGB(0,54,59), inact=Color3.fromRGB(38,42,43), out=Color3.fromRGB(137,147,148)},
+    ["CyanLight"] = {bg=Color3.fromRGB(250,253,253), fg=Color3.fromRGB(25,28,29), pri=Color3.fromRGB(0,104,116), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(218,228,229), out=Color3.fromRGB(111,121,122)},
+
+    ["YellowDark"] = {bg=Color3.fromRGB(29,27,22), fg=Color3.fromRGB(234,226,217), pri=Color3.fromRGB(232,196,104), onpri=Color3.fromRGB(65,45,0), inact=Color3.fromRGB(44,40,33), out=Color3.fromRGB(144,138,129)},
+    ["YellowLight"] = {bg=Color3.fromRGB(255,251,243), fg=Color3.fromRGB(29,27,22), pri=Color3.fromRGB(122,89,0), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(239,228,211), out=Color3.fromRGB(126,118,105)},
+
+    ["TealDark"] = {bg=Color3.fromRGB(25,28,28), fg=Color3.fromRGB(224,227,227), pri=Color3.fromRGB(83,219,211), onpri=Color3.fromRGB(0,55,52), inact=Color3.fromRGB(35,42,42), out=Color3.fromRGB(137,147,146)},
+    ["TealLight"] = {bg=Color3.fromRGB(244,251,250), fg=Color3.fromRGB(25,28,28), pri=Color3.fromRGB(0,106,100), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(218,229,228), out=Color3.fromRGB(111,121,121)},
+
+    ["IndigoDark"] = {bg=Color3.fromRGB(27,27,31), fg=Color3.fromRGB(228,226,230), pri=Color3.fromRGB(186,195,255), onpri=Color3.fromRGB(20,41,118), inact=Color3.fromRGB(41,42,48), out=Color3.fromRGB(142,144,153)},
+    ["IndigoLight"] = {bg=Color3.fromRGB(253,252,255), fg=Color3.fromRGB(27,27,31), pri=Color3.fromRGB(67,89,169), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(223,225,235), out=Color3.fromRGB(117,119,128)},
+
+    ["BrownDark"] = {bg=Color3.fromRGB(31,26,24), fg=Color3.fromRGB(235,224,221), pri=Color3.fromRGB(255,181,154), onpri=Color3.fromRGB(92,27,3), inact=Color3.fromRGB(48,40,37), out=Color3.fromRGB(156,140,136)},
+    ["BrownLight"] = {bg=Color3.fromRGB(255,251,249), fg=Color3.fromRGB(31,26,24), pri=Color3.fromRGB(156,66,33), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(245,222,216), out=Color3.fromRGB(133,115,110)},
+
+    ["LimeDark"] = {bg=Color3.fromRGB(27,28,24), fg=Color3.fromRGB(227,227,221), pri=Color3.fromRGB(186,204,112), onpri=Color3.fromRGB(41,53,0), inact=Color3.fromRGB(42,43,38), out=Color3.fromRGB(143,146,137)},
+    ["LimeLight"] = {bg=Color3.fromRGB(252,253,243), fg=Color3.fromRGB(27,28,24), pri=Color3.fromRGB(86,101,23), onpri=Color3.fromRGB(255,255,255), inact=Color3.fromRGB(225,228,213), out=Color3.fromRGB(117,121,109)}
 }
 --fun fact: im indonesian btw :)
 
@@ -223,11 +258,16 @@ local function CreateBaselined(data)
     local searchAvatar = data.SearchAvatar or getDefaultAvatar()
     local closeCb = data.OnClose
 
+    if not string.match(initTheme, "Dark$") and not string.match(initTheme, "Light$") then
+        local randomSuffix = (math.random() > 0.5) and "Dark" or "Light"
+        initTheme = initTheme .. randomSuffix
+    end
+
     if cp[initTheme] then
         curTheme = cp[initTheme]
     else
         warn("[Baselined] Invalid theme '" .. tostring(initTheme) .. "'.")
-        curTheme = cp["Default"]
+        curTheme = cp["DefaultDark"]
     end
 
     local lib = {}
@@ -245,6 +285,17 @@ local function CreateBaselined(data)
         local finalName = name or configDefaultFile
         if finalName == "" then return end
         
+        lib.Flags["_WinX"] = isMin and preSize.X.Offset or win.Size.X.Offset
+        lib.Flags["_WinY"] = isMin and preSize.Y.Offset or win.Size.Y.Offset
+        lib.Flags["_PosXS"] = win.Position.X.Scale
+        lib.Flags["_PosXO"] = win.Position.X.Offset
+        lib.Flags["_PosYS"] = win.Position.Y.Scale
+        lib.Flags["_PosYO"] = win.Position.Y.Offset
+        
+        if lib.ActiveTabIndex > 0 and lib.Tabs[lib.ActiveTabIndex] then
+            lib.Flags["_ActiveTab"] = lib.Tabs[lib.ActiveTabIndex].btn.Text
+        end
+    
         local success, json = pcall(function()
             return http:JSONEncode(lib.Flags)
         end)
@@ -253,7 +304,7 @@ local function CreateBaselined(data)
             writefile(configFolder .. "/" .. finalName .. configExt, json)
         end
     end
-
+    
     function lib:LoadConfig(name)
         if not configEnabled then return end
         
@@ -266,12 +317,34 @@ local function CreateBaselined(data)
             end)
             
             if success and type(decoded) == "table" then
+                if decoded["_WinX"] and decoded["_WinY"] then
+                    local nw = UDim2.new(0, decoded["_WinX"], 0, decoded["_WinY"])
+                    if not isMin then
+                        win.Size = nw
+                    end
+                    preSize = nw
+                end
+                
+                if decoded["_PosXS"] and decoded["_PosXO"] and decoded["_PosYS"] and decoded["_PosYO"] then
+                    local np = UDim2.new(decoded["_PosXS"], decoded["_PosXO"], decoded["_PosYS"], decoded["_PosYO"])
+                    win.Position = np
+                    prePos = np
+                end
+                
+                if decoded["_ActiveTab"] then
+                    task.spawn(function()
+                        lib:SelectTab(decoded["_ActiveTab"])
+                    end)
+                end
+    
                 for flag, val in pairs(decoded) do
-                    lib.Flags[flag] = val
-                    if lib.Setters[flag] then
-                        task.spawn(function()
-                            pcall(function() lib.Setters[flag](val) end)
-                        end)
+                    if not string.match(flag, "^_") then
+                        lib.Flags[flag] = val
+                        if lib.Setters[flag] then
+                            task.spawn(function()
+                                pcall(function() lib.Setters[flag](val) end)
+                            end)
+                        end
                     end
                 end
             else
@@ -286,7 +359,7 @@ local function CreateBaselined(data)
         local list = {}
         if configEnabled and isfolder(configFolder) then
             for _, file in ipairs(listfiles(configFolder)) do
-                local fileName = file:match("([^/\\]+)%" .. configExt .. "$")
+                local fileName = file:match("([^/\]+)%" .. configExt .. "$")
                 if fileName then table.insert(list, fileName) end
             end
         end
@@ -416,13 +489,18 @@ local function CreateBaselined(data)
     local playerMouse = localPlayer and localPlayer:GetMouse() or nil
     local savedIcon = nil
 
+    local isToggling = false
     local function toggleWindow()
+        if isToggling then return end
+        isToggling = true
+        task.delay(0.4, function() isToggling = false end)
+        
         if isMin then
             isMin = false
             if icnMinMax:IsA("ImageLabel") then icnMinMax.Image = parsedMin.val else icnMinMax.Text = parsedMin.val end
             t(win, "Size", preSize, 0.4)
             if resizeHandle then resizeHandle.Visible = true end
-
+    
             if unlockMouse and uis.MouseEnabled then
                 modalHandler.Modal = true
                 
@@ -444,7 +522,7 @@ local function CreateBaselined(data)
             if icnMinMax:IsA("ImageLabel") then icnMinMax.Image = parsedMax.val else icnMinMax.Text = parsedMax.val end
             t(win, "Size", UDim2.new(0, win.Size.X.Offset, 0, 64), 0.4)
             if resizeHandle then resizeHandle.Visible = false end
-
+    
             if unlockMouse and uis.MouseEnabled then
                 modalHandler.Modal = false
                 
@@ -454,7 +532,7 @@ local function CreateBaselined(data)
                 if playerMouse and savedIcon ~= nil and uis.KeyboardEnabled then
                     playerMouse.Icon = savedIcon
                 end
-
+    
                 if toggleKey and uis.KeyboardEnabled then
                     lib:Notify({
                         Text = "Press <b>" .. toggleKey.Name .. "</b> to maximize " .. titleText .. ".",
@@ -852,7 +930,7 @@ local function CreateBaselined(data)
         })
     end
 
-    function lib:ChangePalette(name)
+    function lib:ChangeTheme(name)
         if not cp[name] then return end
         curTheme = cp[name]
         
