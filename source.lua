@@ -2008,7 +2008,6 @@ local function CreateBaselined(data)
     function lib:AddSwitch(data)
         local txt = data.Title or "Switch"
         local def = data.Default or false
-        local desc = data.Description
         local iconStr = data.Icon
         local checkIcon = data.ShowCheckIcon or false
         local cb = data.Callback
@@ -2049,10 +2048,6 @@ local function CreateBaselined(data)
         l.TextSize = 16
         l.TextXAlignment = Enum.TextXAlignment.Left
         table.insert(objs.fg, l)
-
-        if desc then
-            l.Text = l.Text .. "\n<font transparency='0.4' size='14'>" .. desc .. "</font>"
-        end
 
         local trk = Instance.new("TextButton", r)
         trk.Size = UDim2.new(0, 52, 0, 32)
@@ -2757,7 +2752,6 @@ local function CreateBaselined(data)
         if lblval == nil then lblval = true end
         local sizeStr = data.Size or "xs"
         local iconStr = data.Icon
-        local desc = data.Description
         local cb = data.Callback
         local flag = data.Flag
         lib.ElementCounter += 1
@@ -2807,10 +2801,6 @@ local function CreateBaselined(data)
         vl.TextSize = 14
         vl.TextXAlignment = Enum.TextXAlignment.Left
         table.insert(objs.fg, vl)
-
-        if desc then
-            vl.Text = vl.Text .. "\n<font transparency='0.4' size='14'>" .. desc .. "</font>"
-        end
 
         local hb = Instance.new("TextButton", r)
         hb.Size = UDim2.new(1, 0, 0, cfg.th)
@@ -3389,7 +3379,6 @@ function lib:AddColorPicker(data)
     local titleText = data.Title or "Color Picker"
     local defColor = data.Default or Color3.new(1, 1, 1)
     local iconStr = data.Icon
-    local desc = data.Description
     local cb = data.Callback
     local flag = data.Flag
     lib.ElementCounter += 1
@@ -3467,10 +3456,6 @@ function lib:AddColorPicker(data)
     lbl.TextWrapped = true
     lbl.AutomaticSize = Enum.AutomaticSize.Y
     table.insert(objs.fg, lbl)
-
-    if desc then
-        lbl.Text = lbl.Text .. "\n<font transparency='0.4' size='14'>" .. desc .. "</font>"
-    end
 
     local btn = Instance.new("TextButton", r)
     btn.Size = UDim2.new(0, 40, 0, 24)
