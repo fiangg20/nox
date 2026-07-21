@@ -781,7 +781,6 @@ Btn:SetIcon("terminal_2")</code></pre>
                     <p class="doc-desc">Toggle elements used to adjust Boolean values (True/False). Features the signature Material 3 capsule animation.</p>
                     <pre><code class="language-lua">local AutoFarmToggle = MainTab:AddSwitch({
     Title = "Auto Farm",
-    Description = "Use Auto Farm",
     Default = false,
     ShowCheckIcon = true,
     Icon = "bolt",
@@ -810,7 +809,6 @@ AutoFarmToggle:SetIcon("bolt_boost")</code></pre>
                     </table>
                     <pre><code class="language-lua">local SpeedSlider = MainTab:AddSlider({
     Title = "WalkSpeed",
-    Description = "Set Walkspeed",
     Min = 16,
     Max = 200,
     Default = 16,
@@ -853,7 +851,6 @@ TargetBox:SetIcon("person_check")</code></pre>
                     <p class="doc-desc">Color picker. Built using Material Design 3 guidelines (although there is no color picker in Material Design 3).</p>
                     <pre><code class="language-lua">local PickColor = MainTab:AddColorPicker({
     Title = "Pick Some Color",
-    Description = "Pick some random color",
     Default = Color3.fromRGB(255, 255, 255),
     Icon = "format_color_fill",
     Flag = "Color_Picker",
@@ -862,9 +859,9 @@ TargetBox:SetIcon("person_check")</code></pre>
     end
 })
 PickColor:SetValue(Color3.fromRGB(255, 255, 255))
-PickColor:GetValue()
-PickColor:SetText()
-PickColor:SetIcon()</code></pre>
+local pickColorValue = PickColor:GetValue()
+PickColor:SetText("Pick New Color")
+PickColor:SetIcon("format_paint")</code></pre>
                 </div>
             </section>
             <section id="dropdown" class="content-section">
@@ -963,6 +960,23 @@ local InfoLabel = MainTab:AddLabel({
 })
 InfoLabel:SetText("Status: Active")
 infoLabel:SetIcon("info_i")</code></pre>
+                </div>
+            </section>
+
+            <section id="section" class="content-section">
+                <h2><span class="material-symbols-outlined">segment</span> Section <span class="type-chip">Element</span></h2>
+                <div class="doc-card">
+                    <p class="doc-desc">Element that specifies the section name.</p>
+                    <pre><code class="language-lua">local section = MainTab:AddSection("Beautiful Section")
+section:SetText("More Beautiful Section")</code></pre>
+                </div>
+            </section>
+
+            <section id="divider" class="content-section">
+                <h2><span class="material-symbols-outlined">horizontal_rule</span> Divider <span class="type-chip">Layout</span></h2>
+                <div class="doc-card">
+                    <p class="doc-desc">Divide UI elements into several parts.</p>
+                    <pre><code class="language-lua">MainTab:AddDivider()</code></pre>
                 </div>
             </section>
 
