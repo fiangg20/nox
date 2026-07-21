@@ -3,7 +3,7 @@
     A comprehensive, Material Design 3 inspired UI library for Roblox with theming, animations, and an extensive component system.
     by UltraSirius (@fyandevelopers on Roblox)
 
-    Version 2.7
+    Version 2.8
 ]]
 
 local BaselinedLibrary = {}
@@ -273,6 +273,7 @@ local function CreateBaselined(data)
 
     local lib = {}
     local resizeHandle
+    local dragPill
 
     lib.Flags = {}
     lib.Setters = {}
@@ -705,6 +706,9 @@ local function CreateBaselined(data)
                     
                     tw:Create(btnMinMax, tInfo, {BackgroundTransparency = 1}):Play()
                     tw:Create(btnClose, tInfo, {BackgroundTransparency = 1}):Play()
+                    if dragPill then
+                        tw:Create(dragPill, tInfo, {BackgroundTransparency = 1}):Play()
+                    end
                     
                     setIconTrans(icnMinMax, 1, 0.4)
                     setIconTrans(icnClose, 1, 0.4)
@@ -865,6 +869,8 @@ local function CreateBaselined(data)
         for _,v in pairs(objs.fg) do             
             if v:IsA("ImageLabel") or v:IsA("ImageButton") then
                 t(v, "ImageColor3", curTheme.fg, d)
+            elseif v == dragPill then
+                t(v, "BackgroundColor3", curTheme.fg, d)
             else
                 t(v, "TextColor3", curTheme.fg, d) 
             end 
@@ -1005,7 +1011,8 @@ local function CreateBaselined(data)
         end
         
         if targetIdx == lib.ActiveTabIndex then return end
-        
+        local isFirstLoad = (lib.ActiveTabIndex == 0)
+
         local dir = (targetIdx > lib.ActiveTabIndex) and 1 or -1
         if lib.ActiveTabIndex == 0 then dir = 0 end 
         
@@ -1025,17 +1032,24 @@ local function CreateBaselined(data)
                         tData.data.icon.FontFace = iconFontFilled
                     end
                 end
-                            
+
                 task.spawn(function()
                     rs.RenderStepped:Wait() 
                     rs.RenderStepped:Wait()
                     local btnCenterX = (btn.AbsolutePosition.X - tabListCont.AbsolutePosition.X) + tabListCont.CanvasPosition.X + (btn.AbsoluteSize.X / 2)
                     local contentWidth = tData.data.lbl.TextBounds.X
                    
-                    tw:Create(indicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-                         Size = UDim2.new(0, contentWidth, 0, 3),
-                         Position = UDim2.new(0, btnCenterX, 1, 0)
-                    }):Play()
+                    if isFirstLoad then
+                        tw:Create(indicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                            Size = UDim2.new(0, contentWidth, 0, 3)
+                        }):Play()
+                        indicator.Position = UDim2.new(0, btnCenterX, 1, 0)
+                    else
+                        tw:Create(indicator, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                             Size = UDim2.new(0, contentWidth, 0, 3),
+                             Position = UDim2.new(0, btnCenterX, 1, 0)
+                        }):Play()
+                    end
                 end)
             else
                 tData.data.active = false
@@ -1994,6 +2008,7 @@ local function CreateBaselined(data)
     function lib:AddSwitch(data)
         local txt = data.Title or "Switch"
         local def = data.Default or false
+        local desc = data.Description
         local iconStr = data.Icon
         local checkIcon = data.ShowCheckIcon or false
         local cb = data.Callback
@@ -2034,6 +2049,10 @@ local function CreateBaselined(data)
         l.TextSize = 16
         l.TextXAlignment = Enum.TextXAlignment.Left
         table.insert(objs.fg, l)
+
+        if desc then
+            l.Text = l.Text .. "\n<font transparency='0.4' size='14'>" .. desc .. "</font>"
+        end
 
         local trk = Instance.new("TextButton", r)
         trk.Size = UDim2.new(0, 52, 0, 32)
@@ -2738,6 +2757,7 @@ local function CreateBaselined(data)
         if lblval == nil then lblval = true end
         local sizeStr = data.Size or "xs"
         local iconStr = data.Icon
+        local desc = data.Description
         local cb = data.Callback
         local flag = data.Flag
         lib.ElementCounter += 1
@@ -2787,6 +2807,10 @@ local function CreateBaselined(data)
         vl.TextSize = 14
         vl.TextXAlignment = Enum.TextXAlignment.Left
         table.insert(objs.fg, vl)
+
+        if desc then
+            vl.Text = vl.Text .. "\n<font transparency='0.4' size='14'>" .. desc .. "</font>"
+        end
 
         local hb = Instance.new("TextButton", r)
         hb.Size = UDim2.new(1, 0, 0, cfg.th)
@@ -3365,6 +3389,7 @@ function lib:AddColorPicker(data)
     local titleText = data.Title or "Color Picker"
     local defColor = data.Default or Color3.new(1, 1, 1)
     local iconStr = data.Icon
+    local desc = data.Description
     local cb = data.Callback
     local flag = data.Flag
     lib.ElementCounter += 1
@@ -3442,6 +3467,10 @@ function lib:AddColorPicker(data)
     lbl.TextWrapped = true
     lbl.AutomaticSize = Enum.AutomaticSize.Y
     table.insert(objs.fg, lbl)
+
+    if desc then
+        lbl.Text = lbl.Text .. "\n<font transparency='0.4' size='14'>" .. desc .. "</font>"
+    end
 
     local btn = Instance.new("TextButton", r)
     btn.Size = UDim2.new(0, 40, 0, 24)
@@ -3853,7 +3882,13 @@ end
     end)
     uis.InputChanged:Connect(function(i)
         if resizing and (i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch")) then
-            win.Size = UDim2.new(0, math.max(320, resStartSize.X + (i.Position - resDragStart).X), 0, math.max(400, resStartSize.Y + (i.Position - resDragStart).Y))
+            local newX = math.max(320, resStartSize.X + (i.Position - resDragStart).X)
+            local newY = math.max(400, resStartSize.Y + (i.Position - resDragStart).Y)
+            win.Size = UDim2.new(0, newX, 0, newY)
+            
+            if dragPill then
+                dragPill.Position = UDim2.new(0.5, 0, 0, newY - 8)
+            end
         end
     end)
     uis.InputEnded:Connect(function(i)
@@ -3915,6 +3950,9 @@ end
                         win.Size = nw
                     end
                     preSize = nw
+                    if dragPill then
+                        dragPill.Position = UDim2.new(0.5, 0, 0, decoded["_WinY"] - 8)
+                    end
                 end
                 
                 if decoded["_PosXS"] and decoded["_PosXO"] and decoded["_PosYS"] and decoded["_PosYO"] then
@@ -3986,34 +4024,84 @@ end
         gui:Destroy()
     end
 
+    local topDragBar = Instance.new("Frame", win)
+    topDragBar.Size = UDim2.new(1, -110, 0, 55)
+    topDragBar.Position = UDim2.new(0, 0, 0, 0)
+    topDragBar.BackgroundTransparency = 1
+
+    dragPill = Instance.new("TextButton", win)
+    dragPill.Size = UDim2.new(0, 72, 0, 4)
+    dragPill.AnchorPoint = Vector2.new(0.5, 1)
+    dragPill.Position = UDim2.new(0.5, 0, 1, -8)
+    dragPill.BackgroundColor3 = curTheme.fg
+    dragPill.BackgroundTransparency = 0
+    dragPill.Active = true
+    dragPill.AutoButtonColor = false
+    dragPill.Text = ""
+    dragPill.ZIndex = 500
+    Instance.new("UICorner", dragPill).CornerRadius = UDim.new(1, 0)
+    table.insert(objs.fg, dragPill)
+
     local d, di, ds, sp
-    win.InputBegan:Connect(function(i) 
+    local pillLastInteract = tick()
+    local pillFaded = false
+
+    local function wakePill()
+        pillLastInteract = tick()
+        if pillFaded then
+            pillFaded = false
+            tw:Create(dragPill, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
+        end
+    end
+
+    local function startDrag(i)
         if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then 
             if isMax then return end 
-            d = true; ds = i.Position; sp = win.Position 
+            d = true
+            ds = i.Position
+            sp = win.Position 
+            wakePill()
         end 
-    end)
-    win.InputEnded:Connect(function(i) 
-        if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then d = false end 
-    end)
+    end
+
+    local function endDrag(i)
+        if i.UserInputType.Name:find("MouseButton1") or i.UserInputType.Name:find("Touch") then 
+            d = false 
+        end 
+    end
+
+    topDragBar.InputBegan:Connect(startDrag)
+    topDragBar.InputEnded:Connect(endDrag)
+
+    dragPill.InputBegan:Connect(startDrag)
+    dragPill.InputEnded:Connect(endDrag)
+    dragPill.MouseEnter:Connect(wakePill)
+    dragPill.MouseMoved:Connect(wakePill)
+
     uis.InputChanged:Connect(function(i) 
-        if i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch") then di = i end 
-    end)
-    rs.RenderStepped:Connect(function() 
-        if d and di and not resizing then 
-            win.Position = UDim2.new(sp.X.Scale, sp.X.Offset + (di.Position - ds).X, sp.Y.Scale, sp.Y.Offset + (di.Position - ds).Y) 
+        if i.UserInputType.Name:find("MouseMovement") or i.UserInputType.Name:find("Touch") then 
+            di = i 
         end 
     end)
 
-    --[[tw:Create(win, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, finalSizeX, 0, finalSizeY), Transparency = 0
-    }):Play()]]
+    rs.RenderStepped:Connect(function() 
+        if d and di and not resizing then 
+            win.Position = UDim2.new(sp.X.Scale, sp.X.Offset + (di.Position - ds).X, sp.Y.Scale, sp.Y.Offset + (di.Position - ds).Y) 
+            wakePill()
+        end 
+
+        if not d and (tick() - pillLastInteract > 1) and not pillFaded then
+            pillFaded = true
+            tw:Create(dragPill, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {BackgroundTransparency = 0.6}):Play()
+        end
+    end)
 
     local splashFrame = Instance.new("Frame", win)
     splashFrame.Size = UDim2.new(1, 0, 1, 0)
     splashFrame.BackgroundColor3 = curTheme.bg
     splashFrame.BorderSizePixel = 0
     splashFrame.ZIndex = 9999
+    splashFrame.Active = true
     Instance.new("UICorner", splashFrame).CornerRadius = UDim.new(0, 16)
     
     local splashIconStr = (data.Icon and data.Icon ~= "") and data.Icon or "auto_awesome"
