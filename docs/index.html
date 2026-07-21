@@ -656,11 +656,11 @@
                         <tr><td>ConfigurationSaving</td><td>table</td><td>Save and load configuration for Baselined (Default: true).</td></tr>
                     </table>
                     <pre><code class="language-lua">local Window = Baselined:Create({
-    Title = "Baselined Hub",
+    Title = "Baselined Preview",
     SizeX = 380,
     SizeY = 520,
     ToggleKey = Enum.KeyCode.K,
-    Theme = "Purple", 
+    Theme = "DefaultLight", 
     Search = true,
     UnlockMouse = true,
     ConfigurationSaving = {
@@ -676,7 +676,7 @@
         print("UI Closed!")
     end
 })
-Window:SetTitle("Baselined Hub V2")</code></pre>
+Window:SetTitle("Baselined Preview Duplicate")</code></pre>
                 </div>
             </section>
             
@@ -697,7 +697,24 @@ end</code></pre>
                 <h2><span class="material-symbols-outlined">palette</span> Theme System <span class="type-chip">System</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">You can change the color palette in real-time with smooth transitions, or create your own custom themes using Material 3 Color Roles (Background, Text, Primary, etc).</p>
-                    <pre><code class="language-lua">Window:ChangeTheme("Red") 
+                    <table class="arg-table">
+                        <tr><th>Internal Themes</th></tr>
+                        <tr><td>DefaultDark, DefaultLight</td></tr>
+                        <tr><td>MonochromeDark, MonochromeLight</td></tr>
+                        <tr><td>PurpleDark, PurpleLight</td></tr>
+                        <tr><td>BlueDark, BlueLight</td></tr>
+                        <tr><td>RedDark, RedLight</td></tr>
+                        <tr><td>GreenDark, GreenLight</td></tr>
+                        <tr><td>OrangeDark, OrangeLight</td></tr>
+                        <tr><td>PinkDark, PinkLight</td></tr>
+                        <tr><td>CyanDark, CyanLight</td></tr>
+                        <tr><td>YellowDark, YellowLight</td></tr>
+                        <tr><td>TealDark, TealLight</td></tr>
+                        <tr><td>IndigoDark, IndigoLight</td></tr>
+                        <tr><td>BrownDark, BrownLight</td></tr>
+                        <tr><td>LimeDark, LimeLight</td></tr>
+                    </table>
+                    <pre><code class="language-lua">Window:ChangeTheme("RedLight") 
 Window:AddTheme("MyCustomDark", {
     Background = Color3.fromRGB(20, 20, 20),      
     Text = Color3.fromRGB(240, 240, 240),         
@@ -779,14 +796,14 @@ Btn:SetIcon("terminal_2")</code></pre>
                 <h2><span class="material-symbols-outlined">toggle_on</span> Switch <span class="type-chip">Element</span></h2>
                 <div class="doc-card">
                     <p class="doc-desc">Toggle elements used to adjust Boolean values (True/False). Features the signature Material 3 capsule animation.</p>
-                    <pre><code class="language-lua">local AutoFarmToggle = MainTab:AddSwitch({
-    Title = "Auto Farm",
+                    <pre><code class="language-lua">local FarmToggle = MainTab:AddSwitch({
+    Title = "Switch Example",
     Default = false,
     ShowCheckIcon = true,
     Icon = "bolt",
-    Flag = "Toggle_AutoFarm", 
+    Flag = "Switch", 
     Callback = function(state)
-        print("Auto Farm is now:", state)
+        print("Switch:", state)
     end
 })
 AutoFarmToggle:SetValue(true) 
