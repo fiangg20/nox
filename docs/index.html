@@ -781,6 +781,7 @@ Btn:SetIcon("terminal_2")</code></pre>
                     <p class="doc-desc">Toggle elements used to adjust Boolean values (True/False). Features the signature Material 3 capsule animation.</p>
                     <pre><code class="language-lua">local AutoFarmToggle = MainTab:AddSwitch({
     Title = "Auto Farm",
+    Description = "Use Auto Farm",
     Default = false,
     ShowCheckIcon = true,
     Icon = "bolt",
@@ -809,6 +810,7 @@ AutoFarmToggle:SetIcon("bolt_boost")</code></pre>
                     </table>
                     <pre><code class="language-lua">local SpeedSlider = MainTab:AddSlider({
     Title = "WalkSpeed",
+    Description = "Set Walkspeed",
     Min = 16,
     Max = 200,
     Default = 16,
@@ -851,6 +853,7 @@ TargetBox:SetIcon("person_check")</code></pre>
                     <p class="doc-desc">Color picker. Built using Material Design 3 guidelines (although there is no color picker in Material Design 3).</p>
                     <pre><code class="language-lua">local PickColor = MainTab:AddColorPicker({
     Title = "Pick Some Color",
+    Description = "Pick some random color",
     Default = Color3.fromRGB(255, 255, 255),
     Icon = "format_color_fill",
     Flag = "Color_Picker",
