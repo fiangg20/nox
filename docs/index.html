@@ -701,6 +701,7 @@
                         <tr><td>Search</td><td>boolean</td><td>Displays a Search Bar at the top of the UI (Default: false).</td></tr>
                         <tr><td>UnlockMouse</td><td>boolean</td><td>Unlock mouse while in FPS (Default: true).</td></tr>
                         <tr><td>ConfigurationSaving</td><td>table</td><td>Save and load configuration for Baselined (Default: true).</td></tr>
+                        <tr><td>UseIntegratedSettings</td><td>table</td><td>Use intergated Settings tab for your Window UI (Default: false).</td></tr>
                     </table>
                     <pre><code class="language-lua">local Window = Baselined:Create({
     Title = "Baselined Preview",
@@ -708,13 +709,13 @@
     SizeY = 520,
     ToggleKey = Enum.KeyCode.K,
     Theme = "DefaultLight", 
+    UseIntegratedSettings = true,
     Search = true,
     UnlockMouse = true,
     ConfigurationSaving = {
         Enabled = true,
         FolderName = "BaselinedDocs",
         FileName = "Default",
-        UseIntegratedConfigurationSystem = true
     },
     SearchPlaceholder = "Search features...",
     OnSearch = function(text)
