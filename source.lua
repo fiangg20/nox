@@ -245,6 +245,7 @@ local function CreateBaselined(data)
     local finalSizeY = data.SizeY or 520
     local toggleKey = data.ToggleKey or Enum.KeyCode.K
     local initTheme = data.Theme or "Default"
+    local useSettings = data.UseIntegratedSettings or false
     local enableSearch = data.Search or false
     local searchPlaceholder = data.SearchPlaceholder or "Search..."
     local unlockMouse = data.UnlockMouse
@@ -253,7 +254,6 @@ local function CreateBaselined(data)
     local configEnabled = configData.Enabled or false
     local configFolder = configData.FolderName or "BaselinedConfigs"
     local configDefaultFile = configData.FileName or "BaselinedConfig"
-    local configUseConfig = configData.UseIntegratedConfigurationSystem or false
     local configExt = ".ultrs"
     local searchCb = data.OnSearch
     local searchAvatar = data.SearchAvatar or getDefaultAvatar()
@@ -3932,7 +3932,9 @@ end
                 if decoded["_WinX"] and decoded["_WinY"] then
                     local nw = UDim2.new(0, decoded["_WinX"], 0, decoded["_WinY"])
                     if not isMin then
-                        win.Size = nw
+                    tw:Create(win, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        Size = nw
+                    }):Play()
                     end
                     preSize = nw
                     if dragPill then
@@ -3942,7 +3944,10 @@ end
                 
                 if decoded["_PosXS"] and decoded["_PosXO"] and decoded["_PosYS"] and decoded["_PosYO"] then
                     local np = UDim2.new(decoded["_PosXS"], decoded["_PosXO"], decoded["_PosYS"], decoded["_PosYO"])
-                    win.Position = np
+                    tw:Create(win, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+                        Position = np
+                    }):Play()
+                    Position = np
                     prePos = np
                 end
                 
@@ -4142,7 +4147,7 @@ end
         task.wait(0.012)
     end
 
-    if configEnabled and configUseConfig then
+    if useSettings then
         task.defer(function()
             local cfgTab = lib:AddTab({Title = "Configuration", Icon = "settings"})
             
