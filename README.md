@@ -5,3 +5,6 @@ Documentation [Baselined Documentation](https://fiangg20.github.io/nox/index.htm
 MIT License. See [LICENSE](LICENSE).
 
 Copyright (c) 2026 Bases.
+
+## Note
+ + Nox rebranded into **Baselined**.
