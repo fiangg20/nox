@@ -17,7 +17,7 @@ local http = game:GetService("HttpService")
 local folderName = "BaselinedAssets"
 local jsonName = "m3font.json"
 local ttfName = "GoogleSans.ttf"
-local fontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/font.ttf"
+local fontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/fonts/font.ttf"
 
 local function getDefaultAvatar()
     local success, player = pcall(function()
@@ -47,7 +47,7 @@ local m3Font = Font.new(getcustomasset(pathJSON))
 
 local iconTtfName = "MaterialIcons.ttf"
 local iconJsonName = "materialicons.json"
-local iconFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/MaterialIcons.ttf" 
+local iconFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/fonts/defaulticons.ttf" 
 
 if not isfile(folderName .. "/" .. iconTtfName) then
     writefile(folderName .. "/" .. iconTtfName, game:HttpGet(iconFontUrl))
@@ -61,7 +61,7 @@ local iconFontFilled = Font.new(getcustomasset(iconPathJSON))
 
 local iconOutTtfName = "MaterialIconsOutlined.ttf"
 local iconOutJsonName = "materialiconsoutlined.json"
-local iconOutFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/MaterialIconsOutlined.otf" 
+local iconOutFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/fonts/outlinedicons.otf" 
 
 if not isfile(folderName .. "/" .. iconOutTtfName) then
     writefile(folderName .. "/" .. iconOutTtfName, game:HttpGet(iconOutFontUrl))
