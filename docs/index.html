@@ -401,6 +401,14 @@
             color: var(--md-sys-color-on-surface);
             font-size: 1.05rem;
         }
+        .doc-image {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            object-fit: cover;
+            display: block;
+        }
         .arg-table {
             width: 100%;
             border-collapse: collapse;
@@ -658,7 +666,8 @@
             <div class="nav-label">Popups & Overlays</div>
             <a href="#notify" class="nav-item"><span class="material-symbols-outlined">notifications</span> Notification</a>
             <a href="#dialog" class="nav-item"><span class="material-symbols-outlined">chat_bubble</span> Dialog</a>
-            <div class="nav-label">Credits</div>
+            <div class="nav-label">Others</div>
+            <a href="#example" class="nav-item"><span class="material-symbols-outlined">code</span> Example</a>
             <a href="#credits" class="nav-item"><span class="material-symbols-outlined">group</span> Credits</a>
         </nav>
 
@@ -1084,6 +1093,19 @@ section:SetText("More Beautiful Section")</code></pre>
         }
     }
 })</code></pre>
+                </div>
+            </section>
+
+            <section id="example" class="content-section">
+                <h2><span class="material-symbols-outlined">code</span> Example</h2>
+                <div class="doc-card">
+                    <p class="doc-desc">Want to try some Example?</p>
+                    <img src="https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/docs/baselined-example.png" alt="Preview" class="doc-image">
+                    <p class="doc-desc" style="font-size: 0.95rem; margin-top: -0.5rem; background: rgba(208, 188, 255, 0.1); padding: 12px; border-radius: 8px; display: inline-block;">
+                        <span class="material-symbols-outlined icon-filled" style="font-size: 18px; vertical-align: text-bottom; color: var(--md-sys-color-primary);">code</span> 
+                        Open Website
+                        <a href="https://roscripts.io/s/baselined-example-ui-library" target="_blank" style="color: var(--md-sys-color-primary); text-decoration: underline; font-weight: 500;">Baselined Example UI Library</a>
+                    </p>
                 </div>
             </section>
 
