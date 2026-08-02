@@ -346,7 +346,7 @@ local function CreateBaselined(data)
     top.RichText = true
     top.Text = titleText or "Baselined"
     top.TextColor3 = curTheme.fg
-    top.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+    top.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
     top.TextSize = 22
     top.TextXAlignment = Enum.TextXAlignment.Left
     top.TextTruncate = Enum.TextTruncate.AtEnd
