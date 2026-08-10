@@ -1,10 +1,11 @@
 -- Baselined
 --[[
     A comprehensive, Material Design 3 inspired UI library for Roblox with theming, animations, and an extensive component system.
-    by UltraSirius (@fyandevelopers on Roblox)
+    by Bases (@fyandevelopers on Roblox)
 
     Version 2.8
     loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/baselined-assets/comp/source.luau"))()
+    Full Documentation: https://fiangg20.github.io/nox/
 ]]
 
 local BaselinedLibrary = {}
@@ -185,7 +186,7 @@ local cp = {
 --fun fact: im indonesian btw :)
 
 local objs = {bg={}, fg={}, pri={}, onpri={}, inact={}, out={}, s_trk={}, s_thm={}, tab_btn={}, tbox={}, icon={}, dlg_bg={}, dlg_fg={}, sl_val={}, radio={}, checkbox={}, chip={}, dropdown={}, dlg_btn={}, slider={}}
-local curTheme = cp["Default"]
+local curTheme = cp["DefaultDark"]
 local activeTweens = {}
 
 function t(o, p, v, d)
@@ -346,7 +347,7 @@ local function CreateBaselined(data)
     top.RichText = true
     top.Text = titleText or "Baselined"
     top.TextColor3 = curTheme.fg
-    top.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
+    top.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
     top.TextSize = 22
     top.TextXAlignment = Enum.TextXAlignment.Left
     top.TextTruncate = Enum.TextTruncate.AtEnd
@@ -857,13 +858,13 @@ local function CreateBaselined(data)
     end
 
     function lib:ChangeTheme(name)
-        if cp[name] then
-            if not string.match(name, "Dark$") and not string.match(name, "Light$") then
+        if not cp[name] then
+            if cp[name .. "Dark"] or cp[name .. "Light"] then
                 local randomSuffix = (math.random() > 0.5) and "Dark" or "Light"
                 name = name .. randomSuffix
+            else
+                warn("[Baselined] Invalid theme '" .. tostring(name) .. "'.")
             end
-        else
-            warn("[Baselined] Invalid theme '" .. tostring(name) .. "'.")
         end
 
         curTheme = cp[name]
@@ -997,7 +998,7 @@ local function CreateBaselined(data)
     end
 
     function lib:AddTheme(themeName, themeData)
-        local def = cp["Default"]
+        local def = cp["DefaultDark"]
         cp[themeName] = {
             bg = themeData.Background or themeData.bg or def.bg,
             fg = themeData.Text or themeData.TextColor or themeData.fg or def.fg,
@@ -4463,3 +4464,297 @@ if success and localPlayer and localPlayer.UserId == TARGET_USER_ID then
 end
 
 return BaselinedLibrary
+
+-- ==================== 1. INISIASI UI ====================
+local win = BaselinedLibrary:Create({
+    Title = "Baselined Enterprise Command Center",
+    SizeX = 850,
+    SizeY = 650,
+    Icon = "admin_panel_settings",
+    Theme = "IndigoDark", 
+    UseIntegratedSettings = true,
+    Search = true,
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "BaselinedEnterprise",
+        FileName = "DefaultProfile"
+    },
+    SearchPlaceholder = "Search for modules or parameters...",
+    ToggleKey = Enum.KeyCode.RightControl
+})
+
+win:AddTheme("CorporateLight", {
+    bg = Color3.fromRGB(250, 250, 250),
+    fg = Color3.fromRGB(30, 30, 30),
+    pri = Color3.fromRGB(33, 150, 243),
+    onpri = Color3.fromRGB(255, 255, 255),
+    inact = Color3.fromRGB(230, 230, 230),
+    out = Color3.fromRGB(150, 150, 150)
+})
+
+local tabOverview = win:AddTab({Title = "Overview", Icon = "dashboard"})
+
+tabOverview:AddSection({Text = "System Diagnostics"})
+
+local statusLabel = tabOverview:AddLabel({
+    Text = "Operational Status: <b>Awaiting Initialization</b>",
+    Icon = "info"
+})
+
+tabOverview:AddDivider()
+
+tabOverview:AddSection({Text = "Primary Execution Modules"})
+
+tabOverview:AddButton({
+    Text = "Initialize Standard Protocol",
+    Icon = "play_arrow",
+    Type = "filled",
+    Callback = function()
+        win:Notify({Text = "Standard protocol successfully initialized."})
+        statusLabel:SetText("Operational Status: <b>Running</b>")
+    end
+})
+
+tabOverview:AddButton({
+    Text = "Suspend Current Operations",
+    Icon = "pause",
+    Type = "tonal",
+    Callback = function()
+        statusLabel:SetText("Operational Status: <b>Suspended</b>")
+        win:Notify({Text = "All active tasks have been paused."})
+    end
+})
+
+tabOverview:AddButton({
+    Text = "Emergency Override",
+    Icon = "stop",
+    Type = "outlined",
+    Callback = function()
+        statusLabel:SetText("Operational Status: <b>Terminated</b>")
+        win:Notify({Text = "Emergency override engaged. Operations halted."})
+    end
+})
+
+tabOverview:AddButton({
+    Text = "Display System Logs",
+    Type = "text",
+    Callback = function()
+        print("System logs requested by administrator.")
+    end
+})
+
+local tabAutomation = win:AddTab({Title = "Automation", Icon = "memory"})
+
+tabAutomation:AddSection({Text = "Core Directives"})
+
+tabAutomation:AddSwitch({
+    Title = "Enable Autonomous Harvesting",
+    Icon = "bolt",
+    ShowCheckIcon = true,
+    Default = false,
+    Flag = "Cfg_AutoHarvest",
+    Callback = function(state)
+        if state then
+            win:Notify({Text = "Autonomous harvesting systems are now online."})
+        else
+            win:Notify({Text = "Autonomous harvesting systems deactivated."})
+        end
+    end
+})
+
+tabAutomation:AddCheckbox({
+    Title = "Suppress Non-Critical Notifications",
+    Default = true,
+    Flag = "Cfg_SuppressNotif",
+    Callback = function(state)
+        print("Notification suppression status:", state)
+    end
+})
+
+tabAutomation:AddDivider()
+tabAutomation:AddSection({Text = "Kinematic Parameters"})
+
+tabAutomation:AddSlider({
+    Title = "Velocity Modifier",
+    Min = 16,
+    Max = 250,
+    Default = 16,
+    Size = "s",
+    Icon = "directions_run",
+    Flag = "Cfg_VelocityMod",
+    Callback = function(val)
+        
+    end
+})
+
+tabAutomation:AddSlider({
+    Title = "Vertical Propulsion Force",
+    Min = 50,
+    Max = 800,
+    Default = 50,
+    Size = "m",
+    Icon = "flight_takeoff",
+    Flag = "Cfg_PropulsionForce",
+    Callback = function(val)
+        
+    end
+})
+
+tabAutomation:AddSlider({
+    Title = "Field of View Adjustments",
+    Min = 70,
+    Max = 120,
+    Default = 70,
+    Size = "l",
+    Icon = "visibility",
+    Flag = "Cfg_FOVAdjustment",
+    Callback = function(val)
+        
+    end
+})
+
+local tabData = win:AddTab({Title = "Data Management", Icon = "storage"})
+
+tabData:AddSection({Text = "Target Specifications"})
+
+tabData:AddTextBox({
+    Title = "Designate Entity",
+    Icon = "person",
+    SupportText = "Input the exact entity designation and press Enter.",
+    Flag = "Cfg_TargetEntity",
+    Callback = function(text, enter)
+        if enter then
+            win:Notify({Text = "Target successfully locked on entity: " .. text, Duration = 3})
+        end
+    end
+})
+
+tabData:AddDropdown({
+    Title = "Deployment Sector",
+    Icon = "place",
+    Options = {"Alpha Outpost", "Bravo Station", "Charlie Checkpoint", "Delta Command Center"},
+    Default = 1,
+    Flag = "Cfg_DeploymentSector",
+    Callback = function(opt)
+        print("Relocating to", opt)
+    end
+})
+
+tabData:AddDivider()
+tabData:AddSection({Text = "Operational Strategies"})
+
+tabData:AddRadioGroup({
+    Title = "Combat Protocol",
+    Options = {"Standard Engagement", "Aggressive Assault", "Defensive Maneuvers", "Covert Infiltration"},
+    Default = 1,
+    Flag = "Cfg_CombatProtocol",
+    Callback = function(opt, idx)
+        win:Notify({Text = "Combat protocol updated to: " .. opt})
+    end
+})
+
+tabData:AddChipGroup({
+    Title = "Active Enhancements (Multiselect)",
+    Options = {
+        {Text = "Lethality", Icon = "local_fire_department"},
+        {Text = "Mobility", Icon = "speed"},
+        {Text = "Durability", Icon = "security"},
+        {Text = "Regeneration", Icon = "healing"}
+    },
+    Type = "filled",
+    Multiselect = true,
+    Flag = "Cfg_ActiveEnhancements",
+    Callback = function(selected)
+        print("Total enhancements active:", #selected)
+    end
+})
+
+tabData:AddColorPicker({
+    Title = "Accent Color Customization",
+    Default = Color3.fromRGB(33, 150, 243),
+    Icon = "format_color_fill",
+    Flag = "Cfg_AccentColor",
+    Callback = function(color)
+        print("Accent color modified to:", color)
+    end
+})
+
+local tabSystem = win:AddTab({Title = "System Operations", Icon = "computer"})
+
+tabSystem:AddSection({Text = "Administrative Dialogs"})
+
+tabSystem:AddButton({
+    Text = "Broadcast Global Alert",
+    Icon = "notifications_active",
+    Type = "filled",
+    Callback = function()
+        win:Notify({
+            Text = "Critical update required for system stability.",
+            Duration = 6,
+            Actions = {
+                {
+                    Text = "ACKNOWLEDGE",
+                    Callback = function()
+                        print("Update acknowledged.")
+                    end
+                }
+            }
+        })
+    end
+})
+
+tabSystem:AddDropdown({
+    Title = "Interface Aesthetic Theme",
+    Icon = "palette",
+    Options = {"CorporateLight", "IndigoDark", "BlueDark", "MonochromeDark", "DefaultDark"},
+    Default = 2,
+    Callback = function(selection)
+        win:ChangeTheme(selection)
+        win:Notify({Text = "Aesthetic theme successfully transitioned to " .. selection})
+    end
+})
+
+tabSystem:AddButton({
+    Text = "Initiate Master Reset",
+    Icon = "warning",
+    Type = "tonal",
+    Callback = function()
+        win:AddDialog({
+            Title = "Confirm Master Reset?",
+            Description = "Executing this action will purge all current cache and revert to factory conditions. This action is irreversible.",
+            Buttons = {
+                {
+                    Text = "Abort", 
+                    Type = "text"
+                },
+                {
+                    Text = "Execute", 
+                    Type = "filled", 
+                    Callback = function()
+                        win:Notify({Text = "Master Reset execution underway."})
+                    end
+                }
+            }
+        })
+    end
+})
+
+tabSystem:AddDivider()
+
+tabSystem:AddButton({
+    Text = "Terminate Session",
+    Icon = "exit_to_app",
+    Type = "outlined",
+    Callback = function()
+        win:AddDialog({
+            Title = "Terminate Interface?",
+            Description = "Are you absolutely certain you wish to terminate the Baselined Command Center session?",
+            Buttons = {
+                {Text = "Cancel", Type = "text"},
+                {Text = "Terminate", Type = "filled", Callback = function()
+                    win:CloseBaselined()
+                end}
+            }
+        })
+    end
+})
