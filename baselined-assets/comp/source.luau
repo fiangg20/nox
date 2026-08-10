@@ -47,29 +47,29 @@ local pathJSON = folderName .. "/" .. jsonName
 writefile(pathJSON, http:JSONEncode(fontJsonData))
 local m3Font = Font.new(getcustomasset(pathJSON))
 
-local iconTtfName = "MaterialIcons.ttf"
-local iconJsonName = "materialicons.json"
+local iconTtfName = "defaulticons.ttf"
+local iconJsonName = "defaulticons.json"
 local iconFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/fonts/defaulticons.ttf" 
 
 if not isfile(folderName .. "/" .. iconTtfName) then
     writefile(folderName .. "/" .. iconTtfName, game:HttpGet(iconFontUrl))
 end
 local iconAssetURL = getcustomasset(folderName .. "/" .. iconTtfName)
-local iconFontJsonData = { name = "MaterialIcons", faces = {{ name = "Regular", weight = 400, style = "normal", assetId = iconAssetURL }} }
+local iconFontJsonData = { name = "defaulticons", faces = {{ name = "Regular", weight = 400, style = "normal", assetId = iconAssetURL }} }
 local iconPathJSON = folderName .. "/" .. iconJsonName
 writefile(iconPathJSON, http:JSONEncode(iconFontJsonData))
 
 local iconFontFilled = Font.new(getcustomasset(iconPathJSON))
 
-local iconOutTtfName = "MaterialIconsOutlined.ttf"
-local iconOutJsonName = "materialiconsoutlined.json"
+local iconOutTtfName = "outlinedicons.ttf"
+local iconOutJsonName = "outlinedicons.json"
 local iconOutFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/fonts/outlinedicons.otf" 
 
 if not isfile(folderName .. "/" .. iconOutTtfName) then
     writefile(folderName .. "/" .. iconOutTtfName, game:HttpGet(iconOutFontUrl))
 end
 local iconOutAssetURL = getcustomasset(folderName .. "/" .. iconOutTtfName)
-local iconOutJsonData = { name = "MaterialIconsOutlined", faces = {{ name = "Regular", weight = 400, style = "normal", assetId = iconOutAssetURL }} }
+local iconOutJsonData = { name = "outlinedicons", faces = {{ name = "Regular", weight = 400, style = "normal", assetId = iconOutAssetURL }} }
 local iconOutPathJSON = folderName .. "/" .. iconOutJsonName
 writefile(iconOutPathJSON, http:JSONEncode(iconOutJsonData))
 
