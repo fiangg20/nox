@@ -17,7 +17,7 @@ local http = game:GetService("HttpService")
 
 local folderName = "BaselinedAssets"
 local jsonName = "basefont.json"
-local ttfName = "GoogleSans.ttf"
+local ttfName = "basefont.ttf"
 local fontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/baselined-assets/fonts/font.ttf"
 
 local function getDefaultAvatar()
@@ -39,7 +39,7 @@ if not isfile(folderName .. "/" .. ttfName) then
 end
 local assetURL = getcustomasset(folderName .. "/" .. ttfName)
 local fontJsonData = {
-    name = "CustomFamily_GoogleSans",
+    name = "CustomFamily_Basefont",
     faces = {{ name = "Regular", weight = 400, style = "normal", assetId = assetURL }}
 }
 local pathJSON = folderName .. "/" .. jsonName
@@ -48,7 +48,7 @@ local m3Font = Font.new(getcustomasset(pathJSON))
 
 local iconTtfName = "MaterialIconsNew.ttf"
 local iconJsonName = "materialiconsnew.json"
-local iconFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/baselined-assets/fonts/defaulticons.ttf" 
+local iconFontUrl = "https://github.com/google/material-design-icons/raw/refs/heads/master/font/MaterialIcons-Regular.ttf" 
 
 if not isfile(folderName .. "/" .. iconTtfName) then
     writefile(folderName .. "/" .. iconTtfName, game:HttpGet(iconFontUrl))
@@ -62,7 +62,7 @@ local iconFontFilled = Font.new(getcustomasset(iconPathJSON))
 
 local iconOutOtfName = "MaterialIconsOutlinedNew.otf"
 local iconOutJsonName = "materialiconsoutlinednew.json"
-local iconOutFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/baselined-assets/fonts/outlinedicons.otf" 
+local iconOutFontUrl = "https://github.com/google/material-design-icons/raw/refs/heads/master/font/MaterialIconsOutlined-Regular.otf" 
 
 if not isfile(folderName .. "/" .. iconOutOtfName) then
     writefile(folderName .. "/" .. iconOutOtfName, game:HttpGet(iconOutFontUrl))
@@ -312,9 +312,14 @@ local function CreateBaselined(data)
     notifCont.Size = UDim2.new(1, 0, 1, 0)
     notifCont.BackgroundTransparency = 1
     notifCont.ZIndex = 1000
+    notifCont.AnchorPoint = Vector2.new(0.5, 1)
+    notifCont.Position = UDim2.new(0.5, 0, 1, 0)
 
     local notifPad = Instance.new("UIPadding", notifCont)
     notifPad.PaddingBottom = UDim.new(0, 32)
+    
+    local notifScale = Instance.new("UIScale", notifCont)
+    notifScale.Scale = 1.0
 
     local notifLayout = Instance.new("UIListLayout", notifCont)
     notifLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
@@ -335,6 +340,10 @@ local function CreateBaselined(data)
     
     local winScale = Instance.new("UIScale", win)
     winScale.Scale = 1.0
+
+    winScale:GetPropertyChangedSignal("Scale"):Connect(function()
+        notifScale.Scale = winScale.Scale
+    end)
 
     local topIconObj = nil
     local titleXOffset = 24
@@ -1049,7 +1058,8 @@ local function CreateBaselined(data)
                 task.spawn(function()
                     rs.RenderStepped:Wait() 
                     rs.RenderStepped:Wait()
-                    local btnCenterX = (btn.AbsolutePosition.X - tabListCont.AbsolutePosition.X) + tabListCont.CanvasPosition.X + (btn.AbsoluteSize.X / 2)
+                    local scale = winScale.Scale
+                    local btnCenterX = ((btn.AbsolutePosition.X - tabListCont.AbsolutePosition.X) / scale) + tabListCont.CanvasPosition.X + ((btn.AbsoluteSize.X / scale) / 2)
                     local contentWidth = tData.data.lbl.TextBounds.X
                    
                     if isFirstLoad then
@@ -1526,16 +1536,16 @@ local function CreateBaselined(data)
             local isImg = pIcon and pIcon.type == "image"
             local iconSize = isImg and 40 or 24
             
-            local icn = createIconObj(btn, leadingIcon, UDim2.new(0, iconSize, 0, iconSize), UDim2.new(0.1, -26, 0.5, 0), Vector2.new(0, 0.5), false)
+            local icn = createIconObj(btn, leadingIcon, UDim2.new(0, iconSize, 0, iconSize), UDim2.new(0, 0, 0.5, 0), Vector2.new(0, 0.5), false)
             if icn then
                 if isImg then
                     Instance.new("UICorner", icn).CornerRadius = UDim.new(0, 8)
-                    setIconPosition(icn, UDim2.new(0.1, -33, 0.5, 0), 0)
+                    setIconPosition(icn, UDim2.new(0, 0, 0.5, 0), 0)
                 else
                     setIconColor(icn, curTheme.fg)
                     table.insert(objs.icon, icn)
                 end
-                textOffsetX = 56
+                textOffsetX = iconSize + 12
             end
         end
 
@@ -1544,7 +1554,7 @@ local function CreateBaselined(data)
             if tIcn then
                 setIconColor(tIcn, curTheme.out)
                 table.insert(objs.icon, tIcn)
-                rightOffsetX = 40
+                rightOffsetX = 24 + 12
             end
         end
 
@@ -1647,6 +1657,12 @@ local function CreateBaselined(data)
         table.insert(objs.dlg_bg, dlgBox)
         
         Instance.new("UICorner", dlgBox).CornerRadius = UDim.new(0, 28)
+
+        local dlgScale = Instance.new("UIScale", dlgBox)
+        dlgScale.Scale = winScale.Scale
+        local scaleConn = winScale:GetPropertyChangedSignal("Scale"):Connect(function()
+            dlgScale.Scale = winScale.Scale
+        end)
      
         local dPad = Instance.new("UIPadding", dlgBox)
         dPad.PaddingLeft = UDim.new(0, 24)
@@ -1700,6 +1716,7 @@ local function CreateBaselined(data)
         actLayout.Padding = UDim.new(0, 8)
     
         local function closeDialog()
+            if scaleConn then scaleConn:Disconnect() end
             t(overlay, "BackgroundTransparency", 1, 0.3)
             tw:Create(dlgBox, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
                 Position = UDim2.new(0.5, 0, 0.5, 20), BackgroundTransparency = 1
@@ -2195,6 +2212,8 @@ local function CreateBaselined(data)
         l.FontFace = m3Font
         l.RichText = true
         l.TextSize = 16
+        l.TextWrapped = true
+        l.AutomaticSize = Enum.AutomaticSize.Y
         l.TextXAlignment = Enum.TextXAlignment.Left
         table.insert(objs.fg, l)
 
@@ -3049,9 +3068,10 @@ local function CreateBaselined(data)
             v = m + ((mx - m) * pc)
             valTooltipTxt.Text = string.format("%.2f", v)
             
-            local tx = hb.AbsoluteSize.X * pc
+            local w = hb.AbsoluteSize.X / winScale.Scale
+            local tx = w * pc
             local newActSize = UDim2.new(0, math.max(0, tx - halfGap), 0, cfg.h)
-            local newInactSize = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tx - halfGap), 0, cfg.h)
+            local newInactSize = UDim2.new(0, math.max(0, w - tx - halfGap), 0, cfg.h)
             local newThmPos = UDim2.new(0, tx, 0.5, 0)
 
             local animTime = isClick and 0.3 or 0.05
@@ -3073,18 +3093,20 @@ local function CreateBaselined(data)
 
         task.defer(function()
             local p = (v - m) / (mx - m)
-            local tX = hb.AbsoluteSize.X * p
+            local w = hb.AbsoluteSize.X / winScale.Scale
+            local tX = w * p
             act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
-            inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
+            inact.Size = UDim2.new(0, math.max(0, w - tX - halfGap), 0, cfg.h)
             thm.Position = UDim2.new(0, tX, 0.5, 0)
             updateTrackIcon(tX, 0)
         end)
 
         hb:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
             local p = (v - m) / (mx - m)
-            local tX = hb.AbsoluteSize.X * p
+            local w = hb.AbsoluteSize.X / winScale.Scale
+            local tX = w * p
             act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
-            inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
+            inact.Size = UDim2.new(0, math.max(0, w - tX - halfGap), 0, cfg.h)
             thm.Position = UDim2.new(0, tX, 0.5, 0)
             updateTrackIcon(tX, 0)
         end)
@@ -3139,9 +3161,10 @@ local function CreateBaselined(data)
                 valTooltipTxt.Text = string.format("%.2f", v)
                 
                 local p = (v - m) / (mx - m)
-                local tX = hb.AbsoluteSize.X * p
+                local w = hb.AbsoluteSize.X / winScale.Scale
+                local tX = w * p
                 act.Size = UDim2.new(0, math.max(0, tX - halfGap), 0, cfg.h)
-                inact.Size = UDim2.new(0, math.max(0, hb.AbsoluteSize.X - tX - halfGap), 0, cfg.h)
+                inact.Size = UDim2.new(0, math.max(0, w - tX - halfGap), 0, cfg.h)
                 thm.Position = UDim2.new(0, tX, 0.5, 0)
                 
                 updateTrackIcon(tX, 0.2)
@@ -3166,7 +3189,8 @@ local function CreateBaselined(data)
                     if trackIconObj then
                         trackIconObj.ZIndex = 2
                         local p = (v - m) / (mx - m)
-                        updateTrackIcon(hb.AbsoluteSize.X * p, 0)
+                        local w = hb.AbsoluteSize.X / winScale.Scale
+                        updateTrackIcon(w * p, 0)
                     end
                 end
             end
@@ -4043,7 +4067,21 @@ end
             task.spawn(function()
                 rs.RenderStepped:Wait() rs.RenderStepped:Wait()
                 local btn = lib.Tabs[lib.ActiveTabIndex].btn
-                local btnCenterX = (btn.AbsolutePosition.X - tabListCont.AbsolutePosition.X) + tabListCont.CanvasPosition.X + (btn.AbsoluteSize.X / 2)
+                local scale = winScale.Scale
+                local btnCenterX = ((btn.AbsolutePosition.X - tabListCont.AbsolutePosition.X) / scale) + tabListCont.CanvasPosition.X + ((btn.AbsoluteSize.X / scale) / 2)
+                indicator.Position = UDim2.new(0, btnCenterX, 1, 0)
+                indicator.Size = UDim2.new(0, lib.Tabs[lib.ActiveTabIndex].data.lbl.TextBounds.X, 0, 3)
+            end)
+        end
+    end)
+
+    tabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        if lib.ActiveTabIndex > 0 and lib.Tabs[lib.ActiveTabIndex] then
+            task.spawn(function()
+                rs.RenderStepped:Wait() rs.RenderStepped:Wait()
+                local btn = lib.Tabs[lib.ActiveTabIndex].btn
+                local scale = winScale.Scale
+                local btnCenterX = ((btn.AbsolutePosition.X - tabListCont.AbsolutePosition.X) / scale) + tabListCont.CanvasPosition.X + ((btn.AbsoluteSize.X / scale) / 2)
                 indicator.Position = UDim2.new(0, btnCenterX, 1, 0)
                 indicator.Size = UDim2.new(0, lib.Tabs[lib.ActiveTabIndex].data.lbl.TextBounds.X, 0, 3)
             end)
@@ -4134,7 +4172,7 @@ end
         local list = {}
         if configEnabled and isfolder(configFolder) then
             for _, file in ipairs(listfiles(configFolder)) do
-                local fileName = file:match("([^/\\]+)%" .. configExt .. "$")
+                local fileName = file:match("([^/\]+)%" .. configExt .. "$")
                 if fileName then table.insert(list, fileName) end
             end
         end
