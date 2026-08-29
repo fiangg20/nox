@@ -3,9 +3,8 @@
     A comprehensive, Material Design 3 inspired UI library for Roblox with theming, animations, and an extensive component system.
     by Bases (@fyandevelopers on Roblox)
 
-    Version 2.8
+    Version 2.9
     loadstring(game:HttpGet("https://raw.githubusercontent.com/fiangg20/nox/refs/heads/main/baselined-assets/comp/source.luau"))()
-    Full Documentation: https://fiangg20.github.io/nox/
 ]]
 
 local BaselinedLibrary = {}
@@ -17,9 +16,9 @@ local cg = game:GetService("CoreGui")
 local http = game:GetService("HttpService")
 
 local folderName = "BaselinedAssets"
-local jsonName = "m3font.json"
+local jsonName = "basefont.json"
 local ttfName = "GoogleSans.ttf"
-local fontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/fonts/font.ttf"
+local fontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/baselined-assets/fonts/font.ttf"
 
 local function getDefaultAvatar()
     local success, player = pcall(function()
@@ -47,29 +46,29 @@ local pathJSON = folderName .. "/" .. jsonName
 writefile(pathJSON, http:JSONEncode(fontJsonData))
 local m3Font = Font.new(getcustomasset(pathJSON))
 
-local iconTtfName = "defaulticons.ttf"
-local iconJsonName = "defaulticons.json"
-local iconFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/fonts/defaulticons.ttf" 
+local iconTtfName = "MaterialIconsNew.ttf"
+local iconJsonName = "materialiconsnew.json"
+local iconFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/baselined-assets/fonts/defaulticons.ttf" 
 
 if not isfile(folderName .. "/" .. iconTtfName) then
     writefile(folderName .. "/" .. iconTtfName, game:HttpGet(iconFontUrl))
 end
 local iconAssetURL = getcustomasset(folderName .. "/" .. iconTtfName)
-local iconFontJsonData = { name = "defaulticons", faces = {{ name = "Regular", weight = 400, style = "normal", assetId = iconAssetURL }} }
+local iconFontJsonData = { name = "MaterialIcons", faces = {{ name = "Regular", weight = 400, style = "normal", assetId = iconAssetURL }} }
 local iconPathJSON = folderName .. "/" .. iconJsonName
 writefile(iconPathJSON, http:JSONEncode(iconFontJsonData))
 
 local iconFontFilled = Font.new(getcustomasset(iconPathJSON))
 
-local iconOutTtfName = "outlinedicons.ttf"
-local iconOutJsonName = "outlinedicons.json"
-local iconOutFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/fonts/outlinedicons.otf" 
+local iconOutOtfName = "MaterialIconsOutlinedNew.otf"
+local iconOutJsonName = "materialiconsoutlinednew.json"
+local iconOutFontUrl = "https://github.com/fiangg20/nox/raw/refs/heads/main/baselined-assets/fonts/outlinedicons.otf" 
 
-if not isfile(folderName .. "/" .. iconOutTtfName) then
-    writefile(folderName .. "/" .. iconOutTtfName, game:HttpGet(iconOutFontUrl))
+if not isfile(folderName .. "/" .. iconOutOtfName) then
+    writefile(folderName .. "/" .. iconOutOtfName, game:HttpGet(iconOutFontUrl))
 end
-local iconOutAssetURL = getcustomasset(folderName .. "/" .. iconOutTtfName)
-local iconOutJsonData = { name = "outlinedicons", faces = {{ name = "Regular", weight = 400, style = "normal", assetId = iconOutAssetURL }} }
+local iconOutAssetURL = getcustomasset(folderName .. "/" .. iconOutOtfName)
+local iconOutJsonData = { name = "MaterialIconsOutlined", faces = {{ name = "Regular", weight = 400, style = "normal", assetId = iconOutAssetURL }} }
 local iconOutPathJSON = folderName .. "/" .. iconOutJsonName
 writefile(iconOutPathJSON, http:JSONEncode(iconOutJsonData))
 
@@ -133,6 +132,12 @@ local function setIconColor(obj, color, duration)
     if duration then t(obj, prop, color, duration) else obj[prop] = color end
 end
 
+local function setIconPosition(obj, pos, duration)
+    if not obj then return end
+    local prop = (obj:IsA("ImageLabel") or obj:IsA("ImageButton")) and "Position" or "Position"
+    if duration then t(obj, prop, pos, duration) else obj[prop] = pos end
+end
+
 local function setIconTrans(obj, trans, duration)
     if not obj then return end
     local prop = (obj:IsA("ImageLabel") or obj:IsA("ImageButton")) and "ImageTransparency" or "TextTransparency"
@@ -186,7 +191,7 @@ local cp = {
 --fun fact: im indonesian btw :)
 
 local objs = {bg={}, fg={}, pri={}, onpri={}, inact={}, out={}, s_trk={}, s_thm={}, tab_btn={}, tbox={}, icon={}, dlg_bg={}, dlg_fg={}, sl_val={}, radio={}, checkbox={}, chip={}, dropdown={}, dlg_btn={}, slider={}}
-local curTheme = cp["DefaultDark"]
+local curTheme = cp["Default"]
 local activeTweens = {}
 
 function t(o, p, v, d)
@@ -327,6 +332,9 @@ local function CreateBaselined(data)
     win.Transparency = 1
     table.insert(objs.bg, win)
     Instance.new("UICorner", win).CornerRadius = UDim.new(0, 16)
+    
+    local winScale = Instance.new("UIScale", win)
+    winScale.Scale = 1.0
 
     local topIconObj = nil
     local titleXOffset = 24
@@ -347,7 +355,7 @@ local function CreateBaselined(data)
     top.RichText = true
     top.Text = titleText or "Baselined"
     top.TextColor3 = curTheme.fg
-    top.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+    top.FontFace = Font.new(m3Font.Family, Enum.FontWeight.Bold, Enum.FontStyle.Normal)
     top.TextSize = 22
     top.TextXAlignment = Enum.TextXAlignment.Left
     top.TextTruncate = Enum.TextTruncate.AtEnd
@@ -858,13 +866,13 @@ local function CreateBaselined(data)
     end
 
     function lib:ChangeTheme(name)
-        if not cp[name] then
-            if cp[name .. "Dark"] or cp[name .. "Light"] then
+        if cp[name] then
+            if not string.match(name, "Dark$") and not string.match(name, "Light$") then
                 local randomSuffix = (math.random() > 0.5) and "Dark" or "Light"
                 name = name .. randomSuffix
-            else
-                warn("[Baselined] Invalid theme '" .. tostring(name) .. "'.")
             end
+        else
+            warn("[Baselined] Invalid theme '" .. tostring(name) .. "'.")
         end
 
         curTheme = cp[name]
@@ -998,7 +1006,7 @@ local function CreateBaselined(data)
     end
 
     function lib:AddTheme(themeName, themeData)
-        local def = cp["DefaultDark"]
+        local def = cp["Default"]
         cp[themeName] = {
             bg = themeData.Background or themeData.bg or def.bg,
             fg = themeData.Text or themeData.TextColor or themeData.fg or def.fg,
@@ -1091,6 +1099,7 @@ local function CreateBaselined(data)
     function lib:AddTab(data)
         local txt = data.Title or "Tab"
         local iconStr = data.Icon
+        local isListMode = data.ListMode or false
 
         if not lib.UseTabs then
             lib.UseTabs = true
@@ -1169,14 +1178,14 @@ local function CreateBaselined(data)
         c.Visible = false
         
         local cPad = Instance.new("UIPadding", c)
-        cPad.PaddingLeft = UDim.new(0, 24)
-        cPad.PaddingRight = UDim.new(0, 24)
+        cPad.PaddingLeft = UDim.new(0, isListMode and 0 or 24)
+        cPad.PaddingRight = UDim.new(0, isListMode and 0 or 24)
         cPad.PaddingBottom = UDim.new(0, 20)
         cPad.PaddingTop = UDim.new(0, 20)
 
         local cLayout = Instance.new("UIListLayout", c)
         cLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        cLayout.Padding = UDim.new(0, 18)
+        cLayout.Padding = UDim.new(0, isListMode and 0 or 18)
 
         table.insert(lib.Tabs, {btn = btn, data = tData})
         table.insert(lib.TabContainers, c)
@@ -1224,6 +1233,11 @@ local function CreateBaselined(data)
             __index = function(_, key)
                 if type(lib[key]) == "function" and string.sub(key, 1, 3) == "Add" then
                     return function(_, ...)
+                        if isListMode and key ~= "AddList" then
+                            return setmetatable({}, {
+                                __index = function() return function() end end
+                            })
+                        end
                         local prevContainer = lib.CurrentBuildContainer
                         lib.CurrentBuildContainer = c
                         local result = lib[key](lib, ...)
@@ -1477,6 +1491,136 @@ local function CreateBaselined(data)
                 
                 l.Size = UDim2.new(1, -leftOffset, 0, 32)
                 l.Position = UDim2.new(0, leftOffset, 0, 0)
+            end
+        }
+    end
+
+    function lib:AddList(data)
+        local headline = data.Headline or "List Item"
+        local supportingText = data.SupportingText
+        local leadingIcon = data.LeadingIcon
+        local trailingIcon = data.TrailingIcon
+        local callback = data.Callback
+        
+        lib.ElementCounter += 1
+
+        local hasSupporting = supportingText and supportingText ~= ""
+        local itemHeight = hasSupporting and 72 or 56
+
+        local btn = Instance.new("TextButton", lib.CurrentBuildContainer)
+        btn.LayoutOrder = lib.ElementCounter
+        btn.Size = UDim2.new(1, 0, 0, itemHeight)
+        btn.BackgroundTransparency = 1
+        btn.Text = ""
+        btn.ClipsDescendants = true
+
+        local itemPad = Instance.new("UIPadding", btn)
+        itemPad.PaddingLeft = UDim.new(0, 16)
+        itemPad.PaddingRight = UDim.new(0, 16)
+
+        local textOffsetX = 0
+        local rightOffsetX = 0
+
+        if leadingIcon and leadingIcon ~= "" then
+            local pIcon = parseIcon(leadingIcon)
+            local isImg = pIcon and pIcon.type == "image"
+            local iconSize = isImg and 40 or 24
+            
+            local icn = createIconObj(btn, leadingIcon, UDim2.new(0, iconSize, 0, iconSize), UDim2.new(0.1, -26, 0.5, 0), Vector2.new(0, 0.5), false)
+            if icn then
+                if isImg then
+                    Instance.new("UICorner", icn).CornerRadius = UDim.new(0, 8)
+                    setIconPosition(icn, UDim2.new(0.1, -33, 0.5, 0), 0)
+                else
+                    setIconColor(icn, curTheme.fg)
+                    table.insert(objs.icon, icn)
+                end
+                textOffsetX = 56
+            end
+        end
+
+        if trailingIcon and trailingIcon ~= "" then
+            local tIcn = createIconObj(btn, trailingIcon, UDim2.new(0, 24, 0, 24), UDim2.new(1, 0, 0.5, 0), Vector2.new(1, 0.5), false)
+            if tIcn then
+                setIconColor(tIcn, curTheme.out)
+                table.insert(objs.icon, tIcn)
+                rightOffsetX = 40
+            end
+        end
+
+        local textCont = Instance.new("Frame", btn)
+        textCont.BackgroundTransparency = 1
+        textCont.Position = UDim2.new(0, textOffsetX, 0.5, 0)
+        textCont.Size = UDim2.new(1, -(textOffsetX + rightOffsetX), 0, 0)
+        textCont.AnchorPoint = Vector2.new(0, 0.5)
+        textCont.AutomaticSize = Enum.AutomaticSize.Y
+
+        local tLayout = Instance.new("UIListLayout", textCont)
+        tLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        tLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        tLayout.Padding = UDim.new(0, 2)
+
+        local hdLbl = Instance.new("TextLabel", textCont)
+        hdLbl.BackgroundTransparency = 1
+        hdLbl.Size = UDim2.new(1, 0, 0, 20)
+        hdLbl.Text = headline
+        hdLbl.TextColor3 = curTheme.fg
+        hdLbl.FontFace = m3Font
+        hdLbl.TextSize = 16
+        hdLbl.TextXAlignment = Enum.TextXAlignment.Left
+        hdLbl.RichText = true
+        hdLbl.TextWrapped = true
+        hdLbl.AutomaticSize = Enum.AutomaticSize.Y
+        hdLbl.LayoutOrder = 1
+        table.insert(objs.fg, hdLbl)
+
+        local supLbl
+        if hasSupporting then
+            supLbl = Instance.new("TextLabel", textCont)
+            supLbl.BackgroundTransparency = 1
+            supLbl.Size = UDim2.new(1, 0, 0, 20)
+            supLbl.Text = supportingText
+            supLbl.TextColor3 = curTheme.out
+            supLbl.FontFace = m3Font
+            supLbl.TextSize = 14
+            supLbl.TextXAlignment = Enum.TextXAlignment.Left
+            supLbl.RichText = true
+            supLbl.LayoutOrder = 2
+            table.insert(objs.icon, supLbl)
+            
+            textCont.Size = UDim2.new(1, -(textOffsetX + rightOffsetX), 0, 40)
+        else
+            textCont.Size = UDim2.new(1, -(textOffsetX + rightOffsetX), 0, 20)
+        end
+
+        btn.MouseEnter:Connect(function()
+            t(btn, "BackgroundTransparency", 0.92, 0.2)
+            t(btn, "BackgroundColor3", curTheme.fg, 0.2)
+        end)
+        
+        btn.MouseLeave:Connect(function()
+            t(btn, "BackgroundTransparency", 1, 0.2)
+        end)
+
+        btn.InputBegan:Connect(function(input)
+            RippleEffect(btn, input, curTheme.fg)
+        end)
+        
+        btn.MouseButton1Click:Connect(function()
+            if callback then callback() end
+        end)
+        
+        lib:RegisterElement(btn, headline, "item")
+        
+        return {
+            SetHeadline = function(self, txt)
+                hdLbl.Text = txt
+            end,
+            SetSupportingText = function(self, txt)
+                if supLbl then supLbl.Text = txt end
+            end,
+            SetCallback = function(self, cb)
+                callback = cb
             end
         }
     end
@@ -4278,6 +4422,34 @@ end
                 Icon = "autorenew",
                 Flag = "AutoSaveOnExit",
                 Default = false
+            })
+            
+            cfgTab:AddDivider()
+            cfgTab:AddSection({Text = "Display Options"})
+            
+            local scaleSlider = cfgTab:AddSlider({
+                Title = "UI Scale",
+                Icon = "zoom_in",
+                Min = 0.5,
+                Max = 2,
+                Default = 1,
+                Decimals = 2,
+                Callback = function(val)
+                    if winScale then
+                        t(winScale, "Scale", val, 0.2)
+                    end
+                end
+            })
+            
+            cfgTab:AddButton({
+                Text = "Reset Scale",
+                Icon = "restart_alt",
+                Type = "outlined",
+                Callback = function()
+                    if scaleSlider then
+                        scaleSlider:SetValue(1)
+                    end
+                end
             })
         end)
     end
